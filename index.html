@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth snap-y snap-mandatory h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,6 +60,11 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+
+        /* Enforce Snap Stop */
+        section {
+            scroll-snap-stop: always;
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -83,10 +88,12 @@
     <main class="relative z-10 w-full max-w-[1600px] mx-auto px-4 sm:px-8 md:px-12 opacity-0" id="main-content">
         
         <!-- Hero Section -->
-        <section class="h-screen flex flex-col justify-center pt-20 pb-10 relative" id="hero">
+        <section class="h-screen flex flex-col justify-center pt-20 pb-10 relative snap-start" id="hero">
             <div class="space-y-6 md:space-y-8 parallax-element mt-16 md:mt-32">
                 <p class="text-gray-400 tracking-widest text-sm md:text-base font-code uppercase ml-2 reveal-text">
-                    New York / St. Louis
+                    <span id="loc-nyc" class="cursor-pointer transition-all duration-300 hover:text-blue-400 hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]">New York</span>
+                    <span class="mx-2">/</span>
+                    <span id="loc-stl" class="cursor-pointer transition-all duration-300 hover:text-blue-400 hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]">St. Louis</span>
                 </p>
                 
                 <div class="hover-trigger" data-cursor="text">
@@ -127,13 +134,17 @@
                 </div>
             </div>
             
-            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce reveal-text delay-300">
-                <i data-lucide="chevron-down" class="w-8 h-8 text-gray-500"></i>
+            <!-- Scroll Indicator -->
+            <!-- Wrapped to separate GSAP transform (reveal) from CSS transform (bounce) -->
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-40 reveal-text delay-300">
+                <div id="scroll-indicator" class="animate-bounce cursor-pointer hover-trigger" data-cursor="link">
+                    <i data-lucide="mouse" class="w-8 h-8 text-gray-500"></i>
+                </div>
             </div>
         </section>
 
         <!-- About Section -->
-        <section class="py-24 md:py-32 relative scroll-section">
+        <section id="about" class="min-h-screen flex flex-col justify-center py-24 md:py-32 relative scroll-section snap-start">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
                 <!-- Removed sticky top-32 and glitch-header classes -->
                 <div class="md:col-span-4 text-gray-500 uppercase tracking-widest text-sm font-bold h-fit font-code">
@@ -154,7 +165,7 @@
         </section>
 
         <!-- Experience Section -->
-        <section class="py-24 md:py-32 scroll-section">
+        <section class="min-h-screen flex flex-col justify-center py-24 md:py-32 scroll-section snap-start">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
                 <!-- Removed sticky top-32 and glitch-header classes -->
                 <div class="md:col-span-4 text-gray-500 uppercase tracking-widest text-sm font-bold h-fit font-code">
@@ -223,7 +234,7 @@
         </section>
 
         <!-- WashU Section -->
-        <section class="py-24 md:py-32 bg-white/5 rounded-3xl mx-[-1rem] md:mx-0 px-4 md:px-12 backdrop-blur-sm scroll-section">
+        <section class="min-h-screen flex flex-col justify-center py-24 md:py-32 bg-white/5 rounded-3xl mx-[-1rem] md:mx-0 px-4 md:px-12 backdrop-blur-sm scroll-section snap-start">
             <div class="mb-16 reveal-up">
                 <!-- Removed sticky top-32 and glitch-header classes -->
                 <span class="text-blue-400 uppercase tracking-widest text-sm font-bold block mb-4 font-code">03 / Campus Life</span>
@@ -272,7 +283,7 @@
         </section>
 
         <!-- Projects Section -->
-        <section class="py-24 md:py-32 scroll-section">
+        <section class="min-h-screen flex flex-col justify-center py-24 md:py-32 scroll-section snap-start">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
                 <!-- Removed sticky top-32 and glitch-header classes -->
                 <div class="md:col-span-4 text-gray-500 uppercase tracking-widest text-sm font-bold h-fit font-code">
@@ -325,7 +336,7 @@
         </section>
 
         <!-- Footer -->
-        <footer class="py-20 border-t border-white/10 mt-20 reveal-up">
+        <footer class="py-20 border-t border-white/10 mt-20 reveal-up snap-start">
             <div class="flex flex-col items-start gap-8">
                 
                 <div class="flex gap-4">
@@ -461,6 +472,18 @@
                 scrub: true
             }
         });
+        
+        // Scroll Indicator Click & Fade Logic
+        const scrollIndicator = document.getElementById('scroll-indicator');
+        if (scrollIndicator) {
+            // Click to scroll
+            scrollIndicator.addEventListener('click', () => {
+                const aboutSection = document.getElementById('about');
+                if (aboutSection) {
+                    aboutSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        }
 
         const sections = document.querySelectorAll(".reveal-up");
         sections.forEach(section => {
@@ -483,6 +506,7 @@
         let width, height;
         let particles = [];
         let interactionMode = 'random'; // 'random', 'shape'
+        let isAKMode = false; // State for the "0" key toggle
 
         function resize() {
             width = window.innerWidth;
@@ -518,6 +542,7 @@
             const count = particles.length;
 
             if (type === 'cpu') {
+                // ... (existing CPU logic) ...
                 // CPU: Square Outline + Inner Grid + Pins
                 const size = 140; 
                 const halfSize = size / 2;
@@ -529,89 +554,54 @@
 
                 particles.forEach((p, i) => {
                     if (i < perimeterCount) {
-                        // 1. Square Perimeter
                         const perimeterLen = size * 4;
                         const pos = (i / perimeterCount) * perimeterLen;
-                        
-                        if (pos < size) { // Top
-                            p.tx = (cx - halfSize) + pos;
-                            p.ty = cy - halfSize;
-                        } else if (pos < size * 2) { // Right
-                            p.tx = cx + halfSize;
-                            p.ty = (cy - halfSize) + (pos - size);
-                        } else if (pos < size * 3) { // Bottom
-                            p.tx = (cx + halfSize) - (pos - size * 2);
-                            p.ty = cy + halfSize;
-                        } else { // Left
-                            p.tx = cx - halfSize;
-                            p.ty = (cy + halfSize) - (pos - size * 3);
-                        }
+                        if (pos < size) { p.tx = (cx - halfSize) + pos; p.ty = cy - halfSize; } 
+                        else if (pos < size * 2) { p.tx = cx + halfSize; p.ty = (cy - halfSize) + (pos - size); } 
+                        else if (pos < size * 3) { p.tx = (cx + halfSize) - (pos - size * 2); p.ty = cy + halfSize; } 
+                        else { p.tx = cx - halfSize; p.ty = (cy + halfSize) - (pos - size * 3); }
                     } else if (i < perimeterCount + pinCount) {
-                        // 2. Pins
                         const pinIndex = i - perimeterCount;
                         const pinsPerSide = Math.floor(pinCount / 4);
                         const side = Math.floor(pinIndex / pinsPerSide) % 4;
                         const sideIndex = pinIndex % pinsPerSide;
-                        
-                        // Space pins along the side
                         const spacing = size / pinsPerSide;
                         const offset = (sideIndex * spacing) - halfSize + (spacing/2);
                         const pinLen = 25;
-
-                        if (side === 0) { // Top
-                            p.tx = cx + offset;
-                            p.ty = cy - halfSize - pinLen;
-                        } else if (side === 1) { // Right
-                            p.tx = cx + halfSize + pinLen;
-                            p.ty = cy + offset;
-                        } else if (side === 2) { // Bottom
-                            p.tx = cx + offset;
-                            p.ty = cy + halfSize + pinLen;
-                        } else { // Left
-                            p.tx = cx - halfSize - pinLen;
-                            p.ty = cy + offset;
-                        }
-
+                        if (side === 0) { p.tx = cx + offset; p.ty = cy - halfSize - pinLen; } 
+                        else if (side === 1) { p.tx = cx + halfSize + pinLen; p.ty = cy + offset; } 
+                        else if (side === 2) { p.tx = cx + offset; p.ty = cy + halfSize + pinLen; } 
+                        else { p.tx = cx - halfSize - pinLen; p.ty = cy + offset; }
                     } else {
-                        // 3. Inner Circuitry / Grid
                         const innerIndex = i - perimeterCount - pinCount;
                         const gridSide = Math.ceil(Math.sqrt(innerCount));
-                        const step = (size * 0.6) / gridSide; // Inner box is 60% of size
+                        const step = (size * 0.6) / gridSide; 
                         const start = -(size * 0.6) / 2;
-                        
                         const row = Math.floor(innerIndex / gridSide);
                         const col = innerIndex % gridSide;
-                        
                         p.tx = cx + start + col * step + step/2;
                         p.ty = cy + start + row * step + step/2;
                     }
                 });
 
             } else if (type === 'record') {
-                // Simple Record: Inner Circle + Outer Circle
+                // ... (existing Record logic) ...
                 particles.forEach((p, i) => {
                     let radius, angle;
-                    
-                    // Split particles: 30% for inner circle, 70% for outer circle
                     if (i < count * 0.3) {
-                        // Inner Circle (smaller)
-                        radius = 40 + Math.random() * 2; // Tiny variation for natural look
+                        radius = 40 + Math.random() * 2; 
                         angle = (i / (count * 0.3)) * Math.PI * 2;
                     } else {
-                        // Outer Circle (larger)
                         radius = 100 + Math.random() * 2;
                         angle = ((i - count * 0.3) / (count * 0.7)) * Math.PI * 2;
                     }
-
                     p.tx = cx + Math.cos(angle) * radius;
                     p.ty = cy + Math.sin(angle) * radius;
                 });
 
             } else if (type === 'infinity') {
-                // Lemniscate of Bernoulli (Infinity Symbol)
-                // x = (a * cos(t)) / (1 + sin^2(t))
-                // y = (a * sin(t) * cos(t)) / (1 + sin^2(t))
-                const a = 200; // Scale
+                // ... (existing Infinity logic) ...
+                const a = 200; 
                 particles.forEach((p, i) => {
                     const t = (i / count) * Math.PI * 2;
                     const denom = 1 + Math.sin(t) * Math.sin(t);
@@ -620,380 +610,273 @@
                 });
 
             } else if (type === 'cbn') {
-                // Letters C B N - Bold & Centered
-                const letterW = 80;      // Wider letters
-                const letterH = 120;     // Taller letters
-                const gap = 40;          // Spacing
-                const totalWidth = (letterW * 3) + (gap * 2);
-                const startX = cx - (totalWidth / 2);
-                const strokeWidth = 12;  // Boldness factor
-
+                // ... (existing CBN logic) ...
+                const letterW = 80; const letterH = 120; const gap = 40; const totalWidth = (letterW * 3) + (gap * 2); const startX = cx - (totalWidth / 2); const strokeWidth = 12;
                 particles.forEach((p, i) => {
-                    const group = Math.floor((i / count) * 3); // 0, 1, 2 for C, B, N
-                    const localI = i % Math.floor(count / 3);
-                    const localTotal = Math.floor(count / 3);
-                    const progress = localI / localTotal;
-                    
-                    // Add boldness jitter
-                    const jitterX = (Math.random() - 0.5) * strokeWidth;
-                    const jitterY = (Math.random() - 0.5) * strokeWidth;
-
+                    const group = Math.floor((i / count) * 3); const localI = i % Math.floor(count / 3); const localTotal = Math.floor(count / 3); const progress = localI / localTotal;
+                    const jitterX = (Math.random() - 0.5) * strokeWidth; const jitterY = (Math.random() - 0.5) * strokeWidth;
                     let lx = 0, ly = 0;
-
-                    if (group === 0) { // C
-                        // Arc from 45 deg to 315 deg
-                        // Center of C
-                        const cCenterX = startX + letterW/2;
-                        const cCenterY = cy;
-                        const angle = Math.PI * 0.2 + progress * (Math.PI * 1.6);
-                        
-                        lx = cCenterX + Math.cos(angle) * (letterW/2);
-                        ly = cCenterY + Math.sin(angle) * (letterH/2);
-                    } else if (group === 1) { // B
-                        // Vertical spine + two loops
+                    if (group === 0) { 
+                        const cCenterX = startX + letterW/2; const cCenterY = cy; const angle = Math.PI * 0.2 + progress * (Math.PI * 1.6);
+                        lx = cCenterX + Math.cos(angle) * (letterW/2); ly = cCenterY + Math.sin(angle) * (letterH/2);
+                    } else if (group === 1) { 
                         const bX = startX + letterW + gap;
-                        if (progress < 0.4) { // Vertical spine
-                             lx = bX;
-                             ly = cy - letterH/2 + (progress/0.4) * letterH;
-                        } else if (progress < 0.7) { // Top Loop
-                             const loopProg = (progress - 0.4) / 0.3;
-                             const angle = -Math.PI/2 + loopProg * Math.PI;
-                             lx = bX + Math.cos(angle) * (letterW * 0.6); // Bulge out
-                             ly = cy - letterH/4 + Math.sin(angle) * (letterH/4);
-                        } else { // Bottom Loop
-                             const loopProg = (progress - 0.7) / 0.3;
-                             const angle = -Math.PI/2 + loopProg * Math.PI;
-                             lx = bX + Math.cos(angle) * (letterW * 0.7); // Slightly larger bottom loop
-                             ly = cy + letterH/4 + Math.sin(angle) * (letterH/4);
-                        }
-                    } else { // N
+                        if (progress < 0.4) { lx = bX; ly = cy - letterH/2 + (progress/0.4) * letterH; } 
+                        else if (progress < 0.7) { const loopProg = (progress - 0.4) / 0.3; const angle = -Math.PI/2 + loopProg * Math.PI; lx = bX + Math.cos(angle) * (letterW * 0.6); ly = cy - letterH/4 + Math.sin(angle) * (letterH/4); } 
+                        else { const loopProg = (progress - 0.7) / 0.3; const angle = -Math.PI/2 + loopProg * Math.PI; lx = bX + Math.cos(angle) * (letterW * 0.7); ly = cy + letterH/4 + Math.sin(angle) * (letterH/4); }
+                    } else { 
                         const nX = startX + (letterW + gap) * 2;
-                        if (progress < 0.35) { // Left vertical
-                            lx = nX;
-                            ly = cy + letterH/2 - (progress/0.35) * letterH; // Up
-                        } else if (progress < 0.65) { // Diagonal
-                            const diagProg = (progress - 0.35) / 0.3;
-                            lx = nX + diagProg * letterW;
-                            ly = cy - letterH/2 + diagProg * letterH; // Down
-                        } else { // Right vertical
-                            const vertProg = (progress - 0.65) / 0.35;
-                            lx = nX + letterW;
-                            ly = cy + letterH/2 - vertProg * letterH; // Up
-                        }
+                        if (progress < 0.35) { lx = nX; ly = cy + letterH/2 - (progress/0.35) * letterH; } 
+                        else if (progress < 0.65) { const diagProg = (progress - 0.35) / 0.3; lx = nX + diagProg * letterW; ly = cy - letterH/2 + diagProg * letterH; } 
+                        else { const vertProg = (progress - 0.65) / 0.35; lx = nX + letterW; ly = cy + letterH/2 - vertProg * letterH; }
                     }
-                    p.tx = lx + jitterX;
-                    p.ty = ly + jitterY;
+                    p.tx = lx + jitterX; p.ty = ly + jitterY;
                 });
 
             } else if (type === 'globe') {
-                // Sphere / Globe - Wireframe Style
-                const radius = 130;
-                const tilt = 0.5; // Radians tilt to show curvature
-                
-                // Allocation
-                const silhouetteLimit = Math.floor(count * 0.3); // 30% for outer circle
-                const latLimit = Math.floor(count * 0.6);        // 30% for latitudes
-                                                                 // 40% for longitudes (remainder)
-
-                // Structure Settings
-                const latCount = 5;  // Number of rings
-                const longCount = 8; // Number of vertical lines
-
+                // ... (existing Globe logic) ...
+                const radius = 130; const tilt = 0.5; const silhouetteLimit = Math.floor(count * 0.3); const latLimit = Math.floor(count * 0.6); const latCount = 5; const longCount = 8;
                 particles.forEach((p, i) => {
                     let x, y, z;
-
-                    if (i < silhouetteLimit) {
-                        // 1. Silhouette (Outer Circle)
-                        const angle = (i / silhouetteLimit) * Math.PI * 2;
-                        p.tx = cx + radius * Math.cos(angle);
-                        p.ty = cy + radius * Math.sin(angle);
-                        return;
+                    if (i < silhouetteLimit) { const angle = (i / silhouetteLimit) * Math.PI * 2; p.tx = cx + radius * Math.cos(angle); p.ty = cy + radius * Math.sin(angle); return; }
+                    if (i < latLimit) { 
+                        const subsetSize = latLimit - silhouetteLimit; const idx = i - silhouetteLimit; const latGroupSize = Math.floor(subsetSize / latCount); const latIndex = Math.min(Math.floor(idx / latGroupSize), latCount - 1); const latProg = (idx % latGroupSize) / latGroupSize;
+                        const phi = (Math.PI * 0.15) + (latIndex / (latCount - 1)) * (Math.PI * 0.7); const theta = latProg * Math.PI * 2;
+                        x = radius * Math.sin(phi) * Math.cos(theta); z = radius * Math.sin(phi) * Math.sin(theta); y = radius * Math.cos(phi);
+                    } else { 
+                        const subsetSize = count - latLimit; const idx = i - latLimit; const longGroupSize = Math.floor(subsetSize / longCount); const longIndex = Math.min(Math.floor(idx / longGroupSize), longCount - 1); const longProg = (idx % longGroupSize) / longGroupSize;
+                        const theta = (longIndex / longCount) * Math.PI * 2; const phi = longProg * Math.PI;
+                        x = radius * Math.sin(phi) * Math.cos(theta); z = radius * Math.sin(phi) * Math.sin(theta); y = radius * Math.cos(phi);
                     }
-
-                    // 3D Sphere Math
-                    // Y-axis is vertical (poles), X/Z are equatorial plane
-                    
-                    if (i < latLimit) {
-                        // 2. Latitudes (Horizontal Rings)
-                        const subsetSize = latLimit - silhouetteLimit;
-                        const idx = i - silhouetteLimit;
-                        
-                        // Group particles into rings
-                        const latGroupSize = Math.floor(subsetSize / latCount);
-                        const latIndex = Math.min(Math.floor(idx / latGroupSize), latCount - 1);
-                        const latProg = (idx % latGroupSize) / latGroupSize; // 0 to 1 around ring
-
-                        // Spread latitudes from top to bottom (phi: 0 to PI)
-                        // Avoid exact poles to keep rings visible
-                        const phi = (Math.PI * 0.15) + (latIndex / (latCount - 1)) * (Math.PI * 0.7);
-                        const theta = latProg * Math.PI * 2; // Full circle
-
-                        x = radius * Math.sin(phi) * Math.cos(theta);
-                        z = radius * Math.sin(phi) * Math.sin(theta);
-                        y = radius * Math.cos(phi);
-
-                    } else {
-                        // 3. Longitudes (Vertical Lines)
-                        const subsetSize = count - latLimit;
-                        const idx = i - latLimit;
-                        
-                        const longGroupSize = Math.floor(subsetSize / longCount);
-                        const longIndex = Math.min(Math.floor(idx / longGroupSize), longCount - 1);
-                        const longProg = (idx % longGroupSize) / longGroupSize; // 0 to 1 pole to pole
-
-                        const theta = (longIndex / longCount) * Math.PI * 2; // Angle around equator
-                        const phi = longProg * Math.PI; // Pole to pole
-
-                        x = radius * Math.sin(phi) * Math.cos(theta);
-                        z = radius * Math.sin(phi) * Math.sin(theta);
-                        y = radius * Math.cos(phi);
-                    }
-
-                    // Apply Tilt (Rotate around X-axis)
-                    // y' = y*cos(tilt) - z*sin(tilt)
-                    // z' = y*sin(tilt) + z*cos(tilt) (z' unused for 2D position)
-                    
-                    const rotY = y * Math.cos(tilt) - z * Math.sin(tilt);
-                    
-                    p.tx = cx + x;
-                    p.ty = cy + rotY;
+                    const rotY = y * Math.cos(tilt) - z * Math.sin(tilt); p.tx = cx + x; p.ty = cy + rotY;
                 });
 
             } else if (type === 'nyu') {
-                // NYU Logo + Text - Bold & Centered
-                const torchHeight = 90;
-                const textY = cy + 50;
-                const strokeWidth = 10; // Boldness
-                
-                // Centering Text calculations
-                const letterW = 50;
-                const letterH = 60;
-                const gap = 20;
-                const totalTextW = (letterW * 3) + (gap * 2);
-                const textStartX = cx - (totalTextW / 2);
-
+                // ... (existing NYU logic) ...
+                const torchHeight = 90; const textY = cy + 50; const strokeWidth = 10; const letterW = 50; const letterH = 60; const gap = 20; const totalTextW = (letterW * 3) + (gap * 2); const textStartX = cx - (totalTextW / 2);
                 particles.forEach((p, i) => {
-                    const jitterX = (Math.random() - 0.5) * strokeWidth;
-                    const jitterY = (Math.random() - 0.5) * strokeWidth;
-
-                    if (i < count * 0.25) {
-                        // Torch (Top Center)
-                        const progress = i / (count * 0.25);
-                        // Make torch fuller
-                        const w = 50 * Math.sin(progress * Math.PI); 
-                        const h = torchHeight;
-                        const x = (Math.random() - 0.5) * w; 
-                        const y = -progress * h; 
-                        
-                        p.tx = cx + x;
-                        p.ty = cy + 10 + y; // Position above text
-                    } else {
-                        // Text N Y U logic (omitted for brevity, exists in previous code)
-                        const textIndex = i - Math.floor(count * 0.25);
-                        const textTotal = count - Math.floor(count * 0.25);
-                        const group = Math.floor((textIndex / textTotal) * 3);
-                        const progress = (textIndex % (textTotal/3)) / (textTotal/3);
-                        
+                    const jitterX = (Math.random() - 0.5) * strokeWidth; const jitterY = (Math.random() - 0.5) * strokeWidth;
+                    if (i < count * 0.25) { const progress = i / (count * 0.25); const w = 50 * Math.sin(progress * Math.PI); const h = torchHeight; const x = (Math.random() - 0.5) * w; const y = -progress * h; p.tx = cx + x; p.ty = cy + 10 + y; } 
+                    else {
+                        const textIndex = i - Math.floor(count * 0.25); const textTotal = count - Math.floor(count * 0.25); const group = Math.floor((textIndex / textTotal) * 3); const progress = (textIndex % (textTotal/3)) / (textTotal/3);
                         let lx=0, ly=0;
-                        
-                        if (group === 0) { // N
-                             const currentX = textStartX;
-                             if (progress < 0.35) {
-                                 lx = currentX; 
-                                 ly = textY - letterH/2 + (progress/0.35)*letterH;
-                             } else if (progress < 0.7) {
-                                 const p2 = (progress-0.35)/0.35;
-                                 lx = currentX + p2*letterW;
-                                 ly = textY - letterH/2 + p2*letterH;
-                             } else {
-                                 const p3 = (progress-0.7)/0.3;
-                                 lx = currentX + letterW;
-                                 ly = textY + letterH/2 - p3*letterH;
-                             }
-                        } else if (group === 1) { // Y
-                             const currentX = textStartX + letterW + gap;
-                             if (progress < 0.33) {
-                                 const p2 = progress/0.33;
-                                 lx = currentX + (p2 - 0.5)*letterW + (letterW/2);
-                                 ly = textY - letterH/2 + p2*(letterH/2);
-                             } else if (progress < 0.66) {
-                                 const p2 = (progress-0.33)/0.33;
-                                 lx = currentX + letterW - (p2*0.5*letterW);
-                                 ly = textY - letterH/2 + p2*(letterH/2);
-                             } else {
-                                 const p2 = (progress-0.66)/0.34;
-                                 lx = currentX + letterW/2;
-                                 ly = textY + (p2 * letterH/2);
-                             }
-                        } else { // U
-                             const currentX = textStartX + (letterW + gap) * 2;
-                             if (progress < 0.4) {
-                                 lx = currentX;
-                                 ly = textY - letterH/2 + (progress/0.4)*letterH;
-                             } else if (progress < 0.7) { 
-                                 const p2 = (progress-0.4)/0.3;
-                                 lx = currentX + p2*letterW;
-                                 ly = textY + letterH/2;
-                             } else {
-                                 const p2 = (progress-0.7)/0.3;
-                                 lx = currentX + letterW;
-                                 ly = textY + letterH/2 - p2*letterH;
-                             }
-                        }
-                        p.tx = lx + jitterX;
-                        p.ty = ly + jitterY;
+                        if (group === 0) { const currentX = textStartX; if (progress < 0.35) { lx = currentX; ly = textY - letterH/2 + (progress/0.35)*letterH; } else if (progress < 0.7) { const p2 = (progress-0.35)/0.35; lx = currentX + p2*letterW; ly = textY - letterH/2 + p2*letterH; } else { const p3 = (progress-0.7)/0.3; lx = currentX + letterW; ly = textY + letterH/2 - p3*letterH; } } 
+                        else if (group === 1) { const currentX = textStartX + letterW + gap; if (progress < 0.33) { const p2 = progress/0.33; lx = currentX + (p2 - 0.5)*letterW + (letterW/2); ly = textY - letterH/2 + p2*(letterH/2); } else if (progress < 0.66) { const p2 = (progress-0.33)/0.33; lx = currentX + letterW - (p2*0.5*letterW); ly = textY - letterH/2 + p2*(letterH/2); } else { const p2 = (progress-0.66)/0.34; lx = currentX + letterW/2; ly = textY + (p2 * letterH/2); } } 
+                        else { const currentX = textStartX + (letterW + gap) * 2; if (progress < 0.4) { lx = currentX; ly = textY - letterH/2 + (progress/0.4)*letterH; } else if (progress < 0.7) { const p2 = (progress-0.4)/0.3; lx = currentX + p2*letterW; ly = textY + letterH/2; } else { const p2 = (progress-0.7)/0.3; lx = currentX + letterW; ly = textY + letterH/2 - p2*letterH; } }
+                        p.tx = lx + jitterX; p.ty = ly + jitterY;
                     }
                 });
                 
             } else if (type === 'community') {
-                // Community Icon: 3 People (Center + 2 sides)
+                // ... (existing Community logic) ...
                 particles.forEach((p, i) => {
-                    // Split into 3 groups
-                    const group = Math.floor((i / count) * 3); 
-                    const subProgress = (i % Math.floor(count/3)) / Math.floor(count/3);
-                    
+                    const group = Math.floor((i / count) * 3); const subProgress = (i % Math.floor(count/3)) / Math.floor(count/3);
                     let centerX, centerY, scale;
-                    
-                    if (group === 0) { // Center Person (Larger)
-                        centerX = cx;
-                        centerY = cy - 10;
-                        scale = 1.2;
-                    } else if (group === 1) { // Left Person
-                        centerX = cx - 60;
-                        centerY = cy + 10;
-                        scale = 0.9;
-                    } else { // Right Person
-                        centerX = cx + 60;
-                        centerY = cy + 10;
-                        scale = 0.9;
-                    }
-
-                    // 30% Head, 70% Body
-                    if (subProgress < 0.3) {
-                        // Head (Circle)
-                        const angle = subProgress * (1/0.3) * Math.PI * 2;
-                        const r = 15 * scale;
-                        p.tx = centerX + Math.cos(angle) * r;
-                        p.ty = (centerY - 30 * scale) + Math.sin(angle) * r;
-                    } else {
-                        // Body (Arc)
-                        const arcProg = (subProgress - 0.3) / 0.7;
-                        // Arc from PI to 0 (semi-circleish)
-                        const angle = Math.PI - (arcProg * Math.PI);
-                        const r = 35 * scale;
-                        // Fill the semi circle slightly
-                        const fillR = r * (0.8 + Math.random()*0.2); 
-                        p.tx = centerX + Math.cos(angle) * fillR;
-                        p.ty = (centerY + 10 * scale) - Math.sin(angle) * fillR * 0.6; // Flattened top
-                    }
+                    if (group === 0) { centerX = cx; centerY = cy - 10; scale = 1.2; } else if (group === 1) { centerX = cx - 60; centerY = cy + 10; scale = 0.9; } else { centerX = cx + 60; centerY = cy + 10; scale = 0.9; }
+                    if (subProgress < 0.3) { const angle = subProgress * (1/0.3) * Math.PI * 2; const r = 15 * scale; p.tx = centerX + Math.cos(angle) * r; p.ty = (centerY - 30 * scale) + Math.sin(angle) * r; } 
+                    else { const arcProg = (subProgress - 0.3) / 0.7; const angle = Math.PI - (arcProg * Math.PI); const r = 35 * scale; const fillR = r * (0.8 + Math.random()*0.2); p.tx = centerX + Math.cos(angle) * fillR; p.ty = (centerY + 10 * scale) - Math.sin(angle) * fillR * 0.6; }
                 });
 
             } else if (type === 'stock') {
-                // Stock Graph (Zig Zag Up)
-                // Points relative to center
-                const points = [
-                    {x: -120, y: 60},
-                    {x: -70, y: 20},
-                    {x: -30, y: 50},
-                    {x: 20, y: -20},
-                    {x: 70, y: 10},
-                    {x: 120, y: -70}
-                ];
-
+                // ... (existing Stock logic) ...
+                const points = [{x: -120, y: 60}, {x: -70, y: 20}, {x: -30, y: 50}, {x: 20, y: -20}, {x: 70, y: 10}, {x: 120, y: -70}];
                 particles.forEach((p, i) => {
-                    // Distribute along segments
-                    // 5 segments
-                    const segmentCount = points.length - 1;
-                    const particlesPerSeg = Math.floor(count / segmentCount);
-                    const segIndex = Math.min(Math.floor(i / particlesPerSeg), segmentCount - 1);
-                    const prog = (i % particlesPerSeg) / particlesPerSeg;
-
-                    const p1 = points[segIndex];
-                    const p2 = points[segIndex + 1];
-
-                    // Add some thickness/scatter to line
-                    const scatter = (Math.random() - 0.5) * 4;
-
-                    p.tx = cx + p1.x + (p2.x - p1.x) * prog + scatter;
-                    p.ty = cy + p1.y + (p2.y - p1.y) * prog + scatter;
+                    const segmentCount = points.length - 1; const particlesPerSeg = Math.floor(count / segmentCount); const segIndex = Math.min(Math.floor(i / particlesPerSeg), segmentCount - 1); const prog = (i % particlesPerSeg) / particlesPerSeg;
+                    const p1 = points[segIndex]; const p2 = points[segIndex + 1]; const scatter = (Math.random() - 0.5) * 4;
+                    p.tx = cx + p1.x + (p2.x - p1.x) * prog + scatter; p.ty = cy + p1.y + (p2.y - p1.y) * prog + scatter;
                 });
 
             } else if (type === 'wave') {
-                // Radio Waves (Sine Waves)
+                // ... (existing Wave logic) ...
                 particles.forEach((p, i) => {
-                    // 3 Lines
-                    const line = Math.floor((i/count) * 3);
-                    const prog = (i % Math.floor(count/3)) / Math.floor(count/3); // 0 to 1
-                    
-                    const width = 240;
-                    const x = (prog * width) - (width/2);
-                    
-                    // Freq
-                    const freq = 0.05;
-                    // Amplitude
-                    let amp = 40;
-                    if (line === 0) amp = 20;
-                    if (line === 2) amp = 60;
-
-                    const y = Math.sin(x * freq + (line * Math.PI/4)) * amp;
-                    
-                    p.tx = cx + x;
-                    p.ty = cy + y;
+                    const line = Math.floor((i/count) * 3); const prog = (i % Math.floor(count/3)) / Math.floor(count/3); const width = 240; const x = (prog * width) - (width/2);
+                    const freq = 0.05; let amp = 40; if (line === 0) amp = 20; if (line === 2) amp = 60; const y = Math.sin(x * freq + (line * Math.PI/4)) * amp; p.tx = cx + x; p.ty = cy + y;
                 });
 
             } else if (type === 'music') {
-                // Beamed Notes
-                // Two heads, two stems, one beam
-                const headY = cy + 40;
-                const headR = 15;
-                const stemH = 70;
-                const noteX1 = cx - 30;
-                const noteX2 = cx + 40; // Slight slant
+                // ... (existing Music logic) ...
+                const headY = cy + 40; const headR = 15; const stemH = 70; const noteX1 = cx - 30; const noteX2 = cx + 40;
+                particles.forEach((p, i) => {
+                    const section = Math.floor((i/count) * 5); const prog = (i % Math.floor(count/5)) / Math.floor(count/5);
+                    if (section === 0) { const angle = prog * Math.PI * 2; const r = Math.random() * headR; p.tx = noteX1 + Math.cos(angle) * r; p.ty = headY + Math.sin(angle) * (r*0.8); } 
+                    else if (section === 1) { const angle = prog * Math.PI * 2; const r = Math.random() * headR; p.tx = noteX2 + Math.cos(angle) * r; p.ty = (headY - 10) + Math.sin(angle) * (r*0.8); } 
+                    else if (section === 2) { p.tx = noteX1 + 10; p.ty = headY - (prog * stemH); } 
+                    else if (section === 3) { p.tx = noteX2 + 10; p.ty = (headY - 10) - (prog * stemH); } 
+                    else { const startX = noteX1 + 10; const startY = headY - stemH; const endX = noteX2 + 10; const endY = (headY - 10) - stemH; const beamThick = 15; const thicknessOffset = (Math.random()) * beamThick; p.tx = startX + (endX - startX) * prog; p.ty = startY + (endY - startY) * prog + thicknessOffset; }
+                });
+            } else if (type === 'AK') {
+                // ... (existing AK logic) ...
+                const strokeWidth = 25; // Thick stroke
+                const widthA = 120;
+                const widthK = 100;
+                const gap = 40;
+                const totalW = widthA + widthK + gap;
+                const heightLetter = 160;
+                
+                const startX = cx - totalW / 2;
+                const bottomY = cy + heightLetter / 2;
+                const topY = cy - heightLetter / 2;
 
                 particles.forEach((p, i) => {
-                    // 20% Head 1, 20% Head 2, 20% Stem 1, 20% Stem 2, 20% Beam
-                    const section = Math.floor((i/count) * 5);
-                    const prog = (i % Math.floor(count/5)) / Math.floor(count/5);
+                    // Split into two groups for A and K
+                    // 55% for A (more strokes), 45% for K
+                    const isA = i < count * 0.55;
+                    const groupI = isA ? i : i - Math.floor(count * 0.55);
+                    const groupTotal = isA ? Math.floor(count * 0.55) : count - Math.floor(count * 0.55);
+                    const progress = groupI / groupTotal;
 
-                    if (section === 0) { // Head 1
-                         const angle = prog * Math.PI * 2;
-                         const r = Math.random() * headR;
-                         p.tx = noteX1 + Math.cos(angle) * r;
-                         p.ty = headY + Math.sin(angle) * (r*0.8); // Oval
-                    } else if (section === 1) { // Head 2
-                         const angle = prog * Math.PI * 2;
-                         const r = Math.random() * headR;
-                         p.tx = noteX2 + Math.cos(angle) * r;
-                         p.ty = (headY - 10) + Math.sin(angle) * (r*0.8); // Slightly higher
-                    } else if (section === 2) { // Stem 1
-                         p.tx = noteX1 + 10; // Right side of head
-                         p.ty = headY - (prog * stemH);
-                    } else if (section === 3) { // Stem 2
-                         p.tx = noteX2 + 10;
-                         p.ty = (headY - 10) - (prog * stemH);
-                    } else { // Beam (Thick)
-                         // Connect top of stem 1 to top of stem 2
-                         const startX = noteX1 + 10;
-                         const startY = headY - stemH;
-                         const endX = noteX2 + 10;
-                         const endY = (headY - 10) - stemH;
-                         
-                         const beamThick = 15;
-                         const thicknessOffset = (Math.random()) * beamThick;
+                    // Jitter for boldness
+                    const jitterX = (Math.random() - 0.5) * strokeWidth;
+                    const jitterY = (Math.random() - 0.5) * strokeWidth;
 
-                         p.tx = startX + (endX - startX) * prog;
-                         p.ty = startY + (endY - startY) * prog + thicknessOffset;
+                    if (isA) {
+                        // Letter A
+                        // 40% Left Leg, 40% Right Leg, 20% Cross Bar
+                        if (progress < 0.4) {
+                            // Left Leg / (Bottom Left to Top Center)
+                            const legProg = progress / 0.4;
+                            const x1 = startX; 
+                            const y1 = bottomY;
+                            const x2 = startX + widthA / 2;
+                            const y2 = topY;
+                            p.tx = x1 + (x2 - x1) * legProg + jitterX;
+                            p.ty = y1 + (y2 - y1) * legProg + jitterY;
+                        } else if (progress < 0.8) {
+                            // Right Leg \ (Top Center to Bottom Right)
+                            const legProg = (progress - 0.4) / 0.4;
+                            const x1 = startX + widthA / 2;
+                            const y1 = topY;
+                            const x2 = startX + widthA;
+                            const y2 = bottomY;
+                            p.tx = x1 + (x2 - x1) * legProg + jitterX;
+                            p.ty = y1 + (y2 - y1) * legProg + jitterY;
+                        } else {
+                            // Cross Bar -
+                            const barProg = (progress - 0.8) / 0.2;
+                            const barY = cy + 20; // Slightly below center
+                            const barWidthFactor = 0.5; // Width of bar relative to A
+                            // Interpolate width based on height at barY
+                            // Actually just fix coordinates approx
+                            const x1 = startX + widthA * 0.25;
+                            const x2 = startX + widthA * 0.75;
+                            p.tx = x1 + (x2 - x1) * barProg + jitterX;
+                            p.ty = barY + jitterY;
+                        }
+                    } else {
+                        // Letter K
+                        const startXK = startX + widthA + gap;
+                        // 40% Vertical, 30% Top Diag, 30% Bottom Diag
+                        if (progress < 0.4) {
+                            // Vertical |
+                            const vProg = progress / 0.4;
+                            p.tx = startXK + jitterX;
+                            p.ty = topY + (bottomY - topY) * vProg + jitterY;
+                        } else if (progress < 0.7) {
+                            // Top Diag /
+                            const dProg = (progress - 0.4) / 0.3;
+                            const x1 = startXK + strokeWidth/2; // Start from vertical
+                            const y1 = cy + 10;
+                            const x2 = startXK + widthK;
+                            const y2 = topY;
+                            p.tx = x1 + (x2 - x1) * dProg + jitterX;
+                            p.ty = y1 + (y2 - y1) * dProg + jitterY;
+                        } else {
+                            // Bottom Diag \
+                            const dProg = (progress - 0.7) / 0.3;
+                            const x1 = startXK + strokeWidth/2;
+                            const y1 = cy + 10;
+                            const x2 = startXK + widthK;
+                            const y2 = bottomY;
+                            p.tx = x1 + (x2 - x1) * dProg + jitterX;
+                            p.ty = y1 + (y2 - y1) * dProg + jitterY;
+                        }
                     }
+                });
+            } else if (type === 'nyc') {
+                // NYC Skyline
+                // Define buildings as width percentages and relative heights
+                const baseY = cy + 60;
+                const totalW = 320;
+                const startX = cx - totalW / 2;
+                
+                // Building definitions: [width, height]
+                const buildings = [
+                    [40, 60],  // Small left
+                    [50, 100], // Mid left
+                    [40, 160], // Tallest (Spire)
+                    [60, 120], // Wide tall
+                    [50, 80],  // Mid right
+                    [40, 50],  // Small right
+                    [40, 70]   // End right
+                ];
+
+                particles.forEach((p, i) => {
+                    // Assign each particle to a building based on index
+                    const bIndex = i % buildings.length;
+                    const bData = buildings[bIndex];
+                    const bW = bData[0];
+                    const bH = bData[1];
+                    
+                    // Calculate X position of this building
+                    let currentX = startX;
+                    for(let k=0; k<bIndex; k++) currentX += buildings[k][0];
+                    
+                    // Random pos within building rect
+                    p.tx = currentX + Math.random() * bW;
+                    p.ty = baseY - Math.random() * bH;
+                });
+
+            } else if (type === 'arch') {
+                // St. Louis Arch
+                // Inverted Catenary / Parabola
+                const baseY = cy + 60;
+                const archWidth = 220;
+                const archHeight = 160;
+                const thickness = 25; // Arch gets thinner at top really, but uniform is ok for particles
+                
+                particles.forEach((p, i) => {
+                    // t goes from -1 to 1
+                    const t = (i / count) * 2 - 1; 
+                    
+                    // Basic Parabola: y = H * (1 - t^2)
+                    // We want to fill the space between an outer and inner curve
+                    // But simpler: Defines centerline and add thickness
+                    
+                    const x = t * (archWidth / 2);
+                    // Flatten the top slightly for catenary look or use parabola
+                    // Parabola:
+                    const curveY = archHeight * (1 - t*t);
+                    
+                    // Taper thickness: Thicker at base (t=1), thinner at top (t=0)
+                    const currentThick = thickness * (0.5 + 0.5 * Math.abs(t) * 1.5); 
+                    
+                    const offsetY = (Math.random() - 0.5) * currentThick;
+                    
+                    p.tx = cx + x;
+                    p.ty = baseY - curveY + offsetY;
                 });
             }
         }
 
         function returnToRandom() {
+            if (interactionMode === 'random') return; // Already random
             interactionMode = 'random';
-            // Give them a slight nudge so they don't look frozen
+            
+            // Explosion Effect!
+            // Calculate center
+            const cx = width / 2;
+            const cy = height / 2;
+
             particles.forEach(p => {
-                p.vx = (Math.random() - 0.5) * 0.3;
-                p.vy = (Math.random() - 0.5) * 0.3;
+                // Vector from center
+                const dx = p.x - cx;
+                const dy = p.y - cy;
+                const angle = Math.atan2(dy, dx);
+                
+                // Assign a high outward velocity (Explosion)
+                const burstSpeed = 8 + Math.random() * 8; // Fast!
+                p.vx = Math.cos(angle) * burstSpeed;
+                p.vy = Math.sin(angle) * burstSpeed;
             });
         }
 
@@ -1011,11 +894,24 @@
                     p.x += (p.tx - p.x) * 0.08;
                     p.y += (p.ty - p.y) * 0.08;
                 } else {
-                    // Random movement
+                    // Random movement with Friction/Drag for Explosion Recovery
+                    
+                    // 1. Move
                     p.x += p.vx;
                     p.y += p.vy;
 
-                    // Bounce
+                    // 2. Friction logic
+                    // Calculate current speed
+                    const currentSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+                    const normalSpeed = 0.5; // Target cruising speed
+                    
+                    if (currentSpeed > normalSpeed) {
+                        // Decelerate
+                        p.vx *= 0.94; // Drag factor
+                        p.vy *= 0.94;
+                    }
+
+                    // 3. Bounce
                     if (p.x < 0 || p.x > width) p.vx *= -1;
                     if (p.y < 0 || p.y > height) p.vy *= -1;
 
@@ -1067,6 +963,21 @@
         window.addEventListener('resize', resize);
         resize();
         draw();
+        
+        // Keydown Listener for "AK" Mode
+        window.addEventListener('keydown', (e) => {
+            if (e.key === '0') {
+                if (isAKMode) {
+                    // Turn OFF
+                    isAKMode = false;
+                    returnToRandom();
+                } else {
+                    // Turn ON
+                    isAKMode = true;
+                    formShape('AK');
+                }
+            }
+        });
 
         // Footer icons styling specific class
         document.querySelectorAll('.footer-icon').forEach(icon => {
@@ -1074,6 +985,16 @@
         });
 
         // Event Listeners for Particle Shapes
+        // Wrapper function to guard against AK mode
+        function triggerShape(type) {
+            if (isAKMode) return; // Don't interrupt AK mode
+            formShape(type);
+        }
+        function triggerRandom() {
+            if (isAKMode) return; // Don't interrupt AK mode
+            returnToRandom();
+        }
+
         const cpuProject = document.getElementById('project-cpu');
         const recordProject = document.getElementById('project-record');
         
@@ -1092,59 +1013,72 @@
         const wAshoka = document.getElementById('washu-ashoka');
 
         if (cpuProject) {
-            cpuProject.addEventListener('mouseenter', () => formShape('cpu'));
-            cpuProject.addEventListener('mouseleave', returnToRandom);
+            cpuProject.addEventListener('mouseenter', () => triggerShape('cpu'));
+            cpuProject.addEventListener('mouseleave', triggerRandom);
         }
 
         if (recordProject) {
-            recordProject.addEventListener('mouseenter', () => formShape('record'));
-            recordProject.addEventListener('mouseleave', returnToRandom);
+            recordProject.addEventListener('mouseenter', () => triggerShape('record'));
+            recordProject.addEventListener('mouseleave', triggerRandom);
         }
         
         if (expInfinite) {
-            expInfinite.addEventListener('mouseenter', () => formShape('infinity'));
-            expInfinite.addEventListener('mouseleave', returnToRandom);
+            expInfinite.addEventListener('mouseenter', () => triggerShape('infinity'));
+            expInfinite.addEventListener('mouseleave', triggerRandom);
         }
         
         if (expCbn) {
-            expCbn.addEventListener('mouseenter', () => formShape('cbn'));
-            expCbn.addEventListener('mouseleave', returnToRandom);
+            expCbn.addEventListener('mouseenter', () => triggerShape('cbn'));
+            expCbn.addEventListener('mouseleave', triggerRandom);
         }
         
         if (expSavny) {
-            expSavny.addEventListener('mouseenter', () => formShape('globe'));
-            expSavny.addEventListener('mouseleave', returnToRandom);
+            expSavny.addEventListener('mouseenter', () => triggerShape('globe'));
+            expSavny.addEventListener('mouseleave', triggerRandom);
         }
         
         if (expNyu) {
-            expNyu.addEventListener('mouseenter', () => formShape('nyu'));
-            expNyu.addEventListener('mouseleave', returnToRandom);
+            expNyu.addEventListener('mouseenter', () => triggerShape('nyu'));
+            expNyu.addEventListener('mouseleave', triggerRandom);
         }
 
         // WashU Listeners
         if (wCyc) {
-            wCyc.addEventListener('mouseenter', () => formShape('community'));
-            wCyc.addEventListener('mouseleave', returnToRandom);
+            wCyc.addEventListener('mouseenter', () => triggerShape('community'));
+            wCyc.addEventListener('mouseleave', triggerRandom);
         }
         if (wWc) {
-            wWc.addEventListener('mouseenter', () => formShape('community'));
-            wWc.addEventListener('mouseleave', returnToRandom);
+            wWc.addEventListener('mouseenter', () => triggerShape('community'));
+            wWc.addEventListener('mouseleave', triggerRandom);
         }
         if (wSif) {
-            wSif.addEventListener('mouseenter', () => formShape('stock'));
-            wSif.addEventListener('mouseleave', returnToRandom);
+            wSif.addEventListener('mouseenter', () => triggerShape('stock'));
+            wSif.addEventListener('mouseleave', triggerRandom);
         }
         if (wKwur) {
-            wKwur.addEventListener('mouseenter', () => formShape('wave'));
-            wKwur.addEventListener('mouseleave', returnToRandom);
+            wKwur.addEventListener('mouseenter', () => triggerShape('wave'));
+            wKwur.addEventListener('mouseleave', triggerRandom);
         }
         if (wStrike) {
-            wStrike.addEventListener('mouseenter', () => formShape('music'));
-            wStrike.addEventListener('mouseleave', returnToRandom);
+            wStrike.addEventListener('mouseenter', () => triggerShape('music'));
+            wStrike.addEventListener('mouseleave', triggerRandom);
         }
         if (wAshoka) {
-            wAshoka.addEventListener('mouseenter', () => formShape('globe'));
-            wAshoka.addEventListener('mouseleave', returnToRandom);
+            wAshoka.addEventListener('mouseenter', () => triggerShape('globe'));
+            wAshoka.addEventListener('mouseleave', triggerRandom);
+        }
+        
+        // Location Hover Listeners
+        const locNyc = document.getElementById('loc-nyc');
+        const locStl = document.getElementById('loc-stl');
+
+        if (locNyc) {
+            locNyc.addEventListener('mouseenter', () => triggerShape('nyc'));
+            locNyc.addEventListener('mouseleave', triggerRandom);
+        }
+        if (locStl) {
+            locStl.addEventListener('mouseenter', () => triggerShape('arch'));
+            locStl.addEventListener('mouseleave', triggerRandom);
         }
         
     </script>
