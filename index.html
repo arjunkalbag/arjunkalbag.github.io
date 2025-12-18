@@ -84,20 +84,25 @@
         
         <!-- Hero Section -->
         <section class="h-screen flex flex-col justify-center pt-20 pb-10 relative" id="hero">
-            <div class="space-y-6 md:space-y-8 parallax-element">
+            <div class="space-y-6 md:space-y-8 parallax-element mt-16 md:mt-32">
                 <p class="text-gray-400 tracking-widest text-sm md:text-base font-code uppercase ml-2 reveal-text">
                     New York / St. Louis
                 </p>
                 
                 <div class="hover-trigger" data-cursor="text">
-                    <h1 class="text-[12vw] leading-[0.85] font-black tracking-tighter text-white mix-blend-exclusion reveal-text">
+                    <h1 class="text-[15vw] leading-[0.8] font-black tracking-tighter text-white mix-blend-exclusion reveal-text">
                         ARJUN<br />
                         <span class="text-gray-500 hover:text-white transition-colors duration-500">KALBAG</span>
                     </h1>
                 </div>
 
+                <!-- Tagline -->
+                <p class="text-lg md:text-xl text-gray-400 font-code ml-2 mt-2 reveal-text tracking-widest cursor-default">
+                    <span class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300">ENGINEERING</span> • <span class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300">ECONOMICS</span> • <span class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300">SOUND</span>
+                </p>
+
                 <!-- Phrase/Description Section -->
-                <div class="ml-2 mt-2 space-y-3 reveal-text delay-75">
+                <div class="ml-2 mt-6 space-y-3 reveal-text delay-75">
                     <!-- The Phrase -->
                     <h2 class="text-2xl md:text-3xl font-medium text-blue-400 font-code tracking-tight">
                         Computer Engineering & Economics at WashU
@@ -457,8 +462,6 @@
         // 4. Scroll Animations (ScrollTrigger)
         gsap.registerPlugin(ScrollTrigger);
 
-        // Removed the scroll velocity glitch trigger logic
-
         // Parallax Effect for Hero
         gsap.to(".parallax-element", {
             y: 150,
@@ -581,11 +584,6 @@
             icon.classList.add('p-4', 'bg-white/5', 'rounded-full', 'hover:bg-white/10', 'hover:scale-110', 'transition-all', 'duration-300', 'group', 'border', 'border-white/10', 'hover:border-blue-500/50');
         });
         
-        // Social icon styling
-        document.querySelectorAll('.social-icon').forEach(icon => {
-            icon.classList.add('p-3', 'bg-white/5', 'rounded-full', 'hover:bg-white/20', 'hover:scale-110', 'transition-all', 'duration-300', 'group', 'border', 'border-transparent', 'hover:border-white/30', 'text-gray-300', 'hover:text-white', 'inline-flex', 'items-center', 'justify-center');
-        });
-
     </script>
 </body>
 </html>
