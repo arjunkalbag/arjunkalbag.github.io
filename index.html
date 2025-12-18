@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arjun Kalbag</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/ScrollTrigger.min.js"></script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            cursor: none; /* Hide default cursor */
+        }
+        
+        .font-code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Custom Cursor */
+        #cursor {
+            pointer-events: none;
+            mix-blend-mode: difference;
+            z-index: 9999;
+        }
+
+        /* Selection Color */
+        ::selection {
+            background-color: white;
+            color: black;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Splash Screen -->
+    <div id="splash" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center">
+        <div class="overflow-hidden">
+            <h1 class="text-[20vw] font-black text-white leading-none tracking-tighter transform translate-y-[100%] opacity-0" id="splash-text">AK</h1>
+        </div>
+        <div class="h-[2px] bg-white mt-4 w-0" id="splash-line"></div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div id="cursor" class="fixed top-0 left-0 w-4 h-4 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-75 ease-out"></div>
+    <div id="cursor-follower" class="fixed top-0 left-0 w-4 h-4 border border-white rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[9998] opacity-0 transition-opacity duration-300"></div>
+
+    <!-- Background Canvas -->
+    <canvas id="bg-canvas" class="fixed inset-0 z-0 opacity-60 pointer-events-none"></canvas>
+
+    <!-- Main Content -->
+    <main class="relative z-10 w-full max-w-[1600px] mx-auto px-4 sm:px-8 md:px-12 opacity-0" id="main-content">
+        
+        <!-- Hero Section -->
+        <section class="h-screen flex flex-col justify-center pt-20 pb-10 relative" id="hero">
+            <div class="space-y-6 md:space-y-8 parallax-element">
+                <p class="text-gray-400 tracking-widest text-sm md:text-base font-code uppercase ml-2 reveal-text">
+                    New York / St. Louis
+                </p>
+                
+                <div class="hover-trigger" data-cursor="text">
+                    <h1 class="text-[12vw] leading-[0.85] font-black tracking-tighter text-white mix-blend-exclusion reveal-text">
+                        ARJUN<br />
+                        <span class="text-gray-500 hover:text-white transition-colors duration-500">KALBAG</span>
+                    </h1>
+                </div>
+
+                <!-- Phrase/Description Section -->
+                <div class="ml-2 mt-2 space-y-3 reveal-text delay-75">
+                    <!-- The Phrase -->
+                    <h2 class="text-2xl md:text-3xl font-medium text-blue-400 font-code tracking-tight">
+                        Computer Engineering & Economics at WashU
+                    </h2>
+                    <!-- The Description -->
+                    <p class="text-xl md:text-2xl font-light text-gray-300 max-w-2xl leading-relaxed">
+                        Building the intersection of hardware, sound, and strategy.
+                    </p>
+                </div>
+
+                <!-- Social Logos -->
+                <div class="flex gap-8 pt-8 ml-2 reveal-text delay-100">
+                    <a href="https://linkedin.com/in/arjun-kalbag/" target="_blank" class="text-gray-400 hover:text-[#0077b5] transition-colors hover:scale-110 duration-300 hover-trigger" data-cursor="link" aria-label="LinkedIn">
+                        <i data-lucide="linkedin" class="w-8 h-8"></i>
+                    </a>
+                    <a href="https://github.com/arjunkalbag" target="_blank" class="text-gray-400 hover:text-white transition-colors hover:scale-110 duration-300 hover-trigger" data-cursor="link" aria-label="GitHub">
+                        <i data-lucide="github" class="w-8 h-8"></i>
+                    </a>
+                    <a href="mailto:arjunkalbag07@gmail.com" class="text-gray-400 hover:text-blue-400 transition-colors hover:scale-110 duration-300 hover-trigger" data-cursor="link" aria-label="Email">
+                        <i data-lucide="mail" class="w-8 h-8"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce reveal-text delay-300">
+                <i data-lucide="chevron-down" class="w-8 h-8 text-gray-500"></i>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="py-24 md:py-32 relative scroll-section">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
+                <!-- Removed sticky top-32 and glitch-header classes -->
+                <div class="md:col-span-4 text-gray-500 uppercase tracking-widest text-sm font-bold h-fit font-code">
+                    01 / Statement
+                </div>
+                <div class="md:col-span-8 text-lg md:text-xl lg:text-2xl font-light font-code leading-relaxed text-gray-300 hover-trigger" data-cursor="text">
+                    <p class="mb-6 reveal-up">
+                        I’m a Computer Engineering and Economics student at Washington University in St. Louis, fascinated by the intersection of <span class="text-white font-medium">complex systems</span> and <span class="text-white font-medium">business strategy</span>.
+                    </p>
+                    <p class="mb-6 reveal-up">
+                        I dissect problems from the ground up—from hardware architecture to backend automation—using economic insight to analyze market incentives. 
+                    </p>
+                    <p class="reveal-up">
+                        I don’t just build products; I engineer value. Bridging technical development and business growth, I apply analytical rigor and entrepreneurial spirit to every challenge.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section class="py-24 md:py-32 scroll-section">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
+                <!-- Removed sticky top-32 and glitch-header classes -->
+                <div class="md:col-span-4 text-gray-500 uppercase tracking-widest text-sm font-bold h-fit font-code">
+                    02 / Experience
+                </div>
+                <div class="md:col-span-8 space-y-20">
+                    
+                    <!-- Infinite Goods -->
+                    <div class="group relative pl-8 border-l border-white/10 hover:border-blue-500 transition-colors duration-300 reveal-up hover-trigger" data-cursor="text">
+                        <div class="absolute -left-[20px] top-0 bg-black p-2 rounded-full border border-white/20 group-hover:border-blue-500 group-hover:scale-110 transition-all">
+                            <i data-lucide="trending-up" class="w-5 h-5 text-gray-400 group-hover:text-blue-400"></i>
+                        </div>
+                        <h3 class="text-3xl md:text-5xl font-bold text-white mb-2">Infinite Goods</h3>
+                        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 text-gray-400 font-code">
+                            <span class="text-lg font-medium text-blue-400">Business Development Intern</span>
+                            <span class="hidden md:block">•</span>
+                            <span class="text-sm">May 2023 – Jan 2024</span>
+                        </div>
+                        <p class="text-lg text-gray-300 max-w-2xl font-code">Backend automation for onboarding, 350% integration speedup. Led cold outreach to 100+ founders.</p>
+                    </div>
+
+                    <!-- Carter Burden -->
+                    <div class="group relative pl-8 border-l border-white/10 hover:border-blue-500 transition-colors duration-300 reveal-up hover-trigger" data-cursor="text">
+                        <div class="absolute -left-[20px] top-0 bg-black p-2 rounded-full border border-white/20 group-hover:border-blue-500 group-hover:scale-110 transition-all">
+                            <i data-lucide="users" class="w-5 h-5 text-gray-400 group-hover:text-blue-400"></i>
+                        </div>
+                        <h3 class="text-3xl md:text-5xl font-bold text-white mb-2">Carter Burden Network</h3>
+                        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 text-gray-400 font-code">
+                            <span class="text-lg font-medium text-blue-400">Board Member</span>
+                            <span class="hidden md:block">•</span>
+                            <span class="text-sm">Jun 2023 – Aug 2025</span>
+                        </div>
+                        <p class="text-lg text-gray-300 max-w-2xl font-code">Led community engagement including a prom for 250+ seniors. Contributed to strategy & finance across 20+ board meetings.</p>
+                    </div>
+
+                    <!-- SAVNY -->
+                    <div class="group relative pl-8 border-l border-white/10 hover:border-blue-500 transition-colors duration-300 reveal-up hover-trigger" data-cursor="text">
+                        <div class="absolute -left-[20px] top-0 bg-black p-2 rounded-full border border-white/20 group-hover:border-blue-500 group-hover:scale-110 transition-all">
+                            <i data-lucide="globe" class="w-5 h-5 text-gray-400 group-hover:text-blue-400"></i>
+                        </div>
+                        <h3 class="text-3xl md:text-5xl font-bold text-white mb-2">SAVNY</h3>
+                        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 text-gray-400 font-code">
+                            <span class="text-lg font-medium text-blue-400">Co-founder & Head</span>
+                            <span class="hidden md:block">•</span>
+                            <span class="text-sm">Oct 2023 – Jun 2025</span>
+                        </div>
+                        <p class="text-lg text-gray-300 max-w-2xl font-code">Organized 250+ students for community service. Coordinated 30+ service opportunities and cultural programming.</p>
+                    </div>
+
+                    <!-- NYU Music -->
+                    <div class="group relative pl-8 border-l border-white/10 hover:border-blue-500 transition-colors duration-300 reveal-up hover-trigger" data-cursor="text">
+                        <div class="absolute -left-[20px] top-0 bg-black p-2 rounded-full border border-white/20 group-hover:border-blue-500 group-hover:scale-110 transition-all">
+                            <i data-lucide="music" class="w-5 h-5 text-gray-400 group-hover:text-blue-400"></i>
+                        </div>
+                        <h3 class="text-3xl md:text-5xl font-bold text-white mb-2">NYU Music Tech</h3>
+                        <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 text-gray-400 font-code">
+                            <span class="text-lg font-medium text-blue-400">Research Assistant</span>
+                            <span class="hidden md:block">•</span>
+                            <span class="text-sm">Jan 2024 – Jun 2025</span>
+                        </div>
+                        <p class="text-lg text-gray-300 max-w-2xl font-code">Engineered multi-channel audio systems. Executed post-production & 45-track arrangement for Harvestworks concert.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- WashU Section -->
+        <section class="py-24 md:py-32 bg-white/5 rounded-3xl mx-[-1rem] md:mx-0 px-4 md:px-12 backdrop-blur-sm scroll-section">
+            <div class="mb-16 reveal-up">
+                <!-- Removed sticky top-32 and glitch-header classes -->
+                <span class="text-blue-400 uppercase tracking-widest text-sm font-bold block mb-4 font-code">03 / Campus Life</span>
+                <h2 class="text-4xl md:text-6xl font-black text-white">WASHINGTON UNIVERSITY</h2>
+                <p class="text-xl text-gray-400 mt-2 font-code">Class of 2029 • St. Louis, MO</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card 1 -->
+                <div class="bg-black/40 p-6 rounded-xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 transition-all duration-300 group reveal-up hover-trigger" data-cursor="text">
+                    <i data-lucide="users" class="w-7 h-7 text-gray-500 group-hover:text-blue-400 mb-4"></i>
+                    <h4 class="text-lg font-bold text-gray-200 group-hover:text-white">Consult Your Community</h4>
+                    <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Associate Consultant</p>
+                </div>
+                 <!-- Card 2 -->
+                 <div class="bg-black/40 p-6 rounded-xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 transition-all duration-300 group reveal-up hover-trigger" data-cursor="text">
+                    <i data-lucide="users" class="w-7 h-7 text-gray-500 group-hover:text-blue-400 mb-4"></i>
+                    <h4 class="text-lg font-bold text-gray-200 group-hover:text-white">WashU Consulting</h4>
+                    <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">First Year Rep</p>
+                </div>
+                 <!-- Card 3 -->
+                 <div class="bg-black/40 p-6 rounded-xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 transition-all duration-300 group reveal-up hover-trigger" data-cursor="text">
+                    <i data-lucide="trending-up" class="w-7 h-7 text-gray-500 group-hover:text-blue-400 mb-4"></i>
+                    <h4 class="text-lg font-bold text-gray-200 group-hover:text-white">Student Investment Fund</h4>
+                    <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Senior Analyst</p>
+                </div>
+                 <!-- Card 4 -->
+                 <div class="bg-black/40 p-6 rounded-xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 transition-all duration-300 group reveal-up hover-trigger" data-cursor="text">
+                    <i data-lucide="radio" class="w-7 h-7 text-gray-500 group-hover:text-blue-400 mb-4"></i>
+                    <h4 class="text-lg font-bold text-gray-200 group-hover:text-white">KWUR 90.3 FM</h4>
+                    <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Disc Jockey</p>
+                </div>
+                 <!-- Card 5 -->
+                 <div class="bg-black/40 p-6 rounded-xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 transition-all duration-300 group reveal-up hover-trigger" data-cursor="text">
+                    <i data-lucide="music" class="w-7 h-7 text-gray-500 group-hover:text-blue-400 mb-4"></i>
+                    <h4 class="text-lg font-bold text-gray-200 group-hover:text-white">Strike Magazine</h4>
+                    <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Music Director</p>
+                </div>
+                 <!-- Card 6 -->
+                 <div class="bg-black/40 p-6 rounded-xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 transition-all duration-300 group reveal-up hover-trigger" data-cursor="text">
+                    <i data-lucide="globe" class="w-7 h-7 text-gray-500 group-hover:text-blue-400 mb-4"></i>
+                    <h4 class="text-lg font-bold text-gray-200 group-hover:text-white">Ashoka</h4>
+                    <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Social Chair</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section class="py-24 md:py-32 scroll-section">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
+                <!-- Removed sticky top-32 and glitch-header classes -->
+                <div class="md:col-span-4 text-gray-500 uppercase tracking-widest text-sm font-bold h-fit font-code">
+                    04 / Selected Works
+                </div>
+                <div class="md:col-span-8 space-y-12">
+                    
+                    <!-- Project 1 -->
+                    <div class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-white/5 rounded-lg text-blue-400">
+                                    <i data-lucide="cpu" class="w-6 h-6"></i>
+                                </div>
+                                <h3 class="text-3xl font-bold text-white group-hover:text-blue-400 transition-colors">16-Bit CPU Architecture</h3>
+                            </div>
+                            <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+                        </div>
+                        <div class="flex gap-2 mb-4 flex-wrap">
+                            <span class="text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Computer Engineering</span>
+                            <span class="text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Hardware</span>
+                        </div>
+                        <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                            A 2-year independent study building a 16-bit CPU from scratch using advanced computer & electrical engineering principles. Currently under active development.
+                        </p>
+                    </div>
+
+                    <!-- Project 2 -->
+                    <div class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2 bg-white/5 rounded-lg text-blue-400">
+                                    <i data-lucide="disc" class="w-6 h-6"></i>
+                                </div>
+                                <h3 class="text-3xl font-bold text-white group-hover:text-blue-400 transition-colors">IoT Digital Record Player</h3>
+                            </div>
+                            <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+                        </div>
+                        <div class="flex gap-2 mb-4 flex-wrap">
+                            <span class="text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">IoT</span>
+                            <span class="text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">NFC</span>
+                        </div>
+                        <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                            Designed and built a digital record player from scratch, integrating NFC technology to bridge physical media with digital streaming.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-20 border-t border-white/10 mt-20 reveal-up">
+            <div class="flex flex-col items-start gap-8">
+                
+                <div class="flex gap-4">
+                    <a href="https://linkedin.com/in/arjun-kalbag/" target="_blank" class="footer-icon hover-trigger" data-cursor="link">
+                        <i data-lucide="linkedin" class="w-6 h-6 text-gray-300"></i>
+                    </a>
+                    <a href="https://github.com/arjunkalbag" target="_blank" class="footer-icon hover-trigger" data-cursor="link">
+                        <i data-lucide="github" class="w-6 h-6 text-gray-300"></i>
+                    </a>
+                    <a href="mailto:arjunkalbag07@gmail.com" class="footer-icon hover-trigger" data-cursor="link">
+                        <i data-lucide="mail" class="w-6 h-6 text-gray-300"></i>
+                    </a>
+                </div>
+                <div class="text-left">
+                    <p class="text-gray-500 text-sm font-code">Designed & Built by Arjun Kalbag</p>
+                    <p class="text-gray-600 text-xs mt-1 font-code">© 2026 All Rights Reserved</p>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 1. Initialize Icons
+        lucide.createIcons();
+
+        // 2. Custom Cursor Logic (using GSAP for performance)
+        const cursor = document.getElementById('cursor');
+        const follower = document.getElementById('cursor-follower');
+        const hoverTriggers = document.querySelectorAll('.hover-trigger');
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        // Initial set
+        gsap.set(cursor, { xPercent: -50, yPercent: -50 });
+        gsap.set(follower, { xPercent: -50, yPercent: -50 });
+
+        // Mouse Move Listener
+        window.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Cursor moves instantly
+            gsap.to(cursor, { x: mouseX, y: mouseY, duration: 0.1 });
+            // Follower has lag/spring
+            gsap.to(follower, { x: mouseX, y: mouseY, duration: 0.6, ease: "power2.out" });
+        });
+
+        // Hover Effects
+        hoverTriggers.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                const type = el.getAttribute('data-cursor');
+                if (type === 'text') {
+                    gsap.to(cursor, { scale: 5, backgroundColor: 'white', mixBlendMode: 'difference' });
+                } else if (type === 'link') {
+                    gsap.to(cursor, { scale: 3, backgroundColor: '#3b82f6', mixBlendMode: 'normal', opacity: 0.8 });
+                }
+            });
+
+            el.addEventListener('mouseleave', () => {
+                gsap.to(cursor, { scale: 1, backgroundColor: 'white', mixBlendMode: 'difference', opacity: 1 });
+            });
+        });
+
+        // Click Ripple
+        window.addEventListener('click', (e) => {
+            const ripple = document.createElement('div');
+            ripple.className = 'fixed rounded-full border border-white pointer-events-none z-[99]';
+            ripple.style.left = `${e.clientX}px`;
+            ripple.style.top = `${e.clientY}px`;
+            ripple.style.width = '40px';
+            ripple.style.height = '40px';
+            ripple.style.transform = 'translate(-50%, -50%) scale(0)';
+            document.body.appendChild(ripple);
+
+            gsap.to(ripple, {
+                scale: 3,
+                opacity: 0,
+                duration: 0.6,
+                onComplete: () => ripple.remove()
+            });
+        });
+
+        // 3. Splash Screen Animation
+        window.onload = () => {
+            const tl = gsap.timeline();
+
+            // Reveal "AK"
+            tl.to("#splash-text", {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                ease: "power4.out"
+            })
+            // Grow Line
+            .to("#splash-line", {
+                width: 200,
+                duration: 1,
+                ease: "power2.inOut"
+            })
+            // Fade Out Text
+            .to(["#splash-text", "#splash-line"], {
+                y: -50,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power2.in",
+                delay: 0.5
+            })
+            // Remove Splash Overlay
+            .to("#splash", {
+                opacity: 0,
+                duration: 0.5,
+                onComplete: () => {
+                    document.getElementById('splash').style.display = 'none';
+                }
+            })
+            // Reveal Main Content
+            .to("#main-content", {
+                opacity: 1,
+                duration: 1
+            }, "-=0.2")
+            // Stagger Reveal Elements in Hero
+            .from(".reveal-text", {
+                y: 50,
+                opacity: 0,
+                stagger: 0.1,
+                duration: 0.8,
+                ease: "power2.out"
+            }, "-=0.5");
+        };
+
+        // 4. Scroll Animations (ScrollTrigger)
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Removed the scroll velocity glitch trigger logic
+
+        // Parallax Effect for Hero
+        gsap.to(".parallax-element", {
+            y: 150,
+            opacity: 0,
+            scrollTrigger: {
+                trigger: "#hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            }
+        });
+
+        // Reveal Sections on Scroll
+        const sections = document.querySelectorAll(".reveal-up");
+        sections.forEach(section => {
+            gsap.from(section, {
+                y: 50,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: section,
+                    start: "top 85%",
+                    toggleActions: "play none none reverse"
+                }
+            });
+        });
+
+        // 5. Interactive Background Canvas
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            initParticles();
+        }
+
+        function initParticles() {
+            particles = [];
+            const particleCount = width < 768 ? 40 : 80;
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    size: Math.random() * 2 + 1,
+                    z: Math.random() * 2
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, width, height);
+
+            particles.forEach((p, i) => {
+                // Movement
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Bounce
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                // Interaction with mouse (Repel)
+                const dx = mouseX - p.x;
+                const dy = mouseY - p.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const forceDistance = 150;
+
+                if (distance < forceDistance) {
+                    const force = (forceDistance - distance) / forceDistance;
+                    const forceDirectionX = dx / distance;
+                    const forceDirectionY = dy / distance;
+                    p.x -= forceDirectionX * force * 3;
+                    p.y -= forceDirectionY * force * 3;
+                }
+
+                // Draw Particle
+                const opacity = 0.2 + (p.z * 0.2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Connect Lines
+                for (let j = i + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dx2 = p.x - p2.x;
+                    const dy2 = p.y - p2.y;
+                    const dist = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+
+                    if (dist < 150) {
+                        ctx.strokeStyle = `rgba(100, 100, 100, ${0.15 * (1 - dist / 150)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        draw();
+
+        // Footer icons styling specific class
+        document.querySelectorAll('.footer-icon').forEach(icon => {
+            icon.classList.add('p-4', 'bg-white/5', 'rounded-full', 'hover:bg-white/10', 'hover:scale-110', 'transition-all', 'duration-300', 'group', 'border', 'border-white/10', 'hover:border-blue-500/50');
+        });
+        
+        // Social icon styling
+        document.querySelectorAll('.social-icon').forEach(icon => {
+            icon.classList.add('p-3', 'bg-white/5', 'rounded-full', 'hover:bg-white/20', 'hover:scale-110', 'transition-all', 'duration-300', 'group', 'border', 'border-transparent', 'hover:border-white/30', 'text-gray-300', 'hover:text-white', 'inline-flex', 'items-center', 'justify-center');
+        });
+
+    </script>
+</body>
+</html>
