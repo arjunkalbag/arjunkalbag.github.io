@@ -19,6 +19,8 @@
     <!-- GSAP for Animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/ScrollTrigger.min.js"></script>
+    <!-- Add GSAP Observer Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/Observer.min.js"></script>
 
     <style>
         :root {
@@ -170,14 +172,14 @@
                     </div>
 
                     <!-- Tagline -->
-                <p class="text-lg md:text-xl text-gray-400 font-code ml-2 mt-2 reveal-text tracking-widest cursor-default">
-                    <span id="nav-engineering" class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 cursor-pointer hover-trigger" data-cursor="link">ENGINEERING</span> • 
-                    <span class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300">ECONOMICS</span> • 
-                    <span id="nav-sound" class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 hover-trigger cursor-pointer" data-cursor="link">MUSIC</span>
-                </p>
+                    <p class="text-lg md:text-xl text-gray-400 font-code ml-2 mt-2 reveal-text tracking-widest cursor-default">
+                        <span id="nav-engineering" class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 cursor-pointer hover-trigger" data-cursor="link">ENGINEERING</span> • 
+                        <span class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300">ECONOMICS</span> • 
+                        <span id="nav-sound" class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 hover-trigger cursor-pointer" data-cursor="link">MUSIC</span>
+                    </p>
 
-                <!-- Phrase/Description Section -->
-                <div class="ml-2 mt-6 space-y-3 reveal-text delay-75">
+                    <!-- Phrase/Description Section -->
+                    <div class="ml-2 mt-6 space-y-3 reveal-text delay-75">
                         <!-- The Phrase -->
                         <h2 class="text-2xl md:text-3xl font-medium text-blue-400 font-code tracking-tight">
                             Computer Engineering & Economics at WashU
@@ -212,6 +214,7 @@
 
             <!-- About Section -->
             <section id="about" class="min-h-screen flex flex-col justify-center py-24 md:py-32 relative scroll-section snap-start px-4 sm:px-8 md:px-12">
+                <!-- ... content ... -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
                     <div class="md:col-span-4 text-gray-500 uppercase tracking-widest text-sm font-bold h-fit font-code">
                         01 / Statement
@@ -226,6 +229,7 @@
 
             <!-- Experience Section -->
             <section class="min-h-screen flex flex-col justify-center py-24 md:py-32 scroll-section snap-start px-4 sm:px-8 md:px-12">
+                <!-- ... content ... -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
                     <div class="md:col-span-4 text-gray-500 uppercase tracking-widest text-sm font-bold h-fit font-code">
                         02 / Experience
@@ -286,6 +290,7 @@
 
             <!-- WashU Section -->
             <section class="min-h-screen flex flex-col justify-center py-24 md:py-32 bg-white/5 rounded-3xl mx-[-1rem] md:mx-0 px-4 md:px-12 backdrop-blur-sm scroll-section snap-start">
+                <!-- ... content ... -->
                 <div class="mb-16 reveal-up">
                     <span class="text-blue-400 uppercase tracking-widest text-sm font-bold block mb-4 font-code">03 / Campus Life</span>
                     <h2 class="text-4xl md:text-6xl font-black text-white">WASHINGTON UNIVERSITY</h2>
@@ -329,6 +334,7 @@
 
             <!-- Projects Section -->
             <section id="projects" class="min-h-screen flex flex-col justify-center py-24 md:py-32 scroll-section snap-start px-4 sm:px-8 md:px-12">
+                <!-- ... content ... -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
                     <div class="md:col-span-4 text-gray-500 uppercase tracking-widest text-sm font-bold h-fit font-code">
                         04 / Projects
@@ -398,7 +404,7 @@
         </div>
 
         <!-- MUSIC PAGE VIEW (Hidden by default) -->
-        <div id="music-view" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#F3EFE0] opacity-0 pointer-events-none transition-opacity duration-700">
+        <div id="music-view" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#F3EFE0] opacity-0 pointer-events-none transition-opacity duration-700 overflow-hidden">
             
             <!-- Back Button (Gold) -->
             <div class="absolute top-8 left-8 z-50" id="music-back-btn">
@@ -413,56 +419,113 @@
                 </button>
             </div>
             
-            <!-- Central Content -->
-            <div class="relative z-10 flex flex-col items-center justify-center w-full h-full">
+            <!-- Logo Carousel Container -->
+            <div id="logo-carousel" class="relative w-full h-full flex items-center justify-center overflow-hidden">
                 
-                <!-- Spinning Gold Logo (SVG) -->
-                <a href="https://soundcloud.com/prodarjun" target="_blank" class="group relative hover-trigger flex items-center justify-center" data-cursor="link">
-                    <!-- Glow Effect Container -->
-                    <div class="absolute inset-0 rounded-full bg-[#C5A059] blur-[80px] opacity-10 group-hover:opacity-40 group-hover:blur-[100px] group-hover:scale-110 transition-all duration-1000 ease-out"></div>
-                    
-                    <!-- Spin Wrapper -->
-                    <div class="w-[35vw] h-[35vw] max-w-[600px] max-h-[600px] min-w-[280px] min-h-[280px] relative z-10 animate-spin-slow">
-                        <!-- Geometric SVG Logo (Scale on Hover - Reduced to 1.1) -->
-                        <svg viewBox="0 0 200 200" class="w-full h-full transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 drop-shadow-[0_0_15px_rgba(197,160,89,0.3)]" fill="none" stroke="#C5A059" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                            
-                            <!-- 1. Outer & Inner Circles -->
-                            <circle cx="100" cy="100" r="98" stroke-width="5" />
-                            <circle cx="100" cy="100" r="18" stroke-width="4" />
-                            
-                            <!-- 2. Radial Lines (8 Axes) -->
-                            <g opacity="0.5">
-                                <!-- Vertical & Horizontal -->
-                                <path d="M100 2 V198" />
-                                <path d="M2 100 H198" />
-                                <!-- Diagonals -->
-                                <path d="M30 30 L170 170" />
-                                <path d="M170 30 L30 170" />
-                            </g>
-                            
-                            <!-- 3. Concave Star (Four Pointed) -->
-                            <!-- Points: Top(100,2), Right(198,100), Bottom(100,198), Left(2,100) -->
-                            <!-- Curve control points pull inward towards center -->
-                            <path d="M100 2 Q 100 100 198 100 Q 100 100 100 198 Q 100 100 2 100 Q 100 100 100 2 Z" stroke-width="4" />
-                            
-                            <!-- 4. Secondary Arcs (Overlapping Lens Shapes) -->
-                            <!-- Arcs connecting Cardinal points to Diagonals or Center area -->
-                            <!-- Creating the "Lens" look by intersecting the star curves -->
-                            
-                            <!-- Vertical Lens shape -->
-                            <path d="M100 2 C 140 30 140 170 100 198" />
-                            <path d="M100 2 C 60 30 60 170 100 198" />
-                            
-                            <!-- Horizontal Lens shape -->
-                            <path d="M2 100 C 30 60 170 60 198 100" />
-                            <path d="M2 100 C 30 140 170 140 198 100" />
-                            
-                            <!-- Diagonal Intersections (Star tips to Inner Circle) -->
-                            <path d="M100 2 L 100 100" opacity="0.3" /> <!-- Hidden, implied by radial lines -->
+                <!-- Logo 1 (Original 4-point) -->
+                <div class="music-logo absolute inset-0 flex flex-col items-center justify-center opacity-100" id="logo-1">
+                    <a href="https://soundcloud.com/prodarjun" target="_blank" class="group relative hover-trigger flex items-center justify-center" data-cursor="link">
+                        <div class="absolute inset-0 rounded-full bg-[#C5A059] blur-[80px] opacity-10 group-hover:opacity-40 group-hover:blur-[100px] group-hover:scale-125 transition-all duration-1000 ease-out"></div>
+                        <div class="w-[28vw] h-[28vw] max-w-[500px] max-h-[500px] min-w-[250px] min-h-[250px] relative z-10 animate-spin-slow">
+                            <svg viewBox="0 0 200 200" class="w-full h-full transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 drop-shadow-[0_0_15px_rgba(197,160,89,0.3)]" fill="none" stroke="#C5A059" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="100" cy="100" r="98" stroke-width="5" />
+                                <circle cx="100" cy="100" r="18" stroke-width="4" />
+                                <g opacity="0.5"><path d="M100 2 V198" /><path d="M2 100 H198" /><path d="M30 30 L170 170" /><path d="M170 30 L30 170" /></g>
+                                <path d="M100 2 Q 100 100 198 100 Q 100 100 100 198 Q 100 100 2 100 Q 100 100 100 2 Z" stroke-width="4" />
+                                <path d="M100 2 C 140 30 140 170 100 198" />
+                                <path d="M100 2 C 60 30 60 170 100 198" />
+                                <path d="M2 100 C 30 60 170 60 198 100" />
+                                <path d="M2 100 C 30 140 170 140 198 100" />
+                            </svg>
+                        </div>
+                    </a>
+                    <div class="mt-10 text-[#C5A059] font-code tracking-[0.3em] opacity-0 animate-fade-up">arjunkalbag!</div>
+                </div>
 
-                        </svg>
-                    </div>
-                </a>
+                <!-- Logo 2 (Triangle/3-point) -->
+                <div class="music-logo absolute inset-0 flex flex-col items-center justify-center opacity-0" id="logo-2">
+                    <a href="https://soundcloud.com/prodarjun" target="_blank" class="group relative hover-trigger flex items-center justify-center" data-cursor="link">
+                        <div class="absolute inset-0 rounded-full bg-[#C5A059] blur-[80px] opacity-10 group-hover:opacity-40 group-hover:blur-[100px] group-hover:scale-110 transition-all duration-1000 ease-out"></div>
+                        <div class="w-[28vw] h-[28vw] max-w-[500px] max-h-[500px] min-w-[250px] min-h-[250px] relative z-10 animate-spin-slow">
+                            <svg viewBox="0 0 200 200" class="w-full h-full transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 drop-shadow-[0_0_15px_rgba(197,160,89,0.3)]" fill="none" stroke="#C5A059" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="100" cy="100" r="98" stroke-width="5" />
+                                <circle cx="100" cy="100" r="18" stroke-width="4" />
+                                <g opacity="0.5"><path d="M100 2 V198" /><path d="M15 150 L185 150" /><path d="M15 50 L185 50" /></g>
+                                <!-- Triangle/3-point star -->
+                                <path d="M100 5 L 185 155 L 15 155 Z" stroke-width="4" />
+                                <path d="M100 5 Q 100 100 185 155 Q 100 100 15 155 Q 100 100 100 5 Z" stroke-width="4" /> <!-- Concave triangle -->
+                                <circle cx="100" cy="100" r="60" opacity="0.6" />
+                            </svg>
+                        </div>
+                    </a>
+                    <div class="mt-10 text-[#C5A059] font-code tracking-[0.3em] opacity-0 animate-fade-up">shimmer</div>
+                </div>
+
+                <!-- Logo 3 (Hexagon/6-point) -->
+                <div class="music-logo absolute inset-0 flex flex-col items-center justify-center opacity-0" id="logo-3">
+                    <a href="https://soundcloud.com/prodarjun" target="_blank" class="group relative hover-trigger flex items-center justify-center" data-cursor="link">
+                        <div class="absolute inset-0 rounded-full bg-[#C5A059] blur-[80px] opacity-10 group-hover:opacity-40 group-hover:blur-[100px] group-hover:scale-110 transition-all duration-1000 ease-out"></div>
+                        <div class="w-[28vw] h-[28vw] max-w-[500px] max-h-[500px] min-w-[250px] min-h-[250px] relative z-10 animate-spin-slow">
+                            <svg viewBox="0 0 200 200" class="w-full h-full transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 drop-shadow-[0_0_15px_rgba(197,160,89,0.3)]" fill="none" stroke="#C5A059" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="100" cy="100" r="98" stroke-width="5" />
+                                <circle cx="100" cy="100" r="18" stroke-width="4" />
+                                <!-- 6 Radial Lines -->
+                                <g opacity="0.5">
+                                    <path d="M100 2 V198" />
+                                    <path d="M14 50 L186 150" />
+                                    <path d="M186 50 L14 150" />
+                                </g>
+                                <!-- Star of David style -->
+                                <path d="M100 10 L 178 145 L 22 145 Z" stroke-width="4" />
+                                <path d="M100 190 L 22 55 L 178 55 Z" stroke-width="4" />
+                                <circle cx="100" cy="100" r="40" opacity="0.7" />
+                            </svg>
+                        </div>
+                    </a>
+                    <div class="mt-10 text-[#C5A059] font-code tracking-[0.3em] opacity-0 animate-fade-up">woodlands</div>
+                </div>
+
+                <!-- Logo 4 (Octagon/8-point) -->
+                <div class="music-logo absolute inset-0 flex flex-col items-center justify-center opacity-0" id="logo-4">
+                    <a href="https://soundcloud.com/prodarjun" target="_blank" class="group relative hover-trigger flex items-center justify-center" data-cursor="link">
+                        <div class="absolute inset-0 rounded-full bg-[#C5A059] blur-[80px] opacity-10 group-hover:opacity-40 group-hover:blur-[100px] group-hover:scale-110 transition-all duration-1000 ease-out"></div>
+                        <div class="w-[28vw] h-[28vw] max-w-[500px] max-h-[500px] min-w-[250px] min-h-[250px] relative z-10 animate-spin-slow">
+                            <svg viewBox="0 0 200 200" class="w-full h-full transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 drop-shadow-[0_0_15px_rgba(197,160,89,0.3)]" fill="none" stroke="#C5A059" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="100" cy="100" r="98" stroke-width="5" />
+                                <circle cx="100" cy="100" r="18" stroke-width="4" />
+                                <g opacity="0.5">
+                                    <path d="M100 2 V198" /><path d="M2 100 H198" /><path d="M30 30 L170 170" /><path d="M170 30 L30 170" />
+                                </g>
+                                <!-- 8 Pointed Star -->
+                                <path d="M100 10 L 120 80 L 190 100 L 120 120 L 100 190 L 80 120 L 10 100 L 80 80 Z" stroke-width="4" />
+                                <rect x="55" y="55" width="90" height="90" transform="rotate(45 100 100)" opacity="0.7" />
+                            </svg>
+                        </div>
+                    </a>
+                    <div class="mt-10 text-[#C5A059] font-code tracking-[0.3em] opacity-0 animate-fade-up">capstone</div>
+                </div>
+
+                <!-- Logo 5 (Spiral) -->
+                <div class="music-logo absolute inset-0 flex flex-col items-center justify-center opacity-0" id="logo-5">
+                    <a href="https://soundcloud.com/prodarjun" target="_blank" class="group relative hover-trigger flex items-center justify-center" data-cursor="link">
+                        <div class="absolute inset-0 rounded-full bg-[#C5A059] blur-[80px] opacity-10 group-hover:opacity-40 group-hover:blur-[100px] group-hover:scale-110 transition-all duration-1000 ease-out"></div>
+                        <div class="w-[28vw] h-[28vw] max-w-[500px] max-h-[500px] min-w-[250px] min-h-[250px] relative z-10 animate-spin-slow">
+                            <svg viewBox="0 0 200 200" class="w-full h-full transition-transform duration-[1.5s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-110 drop-shadow-[0_0_15px_rgba(197,160,89,0.3)]" fill="none" stroke="#C5A059" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="100" cy="100" r="98" stroke-width="5" />
+                                <circle cx="100" cy="100" r="18" stroke-width="4" />
+                                <!-- Spirals -->
+                                <path d="M100 100 Q 150 50 190 100" opacity="0.8" />
+                                <path d="M100 100 Q 50 150 10 100" opacity="0.8" />
+                                <path d="M100 100 Q 50 50 100 10" opacity="0.8" />
+                                <path d="M100 100 Q 150 150 100 190" opacity="0.8" />
+                                <!-- Concentric arcs -->
+                                <path d="M100 30 A 70 70 0 0 1 170 100" />
+                                <path d="M100 170 A 70 70 0 0 1 30 100" />
+                            </svg>
+                        </div>
+                    </a>
+                    <div class="mt-10 text-[#C5A059] font-code tracking-[0.3em] opacity-0 animate-fade-up">evangelical</div>
+                </div>
 
             </div>
         </div>
@@ -473,6 +536,7 @@
     <script>
         // 1. Initialize Icons
         lucide.createIcons();
+        gsap.registerPlugin(Observer); // Register Observer
 
         // Add custom spin animations to Tailwind config or CSS
         const style = document.createElement('style');
@@ -483,6 +547,14 @@
             }
             .animate-spin-slow {
                 animation: spin-slow 60s linear infinite; /* Slower spin (60s) */
+            }
+            @keyframes fade-up {
+                0% { opacity: 0; transform: translateY(20px); }
+                100% { opacity: 1; transform: translateY(0); }
+            }
+            .animate-fade-up {
+                animation: fade-up 1s ease-out forwards;
+                animation-delay: 0.5s;
             }
         `;
         document.head.appendChild(style);
@@ -505,7 +577,7 @@
             gsap.to(follower, { x: mouseX, y: mouseY, duration: 0.6, ease: "power2.out" });
         });
 
-        // Hover Effects (General)
+        // ... (Hover Effects Code kept same) ...
         // Delegate event listeners to body to handle dynamic elements or re-scanned DOM
         document.body.addEventListener('mouseenter', (e) => {
             if (e.target.closest('.hover-trigger')) {
@@ -632,7 +704,7 @@
             });
         });
 
-        // 5. Interactive Background Canvas with Shape Morphing
+        // ... (Particle logic kept same, removed for brevity but present in file) ...
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let width, height;
@@ -660,496 +732,73 @@
             
             // Smoother Icon Switch Animation without Rotating Button
             const currentIcon = themeToggle.querySelector('svg');
-            
-            // Press effect
             gsap.to(themeToggle, { scale: 0.9, duration: 0.1, yoyo: true, repeat: 1 });
 
-            // Animate OUT
             if (currentIcon) {
                 gsap.to(currentIcon, {
-                    scale: 0,
-                    opacity: 0,
-                    rotation: 90,
-                    duration: 0.2,
-                    ease: "power2.in",
+                    scale: 0, opacity: 0, rotation: 90, duration: 0.2, ease: "power2.in",
                     onComplete: () => {
                         const iconName = isLightMode ? 'moon' : 'sun';
                         themeToggle.innerHTML = `<i data-lucide="${iconName}" class="w-6 h-6 text-gray-300"></i>`;
                         lucide.createIcons();
-                        
                         const newIcon = themeToggle.querySelector('svg');
                         gsap.set(newIcon, { scale: 0, opacity: 0, rotation: -90 });
-                        
-                        gsap.to(newIcon, {
-                            scale: 1,
-                            opacity: 1,
-                            rotation: 0,
-                            duration: 0.4,
-                            ease: "back.out(2)"
-                        });
+                        gsap.to(newIcon, { scale: 1, opacity: 1, rotation: 0, duration: 0.4, ease: "back.out(2)" });
                     }
                 });
             }
         });
 
-        function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-            initParticles();
-        }
-
+        function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; initParticles(); }
         function initParticles() {
             particles = [];
-            // Create particles - Significantly increased for high fidelity shapes
             const particleCount = width < 768 ? 200 : 400; 
             for (let i = 0; i < particleCount; i++) {
-                particles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    vx: (Math.random() - 0.5) * 0.3,
-                    vy: (Math.random() - 0.5) * 0.3,
-                    size: Math.random() * 2 + 1,
-                    z: Math.random() * 2,
-                    tx: 0, // Target X
-                    ty: 0  // Target Y
-                });
+                particles.push({ x: Math.random() * width, y: Math.random() * height, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, size: Math.random() * 2 + 1, z: Math.random() * 2, tx: 0, ty: 0 });
             }
         }
-
-        // Shape Formation Logic
         function formShape(type) {
-            interactionMode = 'shape';
-            const cx = width / 2;
-            const cy = height / 2;
-            const count = particles.length;
-
+            interactionMode = 'shape'; const cx = width / 2; const cy = height / 2; const count = particles.length;
             if (type === 'cpu') {
-                // ... (existing CPU logic) ...
-                // CPU: Square Outline + Inner Grid + Pins
-                const size = 140; 
-                const halfSize = size / 2;
-                
-                // Allocation
-                const perimeterCount = Math.floor(count * 0.4);
-                const pinCount = Math.floor(count * 0.3);
-                const innerCount = count - perimeterCount - pinCount;
-
+                const size = 140; const halfSize = size / 2; const perimeterCount = Math.floor(count * 0.4); const pinCount = Math.floor(count * 0.3); const innerCount = count - perimeterCount - pinCount;
                 particles.forEach((p, i) => {
-                    if (i < perimeterCount) {
-                        const perimeterLen = size * 4;
-                        const pos = (i / perimeterCount) * perimeterLen;
-                        if (pos < size) { p.tx = (cx - halfSize) + pos; p.ty = cy - halfSize; } 
-                        else if (pos < size * 2) { p.tx = cx + halfSize; p.ty = (cy - halfSize) + (pos - size); } 
-                        else if (pos < size * 3) { p.tx = (cx + halfSize) - (pos - size * 2); p.ty = cy + halfSize; } 
-                        else { p.tx = cx - halfSize; p.ty = (cy + halfSize) - (pos - size * 3); }
-                    } else if (i < perimeterCount + pinCount) {
-                        const pinIndex = i - perimeterCount;
-                        const pinsPerSide = Math.floor(pinCount / 4);
-                        const side = Math.floor(pinIndex / pinsPerSide) % 4;
-                        const sideIndex = pinIndex % pinsPerSide;
-                        const spacing = size / pinsPerSide;
-                        const offset = (sideIndex * spacing) - halfSize + (spacing/2);
-                        const pinLen = 25;
-                        if (side === 0) { p.tx = cx + offset; p.ty = cy - halfSize - pinLen; } 
-                        else if (side === 1) { p.tx = cx + halfSize + pinLen; p.ty = cy + offset; } 
-                        else if (side === 2) { p.tx = cx + offset; p.ty = cy + halfSize + pinLen; } 
-                        else { p.tx = cx - halfSize - pinLen; p.ty = cy + offset; }
-                    } else {
-                        const innerIndex = i - perimeterCount - pinCount;
-                        const gridSide = Math.ceil(Math.sqrt(innerCount));
-                        const step = (size * 0.6) / gridSide; 
-                        const start = -(size * 0.6) / 2;
-                        const row = Math.floor(innerIndex / gridSide);
-                        const col = innerIndex % gridSide;
-                        p.tx = cx + start + col * step + step/2;
-                        p.ty = cy + start + row * step + step/2;
-                    }
+                    if (i < perimeterCount) { const perimeterLen = size * 4; const pos = (i / perimeterCount) * perimeterLen; if (pos < size) { p.tx = (cx - halfSize) + pos; p.ty = cy - halfSize; } else if (pos < size * 2) { p.tx = cx + halfSize; p.ty = (cy - halfSize) + (pos - size); } else if (pos < size * 3) { p.tx = (cx + halfSize) - (pos - size * 2); p.ty = cy + halfSize; } else { p.tx = cx - halfSize; p.ty = (cy + halfSize) - (pos - size * 3); } } 
+                    else if (i < perimeterCount + pinCount) { const pinIndex = i - perimeterCount; const pinsPerSide = Math.floor(pinCount / 4); const side = Math.floor(pinIndex / pinsPerSide) % 4; const sideIndex = pinIndex % pinsPerSide; const spacing = size / pinsPerSide; const offset = (sideIndex * spacing) - halfSize + (spacing/2); const pinLen = 25; if (side === 0) { p.tx = cx + offset; p.ty = cy - halfSize - pinLen; } else if (side === 1) { p.tx = cx + halfSize + pinLen; p.ty = cy + offset; } else if (side === 2) { p.tx = cx + offset; p.ty = cy + halfSize + pinLen; } else { p.tx = cx - halfSize - pinLen; p.ty = cy + offset; } } 
+                    else { const innerIndex = i - perimeterCount - pinCount; const gridSide = Math.ceil(Math.sqrt(innerCount)); const step = (size * 0.6) / gridSide; const start = -(size * 0.6) / 2; const row = Math.floor(innerIndex / gridSide); const col = innerIndex % gridSide; p.tx = cx + start + col * step + step/2; p.ty = cy + start + row * step + step/2; }
                 });
-
-            } else if (type === 'record') {
-                // ... (existing Record logic) ...
-                particles.forEach((p, i) => {
-                    let radius, angle;
-                    if (i < count * 0.3) {
-                        radius = 40 + Math.random() * 2; 
-                        angle = (i / (count * 0.3)) * Math.PI * 2;
-                    } else {
-                        radius = 100 + Math.random() * 2;
-                        angle = ((i - count * 0.3) / (count * 0.7)) * Math.PI * 2;
-                    }
-                    p.tx = cx + Math.cos(angle) * radius;
-                    p.ty = cy + Math.sin(angle) * radius;
-                });
-
-            } else if (type === 'infinity') {
-                // ... (existing Infinity logic) ...
-                const a = 200; 
-                particles.forEach((p, i) => {
-                    const t = (i / count) * Math.PI * 2;
-                    const denom = 1 + Math.sin(t) * Math.sin(t);
-                    p.tx = cx + (a * Math.cos(t)) / denom;
-                    p.ty = cy + (a * Math.sin(t) * Math.cos(t)) / denom;
-                });
-
-            } else if (type === 'cbn') {
-                // ... (existing CBN logic) ...
-                const letterW = 80; const letterH = 120; const gap = 40; const totalWidth = (letterW * 3) + (gap * 2); const startX = cx - (totalWidth / 2); const strokeWidth = 12;
-                particles.forEach((p, i) => {
-                    const group = Math.floor((i / count) * 3); const localI = i % Math.floor(count / 3); const localTotal = Math.floor(count / 3); const progress = localI / localTotal;
-                    const jitterX = (Math.random() - 0.5) * strokeWidth; const jitterY = (Math.random() - 0.5) * strokeWidth;
-                    let lx = 0, ly = 0;
-                    if (group === 0) { 
-                        const cCenterX = startX + letterW/2; const cCenterY = cy; const angle = Math.PI * 0.2 + progress * (Math.PI * 1.6);
-                        lx = cCenterX + Math.cos(angle) * (letterW/2); ly = cCenterY + Math.sin(angle) * (letterH/2);
-                    } else if (group === 1) { 
-                        const bX = startX + letterW + gap;
-                        if (progress < 0.4) { lx = bX; ly = cy - letterH/2 + (progress/0.4) * letterH; } 
-                        else if (progress < 0.7) { const loopProg = (progress - 0.4) / 0.3; const angle = -Math.PI/2 + loopProg * Math.PI; lx = bX + Math.cos(angle) * (letterW * 0.6); ly = cy - letterH/4 + Math.sin(angle) * (letterH/4); } 
-                        else { const loopProg = (progress - 0.7) / 0.3; const angle = -Math.PI/2 + loopProg * Math.PI; lx = bX + Math.cos(angle) * (letterW * 0.7); ly = cy + letterH/4 + Math.sin(angle) * (letterH/4); }
-                    } else { 
-                        const nX = startX + (letterW + gap) * 2;
-                        if (progress < 0.35) { lx = nX; ly = cy + letterH/2 - (progress/0.35) * letterH; } 
-                        else if (progress < 0.65) { const diagProg = (progress - 0.35) / 0.3; lx = nX + diagProg * letterW; ly = cy - letterH/2 + diagProg * letterH; } 
-                        else { const vertProg = (progress - 0.65) / 0.35; lx = nX + letterW; ly = cy + letterH/2 - vertProg * letterH; }
-                    }
-                    p.tx = lx + jitterX; p.ty = ly + jitterY;
-                });
-
-            } else if (type === 'globe') {
-                // ... (existing Globe logic) ...
-                const radius = 130; const tilt = 0.5; const silhouetteLimit = Math.floor(count * 0.3); const latLimit = Math.floor(count * 0.6); const latCount = 5; const longCount = 8;
-                particles.forEach((p, i) => {
-                    let x, y, z;
-                    if (i < silhouetteLimit) { const angle = (i / silhouetteLimit) * Math.PI * 2; p.tx = cx + radius * Math.cos(angle); p.ty = cy + radius * Math.sin(angle); return; }
-                    if (i < latLimit) { 
-                        const subsetSize = latLimit - silhouetteLimit; const idx = i - silhouetteLimit; const latGroupSize = Math.floor(subsetSize / latCount); const latIndex = Math.min(Math.floor(idx / latGroupSize), latCount - 1); const latProg = (idx % latGroupSize) / latGroupSize;
-                        const phi = (Math.PI * 0.15) + (latIndex / (latCount - 1)) * (Math.PI * 0.7); const theta = latProg * Math.PI * 2;
-                        x = radius * Math.sin(phi) * Math.cos(theta); z = radius * Math.sin(phi) * Math.sin(theta); y = radius * Math.cos(phi);
-                    } else { 
-                        const subsetSize = count - latLimit; const idx = i - latLimit; const longGroupSize = Math.floor(subsetSize / longCount); const longIndex = Math.min(Math.floor(idx / longGroupSize), longCount - 1); const longProg = (idx % longGroupSize) / longGroupSize;
-                        const theta = (longIndex / longCount) * Math.PI * 2; const phi = longProg * Math.PI;
-                        x = radius * Math.sin(phi) * Math.cos(theta); z = radius * Math.sin(phi) * Math.sin(theta); y = radius * Math.cos(phi);
-                    }
-                    const rotY = y * Math.cos(tilt) - z * Math.sin(tilt); p.tx = cx + x; p.ty = cy + rotY;
-                });
-
-            } else if (type === 'nyu') {
-                // ... (existing NYU logic) ...
-                const torchHeight = 90; const textY = cy + 50; const strokeWidth = 10; const letterW = 50; const letterH = 60; const gap = 20; const totalTextW = (letterW * 3) + (gap * 2); const textStartX = cx - (totalTextW / 2);
-                particles.forEach((p, i) => {
-                    const jitterX = (Math.random() - 0.5) * strokeWidth; const jitterY = (Math.random() - 0.5) * strokeWidth;
-                    if (i < count * 0.25) { const progress = i / (count * 0.25); const w = 50 * Math.sin(progress * Math.PI); const h = torchHeight; const x = (Math.random() - 0.5) * w; const y = -progress * h; p.tx = cx + x; p.ty = cy + 10 + y; } 
-                    else {
-                        const textIndex = i - Math.floor(count * 0.25); const textTotal = count - Math.floor(count * 0.25); const group = Math.floor((textIndex / textTotal) * 3); const progress = (textIndex % (textTotal/3)) / (textTotal/3);
-                        let lx=0, ly=0;
-                        if (group === 0) { const currentX = textStartX; if (progress < 0.35) { lx = currentX; ly = textY - letterH/2 + (progress/0.35)*letterH; } else if (progress < 0.7) { const p2 = (progress-0.35)/0.35; lx = currentX + p2*letterW; ly = textY - letterH/2 + p2*letterH; } else { const p3 = (progress-0.7)/0.3; lx = currentX + letterW; ly = textY + letterH/2 - p3*letterH; } } 
-                        else if (group === 1) { const currentX = textStartX + letterW + gap; if (progress < 0.33) { const p2 = progress/0.33; lx = currentX + (p2 - 0.5)*letterW + (letterW/2); ly = textY - letterH/2 + p2*(letterH/2); } else if (progress < 0.66) { const p2 = (progress-0.33)/0.33; lx = currentX + letterW - (p2*0.5*letterW); ly = textY - letterH/2 + p2*(letterH/2); } else { const p2 = (progress-0.66)/0.34; lx = currentX + letterW/2; ly = textY + (p2 * letterH/2); } } 
-                        else { const currentX = textStartX + (letterW + gap) * 2; if (progress < 0.4) { lx = currentX; ly = textY - letterH/2 + (progress/0.4)*letterH; } else if (progress < 0.7) { const p2 = (progress-0.4)/0.3; lx = currentX + p2*letterW; ly = textY + letterH/2; } else { const p2 = (progress-0.7)/0.3; lx = currentX + letterW; ly = textY + letterH/2 - p2*letterH; } }
-                        p.tx = lx + jitterX; p.ty = ly + jitterY;
-                    }
-                });
-                
-            } else if (type === 'community') {
-                // ... (existing Community logic) ...
-                particles.forEach((p, i) => {
-                    const group = Math.floor((i / count) * 3); const subProgress = (i % Math.floor(count/3)) / Math.floor(count/3);
-                    let centerX, centerY, scale;
-                    if (group === 0) { centerX = cx; centerY = cy - 10; scale = 1.2; } else if (group === 1) { centerX = cx - 60; centerY = cy + 10; scale = 0.9; } else { centerX = cx + 60; centerY = cy + 10; scale = 0.9; }
-                    if (subProgress < 0.3) { const angle = subProgress * (1/0.3) * Math.PI * 2; const r = 15 * scale; p.tx = centerX + Math.cos(angle) * r; p.ty = (centerY - 30 * scale) + Math.sin(angle) * r; } 
-                    else { const arcProg = (subProgress - 0.3) / 0.7; const angle = Math.PI - (arcProg * Math.PI); const r = 35 * scale; const fillR = r * (0.8 + Math.random()*0.2); p.tx = centerX + Math.cos(angle) * fillR; p.ty = (centerY + 10 * scale) - Math.sin(angle) * fillR * 0.6; }
-                });
-
-            } else if (type === 'stock') {
-                // ... (existing Stock logic) ...
-                const points = [{x: -120, y: 60}, {x: -70, y: 20}, {x: -30, y: 50}, {x: 20, y: -20}, {x: 70, y: 10}, {x: 120, y: -70}];
-                particles.forEach((p, i) => {
-                    const segmentCount = points.length - 1; const particlesPerSeg = Math.floor(count / segmentCount); const segIndex = Math.min(Math.floor(i / particlesPerSeg), segmentCount - 1); const prog = (i % particlesPerSeg) / particlesPerSeg;
-                    const p1 = points[segIndex]; const p2 = points[segIndex + 1]; const scatter = (Math.random() - 0.5) * 4;
-                    p.tx = cx + p1.x + (p2.x - p1.x) * prog + scatter; p.ty = cy + p1.y + (p2.y - p1.y) * prog + scatter;
-                });
-
-            } else if (type === 'wave') {
-                // ... (existing Wave logic) ...
-                particles.forEach((p, i) => {
-                    const line = Math.floor((i/count) * 3); const prog = (i % Math.floor(count/3)) / Math.floor(count/3); const width = 240; const x = (prog * width) - (width/2);
-                    const freq = 0.05; let amp = 40; if (line === 0) amp = 20; if (line === 2) amp = 60; const y = Math.sin(x * freq + (line * Math.PI/4)) * amp; p.tx = cx + x; p.ty = cy + y;
-                });
-
-            } else if (type === 'music') {
-                // ... (existing Music logic) ...
-                const headY = cy + 40; const headR = 15; const stemH = 70; const noteX1 = cx - 30; const noteX2 = cx + 40;
-                particles.forEach((p, i) => {
-                    const section = Math.floor((i/count) * 5); const prog = (i % Math.floor(count/5)) / Math.floor(count/5);
-                    if (section === 0) { const angle = prog * Math.PI * 2; const r = Math.random() * headR; p.tx = noteX1 + Math.cos(angle) * r; p.ty = headY + Math.sin(angle) * (r*0.8); } 
-                    else if (section === 1) { const angle = prog * Math.PI * 2; const r = Math.random() * headR; p.tx = noteX2 + Math.cos(angle) * r; p.ty = (headY - 10) + Math.sin(angle) * (r*0.8); } 
-                    else if (section === 2) { p.tx = noteX1 + 10; p.ty = headY - (prog * stemH); } 
-                    else if (section === 3) { p.tx = noteX2 + 10; p.ty = (headY - 10) - (prog * stemH); } 
-                    else { const startX = noteX1 + 10; const startY = headY - stemH; const endX = noteX2 + 10; const endY = (headY - 10) - stemH; const beamThick = 15; const thicknessOffset = (Math.random()) * beamThick; p.tx = startX + (endX - startX) * prog; p.ty = startY + (endY - startY) * prog + thicknessOffset; }
-                });
-            } else if (type === 'AK') {
-                // ... (existing AK logic) ...
-                const strokeWidth = 25; // Thick stroke
-                const widthA = 120;
-                const widthK = 100;
-                const gap = 40;
-                const totalW = widthA + widthK + gap;
-                const heightLetter = 160;
-                
-                const startX = cx - totalW / 2;
-                const bottomY = cy + heightLetter / 2;
-                const topY = cy - heightLetter / 2;
-
-                particles.forEach((p, i) => {
-                    // Split into two groups for A and K
-                    // 55% for A (more strokes), 45% for K
-                    const isA = i < count * 0.55;
-                    const groupI = isA ? i : i - Math.floor(count * 0.55);
-                    const groupTotal = isA ? Math.floor(count * 0.55) : count - Math.floor(count * 0.55);
-                    const progress = groupI / groupTotal;
-
-                    // Jitter for boldness
-                    const jitterX = (Math.random() - 0.5) * strokeWidth;
-                    const jitterY = (Math.random() - 0.5) * strokeWidth;
-
-                    if (isA) {
-                        // Letter A
-                        // 40% Left Leg, 40% Right Leg, 20% Cross Bar
-                        if (progress < 0.4) {
-                            // Left Leg / (Bottom Left to Top Center)
-                            const legProg = progress / 0.4;
-                            const x1 = startX; 
-                            const y1 = bottomY;
-                            const x2 = startX + widthA / 2;
-                            const y2 = topY;
-                            p.tx = x1 + (x2 - x1) * legProg + jitterX;
-                            p.ty = y1 + (y2 - y1) * legProg + jitterY;
-                        } else if (progress < 0.8) {
-                            // Right Leg \ (Top Center to Bottom Right)
-                            const legProg = (progress - 0.4) / 0.4;
-                            const x1 = startX + widthA / 2;
-                            const y1 = topY;
-                            const x2 = startX + widthA;
-                            const y2 = bottomY;
-                            p.tx = x1 + (x2 - x1) * legProg + jitterX;
-                            p.ty = y1 + (y2 - y1) * legProg + jitterY;
-                        } else {
-                            // Cross Bar -
-                            const barProg = (progress - 0.8) / 0.2;
-                            const barY = cy + 20; // Slightly below center
-                            const barWidthFactor = 0.5; // Width of bar relative to A
-                            // Interpolate width based on height at barY
-                            // Actually just fix coordinates approx
-                            const x1 = startX + widthA * 0.25;
-                            const x2 = startX + widthA * 0.75;
-                            p.tx = x1 + (x2 - x1) * barProg + jitterX;
-                            p.ty = barY + jitterY;
-                        }
-                    } else {
-                        // Letter K
-                        const startXK = startX + widthA + gap;
-                        // 40% Vertical, 30% Top Diag, 30% Bottom Diag
-                        if (progress < 0.4) {
-                            // Vertical |
-                            const vProg = progress / 0.4;
-                            p.tx = startXK + jitterX;
-                            p.ty = topY + (bottomY - topY) * vProg + jitterY;
-                        } else if (progress < 0.7) {
-                            // Top Diag /
-                            const dProg = (progress - 0.4) / 0.3;
-                            const x1 = startXK + strokeWidth/2; // Start from vertical
-                            const y1 = cy + 10;
-                            const x2 = startXK + widthK;
-                            const y2 = topY;
-                            p.tx = x1 + (x2 - x1) * dProg + jitterX;
-                            p.ty = y1 + (y2 - y1) * dProg + jitterY;
-                        } else {
-                            // Bottom Diag \
-                            const dProg = (progress - 0.7) / 0.3;
-                            const x1 = startXK + strokeWidth/2;
-                            const y1 = cy + 10;
-                            const x2 = startXK + widthK;
-                            const y2 = bottomY;
-                            p.tx = x1 + (x2 - x1) * dProg + jitterX;
-                            p.ty = y1 + (y2 - y1) * dProg + jitterY;
-                        }
-                    }
-                });
-            } else if (type === 'nyc') {
-                // NYC Skyline
-                // Define buildings as width percentages and relative heights
-                const baseY = cy + 60;
-                const totalW = 320;
-                const startX = cx - totalW / 2;
-                
-                // Building definitions: [width, height]
-                const buildings = [
-                    [40, 60],  // Small left
-                    [50, 100], // Mid left
-                    [40, 160], // Tallest (Spire)
-                    [60, 120], // Wide tall
-                    [50, 80],  // Mid right
-                    [40, 50],  // Small right
-                    [40, 70]   // End right
-                ];
-
-                particles.forEach((p, i) => {
-                    // Assign each particle to a building based on index
-                    const bIndex = i % buildings.length;
-                    const bData = buildings[bIndex];
-                    const bW = bData[0];
-                    const bH = bData[1];
-                    
-                    // Calculate X position of this building
-                    let currentX = startX;
-                    for(let k=0; k<bIndex; k++) currentX += buildings[k][0];
-                    
-                    // Random pos within building rect
-                    p.tx = currentX + Math.random() * bW;
-                    p.ty = baseY - Math.random() * bH;
-                });
-
-            } else if (type === 'arch') {
-                // St. Louis Arch
-                // Inverted Catenary / Parabola
-                const baseY = cy + 60;
-                const archWidth = 220;
-                const archHeight = 160;
-                const thickness = 25; // Arch gets thinner at top really, but uniform is ok for particles
-                
-                particles.forEach((p, i) => {
-                    // t goes from -1 to 1
-                    const t = (i / count) * 2 - 1; 
-                    
-                    // Basic Parabola: y = H * (1 - t^2)
-                    // We want to fill the space between an outer and inner curve
-                    // But simpler: Defines centerline and add thickness
-                    
-                    const x = t * (archWidth / 2);
-                    // Flatten the top slightly for catenary look or use parabola
-                    // Parabola:
-                    const curveY = archHeight * (1 - t*t);
-                    
-                    // Taper thickness: Thicker at base (t=1), thinner at top (t=0)
-                    const currentThick = thickness * (0.5 + 0.5 * Math.abs(t) * 1.5); 
-                    
-                    const offsetY = (Math.random() - 0.5) * currentThick;
-                    
-                    p.tx = cx + x;
-                    p.ty = baseY - curveY + offsetY;
-                });
+            } else if (type === 'record') { particles.forEach((p, i) => { let radius, angle; if (i < count * 0.3) { radius = 40 + Math.random() * 2; angle = (i / (count * 0.3)) * Math.PI * 2; } else { radius = 100 + Math.random() * 2; angle = ((i - count * 0.3) / (count * 0.7)) * Math.PI * 2; } p.tx = cx + Math.cos(angle) * radius; p.ty = cy + Math.sin(angle) * radius; });
+            } else if (type === 'infinity') { const a = 200; particles.forEach((p, i) => { const t = (i / count) * Math.PI * 2; const denom = 1 + Math.sin(t) * Math.sin(t); p.tx = cx + (a * Math.cos(t)) / denom; p.ty = cy + (a * Math.sin(t) * Math.cos(t)) / denom; });
+            } else if (type === 'cbn') { const letterW = 80; const letterH = 120; const gap = 40; const totalWidth = (letterW * 3) + (gap * 2); const startX = cx - (totalWidth / 2); const strokeWidth = 12; particles.forEach((p, i) => { const group = Math.floor((i / count) * 3); const localI = i % Math.floor(count / 3); const localTotal = Math.floor(count / 3); const progress = localI / localTotal; const jitterX = (Math.random() - 0.5) * strokeWidth; const jitterY = (Math.random() - 0.5) * strokeWidth; let lx = 0, ly = 0; if (group === 0) { const cCenterX = startX + letterW/2; const cCenterY = cy; const angle = Math.PI * 0.2 + progress * (Math.PI * 1.6); lx = cCenterX + Math.cos(angle) * (letterW/2); ly = cCenterY + Math.sin(angle) * (letterH/2); } else if (group === 1) { const bX = startX + letterW + gap; if (progress < 0.4) { lx = bX; ly = cy - letterH/2 + (progress/0.4) * letterH; } else if (progress < 0.7) { const loopProg = (progress - 0.4) / 0.3; const angle = -Math.PI/2 + loopProg * Math.PI; lx = bX + Math.cos(angle) * (letterW * 0.6); ly = cy - letterH/4 + Math.sin(angle) * (letterH/4); } else { const loopProg = (progress - 0.7) / 0.3; const angle = -Math.PI/2 + loopProg * Math.PI; lx = bX + Math.cos(angle) * (letterW * 0.7); ly = cy + letterH/4 + Math.sin(angle) * (letterH/4); } } else { const nX = startX + (letterW + gap) * 2; if (progress < 0.35) { lx = nX; ly = cy + letterH/2 - (progress/0.35) * letterH; } else if (progress < 0.65) { const diagProg = (progress - 0.35) / 0.3; lx = nX + diagProg * letterW; ly = cy - letterH/2 + diagProg * letterH; } else { const vertProg = (progress - 0.65) / 0.35; lx = nX + letterW; ly = cy + letterH/2 - vertProg * letterH; } } p.tx = lx + jitterX; p.ty = ly + jitterY; });
+            } else if (type === 'globe') { const radius = 130; const tilt = 0.5; const silhouetteLimit = Math.floor(count * 0.3); const latLimit = Math.floor(count * 0.6); const latCount = 5; const longCount = 8; particles.forEach((p, i) => { let x, y, z; if (i < silhouetteLimit) { const angle = (i / silhouetteLimit) * Math.PI * 2; p.tx = cx + radius * Math.cos(angle); p.ty = cy + radius * Math.sin(angle); return; } if (i < latLimit) { const subsetSize = latLimit - silhouetteLimit; const idx = i - silhouetteLimit; const latGroupSize = Math.floor(subsetSize / latCount); const latIndex = Math.min(Math.floor(idx / latGroupSize), latCount - 1); const latProg = (idx % latGroupSize) / latGroupSize; const phi = (Math.PI * 0.15) + (latIndex / (latCount - 1)) * (Math.PI * 0.7); const theta = latProg * Math.PI * 2; x = radius * Math.sin(phi) * Math.cos(theta); z = radius * Math.sin(phi) * Math.sin(theta); y = radius * Math.cos(phi); } else { const subsetSize = count - latLimit; const idx = i - latLimit; const longGroupSize = Math.floor(subsetSize / longCount); const longIndex = Math.min(Math.floor(idx / longGroupSize), longCount - 1); const longProg = (idx % longGroupSize) / longGroupSize; const theta = (longIndex / longCount) * Math.PI * 2; const phi = longProg * Math.PI; x = radius * Math.sin(phi) * Math.cos(theta); z = radius * Math.sin(phi) * Math.sin(theta); y = radius * Math.cos(phi); } const rotY = y * Math.cos(tilt) - z * Math.sin(tilt); p.tx = cx + x; p.ty = cy + rotY; });
+            } else if (type === 'nyu') { const torchHeight = 90; const textY = cy + 50; const strokeWidth = 10; const letterW = 50; const letterH = 60; const gap = 20; const totalTextW = (letterW * 3) + (gap * 2); const textStartX = cx - (totalTextW / 2); particles.forEach((p, i) => { const jitterX = (Math.random() - 0.5) * strokeWidth; const jitterY = (Math.random() - 0.5) * strokeWidth; if (i < count * 0.25) { const progress = i / (count * 0.25); const w = 50 * Math.sin(progress * Math.PI); const h = torchHeight; const x = (Math.random() - 0.5) * w; const y = -progress * h; p.tx = cx + x; p.ty = cy + 10 + y; } else { const textIndex = i - Math.floor(count * 0.25); const textTotal = count - Math.floor(count * 0.25); const group = Math.floor((textIndex / textTotal) * 3); const progress = (textIndex % (textTotal/3)) / (textTotal/3); let lx=0, ly=0; if (group === 0) { const currentX = textStartX; if (progress < 0.35) { lx = currentX; ly = textY - letterH/2 + (progress/0.35)*letterH; } else if (progress < 0.7) { const p2 = (progress-0.35)/0.35; lx = currentX + p2*letterW; ly = textY - letterH/2 + p2*letterH; } else { const p3 = (progress-0.7)/0.3; lx = currentX + letterW; ly = textY + letterH/2 - p3*letterH; } } else if (group === 1) { const currentX = textStartX + letterW + gap; if (progress < 0.33) { const p2 = progress/0.33; lx = currentX + (p2 - 0.5)*letterW + (letterW/2); ly = textY - letterH/2 + p2*(letterH/2); } else if (progress < 0.66) { const p2 = (progress-0.33)/0.33; lx = currentX + letterW - (p2*0.5*letterW); ly = textY - letterH/2 + p2*(letterH/2); } else { const p2 = (progress-0.66)/0.34; lx = currentX + letterW/2; ly = textY + (p2 * letterH/2); } } else { const currentX = textStartX + (letterW + gap) * 2; if (progress < 0.4) { lx = currentX; ly = textY - letterH/2 + (progress/0.4)*letterH; } else if (progress < 0.7) { const p2 = (progress-0.4)/0.3; lx = currentX + p2*letterW; ly = textY + letterH/2; } else { const p2 = (progress-0.7)/0.3; lx = currentX + letterW; ly = textY + letterH/2 - p2*letterH; } } p.tx = lx + jitterX; p.ty = ly + jitterY; } });
+            } else if (type === 'community') { particles.forEach((p, i) => { const group = Math.floor((i / count) * 3); const subProgress = (i % Math.floor(count/3)) / Math.floor(count/3); let centerX, centerY, scale; if (group === 0) { centerX = cx; centerY = cy - 10; scale = 1.2; } else if (group === 1) { centerX = cx - 60; centerY = cy + 10; scale = 0.9; } else { centerX = cx + 60; centerY = cy + 10; scale = 0.9; } if (subProgress < 0.3) { const angle = subProgress * (1/0.3) * Math.PI * 2; const r = 15 * scale; p.tx = centerX + Math.cos(angle) * r; p.ty = (centerY - 30 * scale) + Math.sin(angle) * r; } else { const arcProg = (subProgress - 0.3) / 0.7; const angle = Math.PI - (arcProg * Math.PI); const r = 35 * scale; const fillR = r * (0.8 + Math.random()*0.2); p.tx = centerX + Math.cos(angle) * fillR; p.ty = (centerY + 10 * scale) - Math.sin(angle) * fillR * 0.6; } });
+            } else if (type === 'stock') { const points = [{x: -120, y: 60}, {x: -70, y: 20}, {x: -30, y: 50}, {x: 20, y: -20}, {x: 70, y: 10}, {x: 120, y: -70}]; particles.forEach((p, i) => { const segmentCount = points.length - 1; const particlesPerSeg = Math.floor(count / segmentCount); const segIndex = Math.min(Math.floor(i / particlesPerSeg), segmentCount - 1); const prog = (i % particlesPerSeg) / particlesPerSeg; const p1 = points[segIndex]; const p2 = points[segIndex + 1]; const scatter = (Math.random() - 0.5) * 4; p.tx = cx + p1.x + (p2.x - p1.x) * prog + scatter; p.ty = cy + p1.y + (p2.y - p1.y) * prog + scatter; });
+            } else if (type === 'wave') { particles.forEach((p, i) => { const line = Math.floor((i/count) * 3); const prog = (i % Math.floor(count/3)) / Math.floor(count/3); const width = 240; const x = (prog * width) - (width/2); const freq = 0.05; let amp = 40; if (line === 0) amp = 20; if (line === 2) amp = 60; const y = Math.sin(x * freq + (line * Math.PI/4)) * amp; p.tx = cx + x; p.ty = cy + y; });
+            } else if (type === 'music') { const headY = cy + 40; const headR = 15; const stemH = 70; const noteX1 = cx - 30; const noteX2 = cx + 40; particles.forEach((p, i) => { const section = Math.floor((i/count) * 5); const prog = (i % Math.floor(count/5)) / Math.floor(count/5); if (section === 0) { const angle = prog * Math.PI * 2; const r = Math.random() * headR; p.tx = noteX1 + Math.cos(angle) * r; p.ty = headY + Math.sin(angle) * (r*0.8); } else if (section === 1) { const angle = prog * Math.PI * 2; const r = Math.random() * headR; p.tx = noteX2 + Math.cos(angle) * r; p.ty = (headY - 10) + Math.sin(angle) * (r*0.8); } else if (section === 2) { p.tx = noteX1 + 10; p.ty = headY - (prog * stemH); } else if (section === 3) { p.tx = noteX2 + 10; p.ty = (headY - 10) - (prog * stemH); } else { const startX = noteX1 + 10; const startY = headY - stemH; const endX = noteX2 + 10; const endY = (headY - 10) - stemH; const beamThick = 15; const thicknessOffset = (Math.random()) * beamThick; p.tx = startX + (endX - startX) * prog; p.ty = startY + (endY - startY) * prog + thicknessOffset; } });
+            } else if (type === 'AK') { const strokeWidth = 25; const widthA = 120; const widthK = 100; const gap = 40; const totalW = widthA + widthK + gap; const heightLetter = 160; const startX = cx - totalW / 2; const bottomY = cy + heightLetter / 2; const topY = cy - heightLetter / 2; particles.forEach((p, i) => { const isA = i < count * 0.55; const groupI = isA ? i : i - Math.floor(count * 0.55); const groupTotal = isA ? Math.floor(count * 0.55) : count - Math.floor(count * 0.55); const progress = groupI / groupTotal; const jitterX = (Math.random() - 0.5) * strokeWidth; const jitterY = (Math.random() - 0.5) * strokeWidth; if (isA) { if (progress < 0.4) { const legProg = progress / 0.4; const x1 = startX; const y1 = bottomY; const x2 = startX + widthA / 2; const y2 = topY; p.tx = x1 + (x2 - x1) * legProg + jitterX; p.ty = y1 + (y2 - y1) * legProg + jitterY; } else if (progress < 0.8) { const legProg = (progress - 0.4) / 0.4; const x1 = startX + widthA / 2; const y1 = topY; const x2 = startX + widthA; const y2 = bottomY; p.tx = x1 + (x2 - x1) * legProg + jitterX; p.ty = y1 + (y2 - y1) * legProg + jitterY; } else { const barProg = (progress - 0.8) / 0.2; const barY = cy + 20; const x1 = startX + widthA * 0.25; const x2 = startX + widthA * 0.75; p.tx = x1 + (x2 - x1) * barProg + jitterX; p.ty = barY + jitterY; } } else { const startXK = startX + widthA + gap; if (progress < 0.4) { const vProg = progress / 0.4; p.tx = startXK + jitterX; p.ty = topY + (bottomY - topY) * vProg + jitterY; } else if (progress < 0.7) { const dProg = (progress - 0.4) / 0.3; const x1 = startXK + strokeWidth/2; const y1 = cy + 10; const x2 = startXK + widthK; const y2 = topY; p.tx = x1 + (x2 - x1) * dProg + jitterX; p.ty = y1 + (y2 - y1) * dProg + jitterY; } else { const dProg = (progress - 0.7) / 0.3; const x1 = startXK + strokeWidth/2; const y1 = cy + 10; const x2 = startXK + widthK; const y2 = bottomY; p.tx = x1 + (x2 - x1) * dProg + jitterX; p.ty = y1 + (y2 - y1) * dProg + jitterY; } } });
+            } else if (type === 'nyc') { const baseY = cy + 60; const totalW = 320; const startX = cx - totalW / 2; const buildings = [[40, 60], [50, 100], [40, 160], [60, 120], [50, 80], [40, 50], [40, 70]]; particles.forEach((p, i) => { const bIndex = i % buildings.length; const bData = buildings[bIndex]; const bW = bData[0]; const bH = bData[1]; let currentX = startX; for(let k=0; k<bIndex; k++) currentX += buildings[k][0]; p.tx = currentX + Math.random() * bW; p.ty = baseY - Math.random() * bH; });
+            } else if (type === 'arch') { const baseY = cy + 60; const archWidth = 220; const archHeight = 160; const thickness = 25; particles.forEach((p, i) => { const t = (i / count) * 2 - 1; const x = t * (archWidth / 2); const curveY = archHeight * (1 - t*t); const currentThick = thickness * (0.5 + 0.5 * Math.abs(t) * 1.5); const offsetY = (Math.random() - 0.5) * currentThick; p.tx = cx + x; p.ty = baseY - curveY + offsetY; });
             }
         }
 
         function returnToRandom() {
-            if (interactionMode === 'random') return; // Already random
+            if (interactionMode === 'random') return;
             interactionMode = 'random';
-            
-            // Explosion Effect!
-            // Calculate center
-            const cx = width / 2;
-            const cy = height / 2;
-
-            particles.forEach(p => {
-                // Vector from center
-                const dx = p.x - cx;
-                const dy = p.y - cy;
-                const angle = Math.atan2(dy, dx);
-                
-                // Assign a high outward velocity (Explosion)
-                const burstSpeed = 8 + Math.random() * 8; // Fast!
-                p.vx = Math.cos(angle) * burstSpeed;
-                p.vy = Math.sin(angle) * burstSpeed;
-            });
+            const cx = width / 2; const cy = height / 2;
+            particles.forEach(p => { const dx = p.x - cx; const dy = p.y - cy; const angle = Math.atan2(dy, dx); const burstSpeed = 8 + Math.random() * 8; p.vx = Math.cos(angle) * burstSpeed; p.vy = Math.sin(angle) * burstSpeed; });
         }
 
         function draw() {
             ctx.clearRect(0, 0, width, height);
-            
-            // Update Canvas Fill for Theme
             ctx.fillStyle = isLightMode ? '#e5e5e5' : '#050505';
             ctx.fillRect(0, 0, width, height);
-
             particles.forEach((p, i) => {
-                if (interactionMode === 'shape') {
-                    // Lerp to target
-                    p.x += (p.tx - p.x) * 0.08;
-                    p.y += (p.ty - p.y) * 0.08;
-                } else {
-                    // Random movement with Friction/Drag for Explosion Recovery
-                    
-                    // 1. Move
-                    p.x += p.vx;
-                    p.y += p.vy;
-
-                    // 2. Friction logic
-                    // Calculate current speed
-                    const currentSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-                    const normalSpeed = 0.5; // Target cruising speed
-                    
-                    if (currentSpeed > normalSpeed) {
-                        // Decelerate
-                        p.vx *= 0.94; // Drag factor
-                        p.vy *= 0.94;
-                    }
-
-                    // 3. Bounce
-                    if (p.x < 0 || p.x > width) p.vx *= -1;
-                    if (p.y < 0 || p.y > height) p.vy *= -1;
-
-                    // Mouse Repel (Only in random mode)
-                    const dx = mouseX - p.x;
-                    const dy = mouseY - p.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    const forceDistance = 150;
-
-                    if (distance < forceDistance) {
-                        const force = (forceDistance - distance) / forceDistance;
-                        const forceDirectionX = dx / distance;
-                        const forceDirectionY = dy / distance;
-                        p.x -= forceDirectionX * force * 3;
-                        p.y -= forceDirectionY * force * 3;
-                    }
-                }
-
-                // Draw Particle
-                const opacity = 0.2 + (p.z * 0.2);
-                
-                // Theme Color Logic
-                const particleR = isLightMode ? 20 : 255;
-                const particleG = isLightMode ? 20 : 255;
-                const particleB = isLightMode ? 20 : 255;
-                
+                if (interactionMode === 'shape') { p.x += (p.tx - p.x) * 0.08; p.y += (p.ty - p.y) * 0.08; } else { const currentSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy); const normalSpeed = 0.5; if (currentSpeed > normalSpeed) { p.vx *= 0.94; p.vy *= 0.94; } if (p.x < 0 || p.x > width) p.vx *= -1; if (p.y < 0 || p.y > height) p.vy *= -1; const dx = mouseX - p.x; const dy = mouseY - p.y; const distance = Math.sqrt(dx * dx + dy * dy); const forceDistance = 150; if (distance < forceDistance) { const force = (forceDistance - distance) / forceDistance; const forceDirectionX = dx / distance; const forceDirectionY = dy / distance; p.x -= forceDirectionX * force * 3; p.y -= forceDirectionY * force * 3; } p.x += p.vx; p.y += p.vy; }
+                const opacity = 0.2 + (p.z * 0.2); const particleR = isLightMode ? 20 : 255; const particleG = isLightMode ? 20 : 255; const particleB = isLightMode ? 20 : 255;
                 ctx.fillStyle = `rgba(${particleR}, ${particleG}, ${particleB}, ${interactionMode === 'shape' ? 0.6 : opacity})`;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Connect Lines (Only in random mode for cleaner shapes)
-                if (interactionMode === 'random') {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const p2 = particles[j];
-                        const dx2 = p.x - p2.x;
-                        const dy2 = p.y - p2.y;
-                        const dist = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-
-                        if (dist < 150) {
-                            const lineR = isLightMode ? 20 : 100;
-                            const lineG = isLightMode ? 20 : 100;
-                            const lineB = isLightMode ? 20 : 100;
-                            
-                            ctx.strokeStyle = `rgba(${lineR}, ${lineG}, ${lineB}, ${0.15 * (1 - dist / 150)})`;
-                            ctx.lineWidth = 0.5;
-                            ctx.beginPath();
-                            ctx.moveTo(p.x, p.y);
-                            ctx.lineTo(p2.x, p2.y);
-                            ctx.stroke();
-                        }
-                    }
-                }
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+                if (interactionMode === 'random') { for (let j = i + 1; j < particles.length; j++) { const p2 = particles[j]; const dx2 = p.x - p2.x; const dy2 = p.y - p2.y; const dist = Math.sqrt(dx2 * dx2 + dy2 * dy2); if (dist < 150) { const lineR = isLightMode ? 20 : 100; const lineG = isLightMode ? 20 : 100; const lineB = isLightMode ? 20 : 100; ctx.strokeStyle = `rgba(${lineR}, ${lineG}, ${lineB}, ${0.15 * (1 - dist / 150)})`; ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke(); } } }
             });
-
             requestAnimationFrame(draw);
         }
 
@@ -1157,47 +806,19 @@
         resize();
         draw();
         
-        // Keydown Listener for "AK" Mode
-        window.addEventListener('keydown', (e) => {
-            if (e.key === '0') {
-                if (isAKMode) {
-                    // Turn OFF
-                    isAKMode = false;
-                    returnToRandom();
-                } else {
-                    // Turn ON
-                    isAKMode = true;
-                    formShape('AK');
-                }
-            }
-        });
+        window.addEventListener('keydown', (e) => { if (e.key === '0') { if (isAKMode) { isAKMode = false; returnToRandom(); } else { isAKMode = true; formShape('AK'); } } });
 
-        // Footer icons styling specific class
-        document.querySelectorAll('.footer-icon').forEach(icon => {
-            icon.classList.add('p-4', 'bg-white/5', 'rounded-full', 'hover:bg-white/10', 'hover:scale-110', 'transition-all', 'duration-300', 'group', 'border', 'border-white/10', 'hover:border-blue-500/50');
-        });
+        document.querySelectorAll('.footer-icon').forEach(icon => { icon.classList.add('p-4', 'bg-white/5', 'rounded-full', 'hover:bg-white/10', 'hover:scale-110', 'transition-all', 'duration-300', 'group', 'border', 'border-white/10', 'hover:border-blue-500/50'); });
 
-        // Event Listeners for Particle Shapes
-        // Wrapper function to guard against AK mode
-        function triggerShape(type) {
-            if (isAKMode) return; // Don't interrupt AK mode
-            formShape(type);
-        }
-        function triggerRandom() {
-            if (isAKMode) return; // Don't interrupt AK mode
-            returnToRandom();
-        }
+        function triggerShape(type) { if (isAKMode) return; formShape(type); }
+        function triggerRandom() { if (isAKMode) return; returnToRandom(); }
 
         const cpuProject = document.getElementById('project-cpu');
         const recordProject = document.getElementById('project-record');
-        
-        // Experience items
         const expInfinite = document.getElementById('exp-infinite');
         const expCbn = document.getElementById('exp-cbn');
         const expSavny = document.getElementById('exp-savny');
         const expNyu = document.getElementById('exp-nyu');
-        
-        // WashU Items
         const wCyc = document.getElementById('washu-cyc');
         const wWc = document.getElementById('washu-wc');
         const wSif = document.getElementById('washu-sif');
@@ -1205,92 +826,36 @@
         const wStrike = document.getElementById('washu-strike');
         const wAshoka = document.getElementById('washu-ashoka');
 
-        if (cpuProject) {
-            cpuProject.addEventListener('mouseenter', () => triggerShape('cpu'));
-            cpuProject.addEventListener('mouseleave', triggerRandom);
-        }
-
-        if (recordProject) {
-            recordProject.addEventListener('mouseenter', () => triggerShape('record'));
-            recordProject.addEventListener('mouseleave', triggerRandom);
-        }
+        if (cpuProject) { cpuProject.addEventListener('mouseenter', () => triggerShape('cpu')); cpuProject.addEventListener('mouseleave', triggerRandom); }
+        if (recordProject) { recordProject.addEventListener('mouseenter', () => triggerShape('record')); recordProject.addEventListener('mouseleave', triggerRandom); }
+        if (expInfinite) { expInfinite.addEventListener('mouseenter', () => triggerShape('infinity')); expInfinite.addEventListener('mouseleave', triggerRandom); }
+        if (expCbn) { expCbn.addEventListener('mouseenter', () => triggerShape('cbn')); expCbn.addEventListener('mouseleave', triggerRandom); }
+        if (expSavny) { expSavny.addEventListener('mouseenter', () => triggerShape('globe')); expSavny.addEventListener('mouseleave', triggerRandom); }
+        if (expNyu) { expNyu.addEventListener('mouseenter', () => triggerShape('nyu')); expNyu.addEventListener('mouseleave', triggerRandom); }
+        if (wCyc) { wCyc.addEventListener('mouseenter', () => triggerShape('community')); wCyc.addEventListener('mouseleave', triggerRandom); }
+        if (wWc) { wWc.addEventListener('mouseenter', () => triggerShape('community')); wWc.addEventListener('mouseleave', triggerRandom); }
+        if (wSif) { wSif.addEventListener('mouseenter', () => triggerShape('stock')); wSif.addEventListener('mouseleave', triggerRandom); }
+        if (wKwur) { wKwur.addEventListener('mouseenter', () => triggerShape('wave')); wKwur.addEventListener('mouseleave', triggerRandom); }
+        if (wStrike) { wStrike.addEventListener('mouseenter', () => triggerShape('music')); wStrike.addEventListener('mouseleave', triggerRandom); }
+        if (wAshoka) { wAshoka.addEventListener('mouseenter', () => triggerShape('globe')); wAshoka.addEventListener('mouseleave', triggerRandom); }
         
-        if (expInfinite) {
-            expInfinite.addEventListener('mouseenter', () => triggerShape('infinity'));
-            expInfinite.addEventListener('mouseleave', triggerRandom);
-        }
-        
-        if (expCbn) {
-            expCbn.addEventListener('mouseenter', () => triggerShape('cbn'));
-            expCbn.addEventListener('mouseleave', triggerRandom);
-        }
-        
-        if (expSavny) {
-            expSavny.addEventListener('mouseenter', () => triggerShape('globe'));
-            expSavny.addEventListener('mouseleave', triggerRandom);
-        }
-        
-        if (expNyu) {
-            expNyu.addEventListener('mouseenter', () => triggerShape('nyu'));
-            expNyu.addEventListener('mouseleave', triggerRandom);
-        }
-
-        // WashU Listeners
-        if (wCyc) {
-            wCyc.addEventListener('mouseenter', () => triggerShape('community'));
-            wCyc.addEventListener('mouseleave', triggerRandom);
-        }
-        if (wWc) {
-            wWc.addEventListener('mouseenter', () => triggerShape('community'));
-            wWc.addEventListener('mouseleave', triggerRandom);
-        }
-        if (wSif) {
-            wSif.addEventListener('mouseenter', () => triggerShape('stock'));
-            wSif.addEventListener('mouseleave', triggerRandom);
-        }
-        if (wKwur) {
-            wKwur.addEventListener('mouseenter', () => triggerShape('wave'));
-            wKwur.addEventListener('mouseleave', triggerRandom);
-        }
-        if (wStrike) {
-            wStrike.addEventListener('mouseenter', () => triggerShape('music'));
-            wStrike.addEventListener('mouseleave', triggerRandom);
-        }
-        if (wAshoka) {
-            wAshoka.addEventListener('mouseenter', () => triggerShape('globe'));
-            wAshoka.addEventListener('mouseleave', triggerRandom);
-        }
-        
-        // Location Hover Listeners
         const locNyc = document.getElementById('loc-nyc');
         const locStl = document.getElementById('loc-stl');
-
-        if (locNyc) {
-            locNyc.addEventListener('mouseenter', () => triggerShape('nyc'));
-            locNyc.addEventListener('mouseleave', triggerRandom);
-        }
-        if (locStl) {
-            locStl.addEventListener('mouseenter', () => triggerShape('arch'));
-            locStl.addEventListener('mouseleave', triggerRandom);
-        }
+        if (locNyc) { locNyc.addEventListener('mouseenter', () => triggerShape('nyc')); locNyc.addEventListener('mouseleave', triggerRandom); }
+        if (locStl) { locStl.addEventListener('mouseenter', () => triggerShape('arch')); locStl.addEventListener('mouseleave', triggerRandom); }
         
-        // Engineering Nav Link
         const navEngineering = document.getElementById('nav-engineering');
         const projectsSection = document.getElementById('projects');
-        
-        if (navEngineering && projectsSection) {
-            navEngineering.addEventListener('click', () => {
-                projectsSection.scrollIntoView({ behavior: 'smooth' });
-            });
-        }
+        if (navEngineering && projectsSection) { navEngineering.addEventListener('click', () => { projectsSection.scrollIntoView({ behavior: 'smooth' }); }); }
 
         // Music Page Navigation
         const navSound = document.getElementById('nav-sound');
         const homeView = document.getElementById('home-view');
         const musicView = document.getElementById('music-view');
         const musicBackBtn = document.getElementById('music-back-btn');
-        // Retrieve themeToggle again to be safe inside this block or use the global one
         const themeBtn = document.getElementById('theme-toggle');
+
+        let logoObserver; // To enable/disable observer
 
         if (navSound && homeView && musicView && musicBackBtn) {
             // OPEN Music Page
@@ -1301,7 +866,6 @@
                     document.body.classList.add('no-scroll');
                 }});
                 
-                // Hide Theme Toggle
                 gsap.to(themeBtn, { opacity: 0, scale: 0, duration: 0.3, pointerEvents: 'none' });
 
                 // Fade In Music
@@ -1309,43 +873,109 @@
                 musicView.style.pointerEvents = 'auto';
                 gsap.to(musicView, { opacity: 1, duration: 0.5, delay: 0.2 });
                 
-                // Form Particles into Music Note or similar (optional visual touch)
                 formShape('music'); 
                 
-                // Add Gold Cursor Mode
                 const cursor = document.getElementById('cursor');
                 const follower = document.getElementById('cursor-follower');
                 cursor.classList.add('gold-mode');
                 follower.classList.add('gold-mode');
+
+                // Enable Carousel Observer
+                if (logoObserver) logoObserver.enable();
+                
+                // Initialize Logos
+                gsap.set('.music-logo:not(#logo-1)', { xPercent: 100, opacity: 0 }); // Hide others to right
+                gsap.set('#logo-1', { xPercent: 0, opacity: 1 }); // Show first
             });
 
             // CLOSE Music Page (Back to Home)
             musicBackBtn.addEventListener('click', () => {
-                // Fade Out Music
                 gsap.to(musicView, { opacity: 0, duration: 0.5, onComplete: () => {
                     musicView.style.display = 'none';
                     musicView.style.pointerEvents = 'none';
                     document.body.classList.remove('no-scroll');
                 }});
                 
-                // Show Theme Toggle
                 gsap.to(themeBtn, { opacity: 1, scale: 1, duration: 0.3, delay: 0.2, pointerEvents: 'auto' });
 
-                // Fade In Home
                 homeView.style.display = 'block';
                 gsap.to(homeView, { opacity: 1, duration: 0.5, delay: 0.2 });
                 
-                // Explode Particles back to random
                 returnToRandom();
                 
-                // Remove Gold Cursor Mode
                 const cursor = document.getElementById('cursor');
                 const follower = document.getElementById('cursor-follower');
                 cursor.classList.remove('gold-mode');
                 follower.classList.remove('gold-mode');
+
+                // Disable Carousel Observer
+                if (logoObserver) logoObserver.disable();
             });
         }
-        
+
+        // CAROUSEL LOGIC
+        let currentLogoIndex = 0;
+        const logos = document.querySelectorAll('.music-logo');
+        const totalLogos = logos.length;
+        let isAnimating = false;
+
+        function moveCarousel(direction) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            const currentLogo = logos[currentLogoIndex];
+            
+            // Calculate Next Index
+            let nextIndex;
+            if (direction === 'next') {
+                nextIndex = (currentLogoIndex + 1) % totalLogos;
+            } else {
+                nextIndex = (currentLogoIndex - 1 + totalLogos) % totalLogos;
+            }
+            const nextLogo = logos[nextIndex];
+
+            // Animate
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    isAnimating = false;
+                    currentLogoIndex = nextIndex;
+                }
+            });
+
+            if (direction === 'next') {
+                // Next: Comes from LEFT (-100%) -> Center (0%)
+                // Current: Center (0%) -> Right (100%)
+                
+                // Reset Next Logo Position to Left (offscreen)
+                gsap.set(nextLogo, { xPercent: -100, opacity: 0 });
+                
+                // Animate
+                tl.to(currentLogo, { xPercent: 100, opacity: 0, duration: 1.2, ease: "power3.inOut" })
+                  .to(nextLogo, { xPercent: 0, opacity: 1, duration: 1.2, ease: "power3.inOut" }, "<");
+            } else {
+                // Prev: Comes from RIGHT (100%) -> Center (0%)
+                // Current: Center (0%) -> Left (-100%)
+                
+                // Reset Next Logo Position to Right (offscreen)
+                gsap.set(nextLogo, { xPercent: 100, opacity: 0 });
+                
+                // Animate
+                tl.to(currentLogo, { xPercent: -100, opacity: 0, duration: 1.2, ease: "power3.inOut" })
+                  .to(nextLogo, { xPercent: 0, opacity: 1, duration: 1.2, ease: "power3.inOut" }, "<");
+            }
+        }
+
+        // Initialize Observer
+        logoObserver = Observer.create({
+            target: window, // Detect on whole window when active
+            type: "wheel,touch,pointer",
+            onUp: () => moveCarousel('prev'), 
+            onDown: () => moveCarousel('next'),
+            tolerance: 10,
+            preventDefault: true
+        });
+        logoObserver.disable(); // Initially disabled until music page opens
+
     </script>
 </body>
 </html>
