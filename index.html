@@ -21,14 +21,57 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/ScrollTrigger.min.js"></script>
 
     <style>
+        :root {
+            --bg-color: #050505;
+            --text-primary: #e0e0e0;
+            --text-secondary: #9ca3af; /* gray-400 */
+            --card-bg: rgba(0,0,0,0.4);
+            --border-color: rgba(255,255,255,0.1);
+            --particle-color: 255, 255, 255;
+            --accent-blue: #60a5fa;
+        }
+
+        body.light-mode {
+            --bg-color: #e5e5e5;
+            --text-primary: #111827; /* gray-900 */
+            --text-secondary: #4b5563; /* gray-600 */
+            --card-bg: rgba(255,255,255,0.6);
+            --border-color: rgba(0,0,0,0.1);
+            --particle-color: 20, 20, 20;
+            --accent-blue: #2563eb;
+        }
+
         body {
-            background-color: #050505;
-            color: #e0e0e0;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
             cursor: none; /* Hide default cursor */
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
         
+        /* Light Mode Overrides for Tailwind Classes */
+        body.light-mode .text-white { color: var(--text-primary) !important; }
+        body.light-mode .text-gray-400 { color: var(--text-secondary) !important; }
+        body.light-mode .text-gray-300 { color: var(--text-secondary) !important; }
+        /* Added override for gray-200 to be black in light mode */
+        body.light-mode .text-gray-200 { color: #000000 !important; }
+        body.light-mode .text-gray-500 { color: #6b7280 !important; }
+        body.light-mode .text-blue-400 { color: var(--accent-blue) !important; }
+        
+        body.light-mode .bg-black { background-color: transparent !important; } 
+        body.light-mode .bg-black\/40 { background-color: var(--card-bg) !important; }
+        body.light-mode .bg-black\/20 { background-color: transparent !important; } /* Added this line */
+        body.light-mode .bg-white\/5 { background-color: rgba(0,0,0,0.05) !important; }
+        
+        body.light-mode .border-white\/10 { border-color: var(--border-color) !important; }
+        body.light-mode .border-white\/20 { border-color: var(--border-color) !important; }
+        body.light-mode .border-white\/5 { border-color: var(--border-color) !important; }
+
+        /* Inverse Cursor for Light Mode */
+        body.light-mode #cursor { background-color: black; mix-blend-mode: normal; opacity: 0.8; }
+        body.light-mode #cursor-follower { border-color: black; }
+
         .font-code {
             font-family: 'JetBrains Mono', monospace;
         }
@@ -42,8 +85,8 @@
 
         /* Selection Color */
         ::selection {
-            background-color: white;
-            color: black;
+            background-color: var(--text-primary);
+            color: var(--bg-color);
         }
 
         /* Scrollbar */
@@ -51,7 +94,7 @@
             width: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #050505;
+            background: var(--bg-color);
         }
         ::-webkit-scrollbar-thumb {
             background: #333;
@@ -60,6 +103,8 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #555;
         }
+        body.light-mode ::-webkit-scrollbar-thumb { background: #ccc; }
+        body.light-mode ::-webkit-scrollbar-thumb:hover { background: #999; }
 
         /* Enforce Snap Stop */
         section {
@@ -68,6 +113,11 @@
     </style>
 </head>
 <body class="antialiased">
+
+    <!-- Theme Toggle Button -->
+    <button id="theme-toggle" class="fixed top-8 right-8 z-50 p-3 rounded-full border border-white/20 transition-transform duration-300 bg-black/20 hover-trigger" data-cursor="link">
+        <i id="theme-icon" data-lucide="sun" class="w-6 h-6 text-gray-300"></i>
+    </button>
 
     <!-- Splash Screen -->
     <div id="splash" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center">
@@ -105,9 +155,9 @@
 
                 <!-- Tagline -->
                 <p class="text-lg md:text-xl text-gray-400 font-code ml-2 mt-2 reveal-text tracking-widest cursor-default">
-                    <span class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300">ENGINEERING</span> • 
+                    <span id="nav-engineering" class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 cursor-pointer hover-trigger" data-cursor="link">ENGINEERING</span> • 
                     <span class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300">ECONOMICS</span> • 
-                    <a href="https://drive.google.com/drive/folders/1z-0ycJ5WCbNF71UemWRwg2YosB_MIm3E?usp=sharing" target="_blank" class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 hover-trigger" data-cursor="link">SOUND</a>
+                    <a href="https://soundcloud.com/prodarjun" target="_blank" class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 hover-trigger" data-cursor="link">SOUND</a>
                 </p>
 
                 <!-- Phrase/Description Section -->
@@ -279,11 +329,11 @@
         </section>
 
         <!-- Projects Section -->
-        <section class="min-h-screen flex flex-col justify-center py-24 md:py-32 scroll-section snap-start">
+        <section id="projects" class="min-h-screen flex flex-col justify-center py-24 md:py-32 scroll-section snap-start">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
                 <!-- Removed sticky top-32 and glitch-header classes -->
                 <div class="md:col-span-4 text-gray-500 uppercase tracking-widest text-sm font-bold h-fit font-code">
-                    04 / Selected Works
+                    04 / Projects
                 </div>
                 <div class="md:col-span-8 space-y-12">
                     
@@ -503,6 +553,64 @@
         let particles = [];
         let interactionMode = 'random'; // 'random', 'shape'
         let isAKMode = false; // State for the "0" key toggle
+        let isLightMode = false;
+
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        // Note: We don't cache the icon element because Lucide replaces it.
+        
+        // Hover Spin Animation (Only on Hover)
+        themeToggle.addEventListener('mouseenter', () => {
+            gsap.to(themeToggle, { rotation: 180, duration: 0.3, ease: "power2.out", overwrite: true });
+        });
+
+        themeToggle.addEventListener('mouseleave', () => {
+            gsap.to(themeToggle, { rotation: 0, duration: 0.1, ease: "power2.out", overwrite: true });
+        });
+        
+        themeToggle.addEventListener('click', () => {
+            isLightMode = !isLightMode;
+            document.body.classList.toggle('light-mode');
+            
+            // Smoother Icon Switch Animation without Rotating Button
+            // 1. Get the current icon (SVG)
+            const currentIcon = themeToggle.querySelector('svg');
+            
+            // Press effect on button (scale down slightly)
+            gsap.to(themeToggle, { scale: 0.9, duration: 0.1, yoyo: true, repeat: 1 });
+
+            // 2. Animate OUT the current icon
+            if (currentIcon) {
+                gsap.to(currentIcon, {
+                    scale: 0,
+                    opacity: 0,
+                    rotation: 90,
+                    duration: 0.2,
+                    ease: "power2.in",
+                    onComplete: () => {
+                        // 3. Swap the HTML after animation is done
+                        const iconName = isLightMode ? 'moon' : 'sun';
+                        themeToggle.innerHTML = `<i data-lucide="${iconName}" class="w-6 h-6 text-gray-300"></i>`;
+                        lucide.createIcons();
+                        
+                        // 4. Get the NEW icon
+                        const newIcon = themeToggle.querySelector('svg');
+                        
+                        // 5. Set initial state for entrance
+                        gsap.set(newIcon, { scale: 0, opacity: 0, rotation: -90 });
+                        
+                        // 6. Animate IN the new icon
+                        gsap.to(newIcon, {
+                            scale: 1,
+                            opacity: 1,
+                            rotation: 0,
+                            duration: 0.4,
+                            ease: "back.out(2)"
+                        });
+                    }
+                });
+            }
+        });
 
         function resize() {
             width = window.innerWidth;
@@ -879,9 +987,8 @@
         function draw() {
             ctx.clearRect(0, 0, width, height);
             
-            // Background style based on mode? 
-            // Stick to dark
-            ctx.fillStyle = '#050505';
+            // Update Canvas Fill for Theme
+            ctx.fillStyle = isLightMode ? '#e5e5e5' : '#050505';
             ctx.fillRect(0, 0, width, height);
 
             particles.forEach((p, i) => {
@@ -928,7 +1035,13 @@
 
                 // Draw Particle
                 const opacity = 0.2 + (p.z * 0.2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${interactionMode === 'shape' ? 0.6 : opacity})`;
+                
+                // Theme Color Logic
+                const particleR = isLightMode ? 20 : 255;
+                const particleG = isLightMode ? 20 : 255;
+                const particleB = isLightMode ? 20 : 255;
+                
+                ctx.fillStyle = `rgba(${particleR}, ${particleG}, ${particleB}, ${interactionMode === 'shape' ? 0.6 : opacity})`;
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -942,7 +1055,11 @@
                         const dist = Math.sqrt(dx2 * dx2 + dy2 * dy2);
 
                         if (dist < 150) {
-                            ctx.strokeStyle = `rgba(100, 100, 100, ${0.15 * (1 - dist / 150)})`;
+                            const lineR = isLightMode ? 20 : 100;
+                            const lineG = isLightMode ? 20 : 100;
+                            const lineB = isLightMode ? 20 : 100;
+                            
+                            ctx.strokeStyle = `rgba(${lineR}, ${lineG}, ${lineB}, ${0.15 * (1 - dist / 150)})`;
                             ctx.lineWidth = 0.5;
                             ctx.beginPath();
                             ctx.moveTo(p.x, p.y);
@@ -1075,6 +1192,16 @@
         if (locStl) {
             locStl.addEventListener('mouseenter', () => triggerShape('arch'));
             locStl.addEventListener('mouseleave', triggerRandom);
+        }
+        
+        // Engineering Nav Link
+        const navEngineering = document.getElementById('nav-engineering');
+        const projectsSection = document.getElementById('projects');
+        
+        if (navEngineering && projectsSection) {
+            navEngineering.addEventListener('click', () => {
+                projectsSection.scrollIntoView({ behavior: 'smooth' });
+            });
         }
         
     </script>
