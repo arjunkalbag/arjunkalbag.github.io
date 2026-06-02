@@ -541,6 +541,26 @@
                             </p>
                         </div>
 
+                        <div id="project-needl" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
+                            <a href="https://useneedl.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-start mb-4" data-cursor="link">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 bg-white/5 rounded-lg text-blue-400">
+                                        <i data-lucide="disc-3" class="w-6 h-6"></i>
+                                    </div>
+                                    <h3 class="text-3xl font-bold text-white group-hover:text-blue-400 transition-colors">Needl</h3>
+                                </div>
+                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+                            </a>
+                            <div class="flex gap-2 mb-4 flex-wrap">
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">JavaScript</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Three.js</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Web Audio API</span>
+                            </div>
+                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                                Developed a browser-based music player featuring a real-time 3D vinyl visualization, local audio file management, and interactive playback controls. Built with JavaScript, Three.js, and the Web Audio API.
+                            </p>
+                        </div>
+
                         <div id="project-cpu" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
                             <div class="flex justify-between items-start mb-4">
                                 <div class="flex items-center gap-3">
@@ -1016,6 +1036,22 @@
                         p.ty = cy + tri[0].y * sa + tri[1].y * sb + tri[2].y * sc;
                     }
                 });
+            } else if (type === 'vinyl') {
+                // Needl — vinyl record: concentric grooves + center label + hole
+                const grooves = [98, 84, 70, 56, 30, 18];
+                particles.forEach((p, i) => {
+                    if (i < count * 0.06) {
+                        // center hole
+                        const a = Math.random() * Math.PI * 2; const r = Math.random() * 6;
+                        p.tx = cx + Math.cos(a) * r; p.ty = cy + Math.sin(a) * r;
+                    } else {
+                        const g = grooves[i % grooves.length];
+                        const a = Math.random() * Math.PI * 2;
+                        const r = g + (Math.random() - 0.5) * 2.5;
+                        p.tx = cx + Math.cos(a) * r;
+                        p.ty = cy + Math.sin(a) * r;
+                    }
+                });
             }
         }
 
@@ -1054,6 +1090,7 @@
         // Map each hover-target element id to the particle shape it forms
         const shapeMap = {
             'project-playback': 'play',
+            'project-needl': 'vinyl',
             'project-cpu': 'cpu',
             'project-record': 'record',
             'exp-create': 'asterisk',
