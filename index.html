@@ -1179,10 +1179,10 @@
             ctx.fillRect(0, 0, width, height);
             particles.forEach((p, i) => {
                 if (interactionMode === 'shape') { p.x += (p.tx - p.x) * 0.08; p.y += (p.ty - p.y) * 0.08; } else { const currentSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy); const normalSpeed = 0.5; if (currentSpeed > normalSpeed) { p.vx *= 0.94; p.vy *= 0.94; } if (p.x < 0 || p.x > width) p.vx *= -1; if (p.y < 0 || p.y > height) p.vy *= -1; const dx = mouseX - p.x; const dy = mouseY - p.y; const distance = Math.sqrt(dx * dx + dy * dy); const forceDistance = 150; if (distance < forceDistance) { const force = (forceDistance - distance) / forceDistance; const forceDirectionX = dx / distance; const forceDirectionY = dy / distance; p.x -= forceDirectionX * force * 3; p.y -= forceDirectionY * force * 3; } p.x += p.vx; p.y += p.vy; }
-                const opacity = 0.2 + (p.z * 0.2); const particleR = isLightMode ? 20 : 255; const particleG = isLightMode ? 20 : 255; const particleB = isLightMode ? 20 : 255;
+                const opacity = 0.2 + (p.z * 0.2); const particleR = isLightMode ? 37 : 96; const particleG = isLightMode ? 99 : 165; const particleB = isLightMode ? 235 : 250;
                 ctx.fillStyle = `rgba(${particleR}, ${particleG}, ${particleB}, ${interactionMode === 'shape' ? 0.6 : opacity})`;
                 ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-                if (interactionMode === 'random') { for (let j = i + 1; j < particles.length; j++) { const p2 = particles[j]; const dx2 = p.x - p2.x; const dy2 = p.y - p2.y; const dist = Math.sqrt(dx2 * dx2 + dy2 * dy2); if (dist < 150) { const lineR = isLightMode ? 20 : 100; const lineG = isLightMode ? 20 : 100; const lineB = isLightMode ? 20 : 100; ctx.strokeStyle = `rgba(${lineR}, ${lineG}, ${lineB}, ${0.15 * (1 - dist / 150)})`; ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke(); } } }
+                if (interactionMode === 'random') { for (let j = i + 1; j < particles.length; j++) { const p2 = particles[j]; const dx2 = p.x - p2.x; const dy2 = p.y - p2.y; const dist = Math.sqrt(dx2 * dx2 + dy2 * dy2); if (dist < 150) { const lineR = isLightMode ? 37 : 96; const lineG = isLightMode ? 99 : 165; const lineB = isLightMode ? 235 : 250; ctx.strokeStyle = `rgba(${lineR}, ${lineG}, ${lineB}, ${0.15 * (1 - dist / 150)})`; ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke(); } } }
             });
             requestAnimationFrame(draw);
         }
