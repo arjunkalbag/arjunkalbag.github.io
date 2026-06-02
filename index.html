@@ -97,6 +97,11 @@
         }
         .font-resolide { font-family: 'Resolide Serif', serif; }
 
+        /* Theme-aware logos: *-for-dark shows in dark mode, *-for-light in light mode */
+        .logo-for-light { display: none; }
+        body.light-mode .logo-for-dark { display: none; }
+        body.light-mode .logo-for-light { display: inline-block; }
+
         /* Custom Cursor */
         #cursor {
             pointer-events: none;
@@ -420,9 +425,10 @@
                             <div class="absolute -left-[20px] top-0 bg-black p-2 rounded-full border border-white/20 group-hover:border-blue-500 group-hover:scale-110 transition-all">
                                 <i data-lucide="asterisk" class="w-5 h-5 text-gray-400 group-hover:text-blue-400"></i>
                             </div>
-                            <a href="https://trycreate.co/" target="_blank" rel="noopener" class="inline-flex items-center gap-3" data-cursor="link">
-                                <h3 class="text-3xl md:text-5xl font-bold text-white mb-2 transition-colors group-hover:text-blue-400">Create Wellness</h3>
-                                <i data-lucide="arrow-up-right" class="link-arrow w-5 h-5 md:w-7 md:h-7 text-gray-600 mb-2 group-hover:text-blue-400"></i>
+                            <a href="https://trycreate.co/" target="_blank" rel="noopener" class="inline-flex items-center gap-3 mb-2" data-cursor="link">
+                                <img src="assets/create-logo-white.png" alt="Create Wellness" class="logo-for-dark h-9 md:h-12 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
+                                <img src="assets/create-logo-orange.png" alt="Create Wellness" class="logo-for-light h-9 md:h-12 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
+                                <i data-lucide="arrow-up-right" class="link-arrow w-5 h-5 md:w-7 md:h-7 text-gray-600 group-hover:text-blue-400"></i>
                             </a>
                             <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 text-gray-400 font-code">
                                 <span class="text-lg font-medium text-blue-400">Product Management & Strategy Intern</span>
@@ -568,7 +574,8 @@
                     <div class="md:col-span-8 space-y-12">
                         <div id="project-playback" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
                             <a href="https://tryplayback.xyz" target="_blank" rel="noopener" class="flex justify-between items-start mb-4" data-cursor="link">
-                                <img src="assets/playback-logo.png" alt="Playback" class="h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
+                                <img src="assets/playback-logo.png" alt="Playback" class="logo-for-dark h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
+                                <img src="assets/playback-logo-dark.png" alt="Playback" class="logo-for-light h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
                                 <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
                             </a>
                             <div class="flex gap-2 mb-4 flex-wrap">
