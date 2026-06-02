@@ -218,9 +218,9 @@
         /* Animated ASCII portrait */
         .ascii-portrait {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 4.3px;
+            font-size: 7px;
             line-height: 1;
-            letter-spacing: 0.4px;
+            letter-spacing: 0.6px;
             white-space: pre;
             font-weight: 500;
             transform-style: preserve-3d;
@@ -233,8 +233,8 @@
             transition: filter 0.45s ease;
             filter: drop-shadow(0 0 0 rgba(96,165,250,0));
         }
-        @media (min-width: 1280px) { .ascii-portrait { font-size: 5.5px; letter-spacing: 0.5px; } }
-        @media (min-width: 1536px) { .ascii-portrait { font-size: 6.5px; } }
+        @media (min-width: 1280px) { .ascii-portrait { font-size: 9px; letter-spacing: 0.7px; } }
+        @media (min-width: 1536px) { .ascii-portrait { font-size: 11px; letter-spacing: 0.8px; } }
         #ascii-wrap:hover .ascii-portrait {
             filter: drop-shadow(0 0 26px rgba(96,165,250,0.55));
         }
@@ -324,7 +324,7 @@
         <div id="home-view">
             <!-- Hero Section -->
             <section class="h-screen flex flex-col justify-center pt-20 pb-10 relative snap-start px-4 sm:px-8 md:px-12" id="hero">
-                <div class="space-y-6 md:space-y-8 parallax-element mt-16 md:mt-32">
+                <div class="space-y-6 md:space-y-8 parallax-element mt-16 md:mt-32 relative z-10">
                     <p class="text-gray-400 tracking-widest text-sm md:text-base font-code uppercase ml-2 reveal-text">
                         <span id="loc-nyc" class="cursor-pointer transition-all duration-300 hover:text-blue-400 hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]">New York</span>
                         <span class="mx-2">/</span>
@@ -372,7 +372,7 @@
                 </div>
 
                 <!-- Animated ASCII Portrait -->
-                <div id="ascii-wrap" class="hidden lg:flex absolute right-[4%] top-1/2 -translate-y-1/2 z-20 items-center justify-center opacity-0 hover-trigger" data-cursor="link" style="perspective: 1100px;">
+                <div id="ascii-wrap" class="hidden lg:flex absolute right-[2%] top-1/2 -translate-y-1/2 z-0 items-center justify-center opacity-0 hover-trigger" data-cursor="link" style="perspective: 1100px;">
                     <pre id="ascii-portrait" aria-label="ASCII portrait of Arjun Kalbag" class="ascii-portrait m-0"></pre>
                 </div>
 
@@ -797,7 +797,7 @@
             const pre = document.getElementById('ascii-portrait');
             if (!wrap || !pre) return;
 
-            const COLS = 92;
+            const COLS = 108;
             const CHAR_RATIO = 0.6;            // monospace cell width / height
             const RAMP = " .:-=+*#%@";          // sparse -> dense (bright pixels render denser)
 
