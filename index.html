@@ -15,7 +15,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@300;400;500&family=EB+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
     
     <!-- Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -100,6 +100,9 @@
             font-display: swap;
         }
         .font-resolide { font-family: 'Resolide Serif', serif; }
+
+        /* Classic Ivy-League serif (Vantage Prep) */
+        .font-ivy { font-family: 'EB Garamond', 'Times New Roman', Times, serif; }
 
         /* Theme-aware logos: *-for-dark shows in dark mode, *-for-light in light mode */
         .logo-for-light { display: none; }
@@ -613,7 +616,10 @@
 
                         <div id="project-vantage" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
                             <a href="https://vantageprep.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
-                                <img src="assets/vantage-logo.png" alt="Vantage Prep" class="h-24 md:h-32 w-auto transition-transform duration-300 group-hover:scale-[1.04]" />
+                                <div class="flex items-center gap-4 md:gap-5">
+                                    <img src="assets/vantage-logo.png" alt="Vantage Prep" class="h-24 md:h-32 w-auto transition-transform duration-300 group-hover:scale-[1.04]" />
+                                    <span class="font-ivy font-semibold text-4xl md:text-6xl tracking-wide text-white group-hover:text-blue-400 transition-colors">Vantage Prep</span>
+                                </div>
                                 <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
                             </a>
                             <div class="flex gap-2 mb-4 flex-wrap">
