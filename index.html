@@ -104,6 +104,18 @@
         /* Classic Ivy-League serif (Vantage Prep) */
         .font-ivy { font-family: 'EB Garamond', 'Times New Roman', Times, serif; }
 
+        /* Create brand font (Nicholas) for the Report Engine title */
+        @font-face {
+            font-family: 'Nicholas';
+            src: url('assets/Nicholas.otf') format('opentype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        .font-nicholas { font-family: 'Nicholas', 'Inter', sans-serif; }
+        .create-text { color: #ffffff; }
+        body.light-mode .create-text { color: #f57e25 !important; }
+
         /* Theme-aware logos: *-for-dark shows in dark mode, *-for-light in light mode */
         .logo-for-light { display: none; }
         body.light-mode .logo-for-dark { display: none; }
@@ -591,6 +603,24 @@
                             </div>
                             <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
                                 Work in progress music hardware.
+                            </p>
+                        </div>
+
+                        <div id="project-create-report" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
+                            <a href="https://createwellness.github.io" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
+                                <div class="flex items-center gap-3 md:gap-4">
+                                    <img src="assets/create-logo-white.png" alt="Create" class="logo-for-dark h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
+                                    <img src="assets/create-logo-orange.png" alt="Create" class="logo-for-light h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
+                                    <span class="font-nicholas create-text text-3xl md:text-4xl group-hover:opacity-80 transition-opacity">Report Engine</span>
+                                </div>
+                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+                            </a>
+                            <div class="flex gap-2 mb-4 flex-wrap">
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Data Tooling</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Automation</span>
+                            </div>
+                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                                A reporting tool I built for Create Wellness that turns raw SPINS retail data into polished, branded board reports. It automates a multi-hour manual workflow into a one-click export.
                             </p>
                         </div>
 
@@ -1237,6 +1267,7 @@
         // Map each hover-target element id to the particle shape it forms
         const shapeMap = {
             'project-playback': 'play',
+            'project-create-report': 'stock',
             'project-needl': 'vinyl',
             'project-vantage': 'crest',
             'project-cpu': 'cpu',
