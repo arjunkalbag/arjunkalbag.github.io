@@ -116,6 +116,16 @@
         .create-text { color: #ffffff; }
         body.light-mode .create-text { color: #f57e25 !important; }
 
+        /* Vantely display font (Create report engine wordmark) */
+        @font-face {
+            font-family: 'Vantely';
+            src: url('assets/Vantely.ttf') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        .font-vantely { font-family: 'Vantely', 'Inter', sans-serif; }
+
         /* Theme-aware logos: *-for-dark shows in dark mode, *-for-light in light mode */
         .logo-for-light { display: none; }
         body.light-mode .logo-for-dark { display: none; }
@@ -609,9 +619,9 @@
                         <div id="project-create-report" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
                             <a href="https://createwellness.github.io" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
                                 <div class="flex items-center gap-3 md:gap-4">
-                                    <img src="assets/create-logo-white.png" alt="Create" class="logo-for-dark h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
-                                    <img src="assets/create-logo-orange.png" alt="Create" class="logo-for-light h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
-                                    <span class="font-nicholas create-text text-3xl md:text-4xl translate-y-[0.16em] group-hover:opacity-80 transition-opacity">Report Engine</span>
+                                    <img src="assets/symbol-white.svg" alt="Create symbol" class="logo-for-dark h-10 md:h-14 w-auto transition-transform duration-300 group-hover:scale-[1.05]" />
+                                    <img src="assets/symbol-orange.png" alt="Create symbol" class="logo-for-light h-10 md:h-14 w-auto transition-transform duration-300 group-hover:scale-[1.05]" />
+                                    <span class="font-vantely create-text lowercase text-4xl md:text-6xl group-hover:opacity-80 transition-opacity">create report engine</span>
                                 </div>
                                 <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
                             </a>
