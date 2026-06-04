@@ -877,6 +877,28 @@
             const CHAR_RATIO = 0.6;            // monospace cell width / height
             const RAMP = " .:-=+*#%@";          // sparse -> dense (bright pixels render denser)
 
+            // Sampled luminance grid (cell = 0..1 brightness, or -1 for transparent).
+            // Stored once so we can re-render per theme without re-decoding the image.
+            let grid = null, gRows = 0;
+            function renderAscii() {
+                if (!grid) return;
+                // Light mode = dark ink on light paper, so invert tones: dark areas get the densest glyphs.
+                const invert = document.body.classList.contains('light-mode');
+                let out = '';
+                for (let y = 0; y < gRows; y++) {
+                    for (let x = 0; x < COLS; x++) {
+                        const cell = grid[y * COLS + x];
+                        if (cell < 0) { out += ' '; continue; } // transparent background
+                        const v = invert ? (1 - cell) : cell;
+                        let idx = Math.round(v * (RAMP.length - 1));
+                        if (idx < 1) idx = 1;   // keep faint areas visible
+                        out += RAMP[idx];
+                    }
+                    out += '\n';
+                }
+                pre.textContent = out;
+            }
+
             const img = new Image();
             img.src = 'assets/profile.png';
             img.onload = () => {
@@ -906,23 +928,21 @@
                 const cx = c.getContext('2d', { willReadFrequently: true });
                 cx.drawImage(img, sx, sy, sw, sh, 0, 0, COLS, rows);
                 const d = cx.getImageData(0, 0, COLS, rows).data;
-                let out = '';
-                for (let y = 0; y < rows; y++) {
-                    for (let x = 0; x < COLS; x++) {
-                        const i = (y * COLS + x) * 4;
-                        if (d[i + 3] < 60) { out += ' '; continue; } // transparent background
-                        let lum = (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) / 255;
-                        lum = Math.min(1, Math.max(0, (lum - 0.5) * 1.35 + 0.5)); // contrast boost for facial detail
-                        let idx = Math.round(lum * (RAMP.length - 1));
-                        if (idx < 1) idx = 1;   // keep dark areas (suit) faintly visible
-                        out += RAMP[idx];
-                    }
-                    out += '\n';
+                grid = new Array(COLS * rows); gRows = rows;
+                for (let p = 0; p < COLS * rows; p++) {
+                    const i = p * 4;
+                    if (d[i + 3] < 60) { grid[p] = -1; continue; }
+                    let lum = (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) / 255;
+                    lum = Math.min(1, Math.max(0, (lum - 0.5) * 1.35 + 0.5)); // contrast boost for facial detail
+                    grid[p] = lum;
                 }
-                pre.textContent = out;
+                renderAscii();
                 gsap.to(wrap, { opacity: 1, duration: 1.2, ease: 'power2.out', delay: 0.3 });
             };
             img.onerror = () => { wrap.style.display = 'none'; };
+
+            // Re-render with inverted tones whenever the light/dark theme changes.
+            new MutationObserver(renderAscii).observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
             // 3D mouse-tracking rotation + idle float + hover scale
             let tRX = 0, tRY = 0, rx = 0, ry = 0, scale = 1, tScale = 1, t = 0;
