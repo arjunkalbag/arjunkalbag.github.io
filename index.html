@@ -126,6 +126,18 @@
         }
         .font-vantely { font-family: 'Vantely', 'Inter', sans-serif; }
 
+        /* Hobsky display font (Pitstop wordmark) + theme-aware Pitstop accent */
+        @font-face {
+            font-family: 'Hobsky';
+            src: url('assets/Hobsky.otf') format('opentype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        .font-hobsky { font-family: 'Hobsky', 'Inter', sans-serif; }
+        .pitstop-accent { color: #FBEC5D; }
+        body.light-mode .pitstop-accent { color: #000000 !important; }
+
         /* Theme-aware logos: *-for-dark shows in dark mode, *-for-light in light mode */
         .logo-for-light { display: none; }
         body.light-mode .logo-for-dark { display: none; }
@@ -631,6 +643,35 @@
                             </div>
                             <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
                                 Developed a data aggregation and automated reporting platform that transforms raw retail analytics datasets into presentation-ready executive reports.
+                            </p>
+                        </div>
+
+                        <div id="project-pitstop" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
+                            <a href="https://app.netlify.com/projects/usepitstop/overview" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
+                                <div class="pitstop-accent flex items-center gap-3 md:gap-5">
+                                    <span class="block h-16 w-16 md:h-24 md:w-24 shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
+                                        <svg viewBox="0 0 120 120" class="w-full h-full overflow-visible" aria-hidden="true">
+                                            <defs>
+                                                <filter id="pitstop-blob-warp" x="-60%" y="-60%" width="220%" height="220%">
+                                                    <feTurbulence type="fractalNoise" baseFrequency="0.016 0.022" numOctaves="3" seed="7" result="n">
+                                                        <animate attributeName="baseFrequency" dur="13s" values="0.016 0.022;0.026 0.013;0.011 0.028;0.016 0.022" repeatCount="indefinite" />
+                                                    </feTurbulence>
+                                                    <feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G" />
+                                                </filter>
+                                            </defs>
+                                            <circle cx="60" cy="60" r="30" fill="currentColor" filter="url(#pitstop-blob-warp)" />
+                                        </svg>
+                                    </span>
+                                    <span class="font-hobsky uppercase text-6xl md:text-8xl leading-none tracking-tight">Pitstop</span>
+                                </div>
+                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+                            </a>
+                            <div class="flex gap-2 mb-4 flex-wrap">
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Geospatial</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Routing</span>
+                            </div>
+                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                                Pitstop maps the best places to stop along your travel route based on user input. It leverages dynamic geospatial routing and real-time telemetry to optimize your detours.
                             </p>
                         </div>
 
