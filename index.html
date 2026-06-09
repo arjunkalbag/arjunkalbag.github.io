@@ -648,7 +648,7 @@
 
                         <div id="project-pitstop" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
                             <a href="https://usepitstop.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
-                                <div class="pitstop-accent flex items-center gap-3 md:gap-5">
+                                <div class="pitstop-accent flex items-center gap-0 md:gap-1">
                                     <span class="block h-16 w-16 md:h-24 md:w-24 shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
                                         <svg viewBox="0 0 120 120" class="w-full h-full overflow-visible" aria-hidden="true">
                                             <defs>
@@ -1300,6 +1300,36 @@
                         p.ty = cy + Math.sin(a) * r;
                     }
                 });
+            } else if (type === 'pin') {
+                // Pitstop — map location pin: teardrop outline + hollow center + filled head
+                const R = 62, headY = cy - 28, tipY = cy + 115, holeR = 24;
+                const D = tipY - headY;
+                const al = Math.acos(R / D);
+                const thR = Math.atan2(Math.cos(al), Math.sin(al));
+                const SPAN = Math.PI + 2 * thR;            // long arc over the top
+                const rt = { x: cx + R * Math.sin(al), y: headY + R * Math.cos(al) };
+                const lt = { x: cx - R * Math.sin(al), y: headY + R * Math.cos(al) };
+                const tip = { x: cx, y: tipY };
+                const lineLen = Math.hypot(tip.x - rt.x, tip.y - rt.y);
+                const arcLen = R * SPAN;
+                const total = 2 * lineLen + arcLen;
+                const f1 = lineLen / total, f2 = (lineLen + arcLen) / total;
+                particles.forEach((p, i) => {
+                    const f = i / count;
+                    if (f < 0.52) {
+                        const u = f / 0.52;
+                        if (u < f1) { const t = u / f1; p.tx = tip.x + (rt.x - tip.x) * t; p.ty = tip.y + (rt.y - tip.y) * t; }
+                        else if (u < f2) { const t = (u - f1) / (f2 - f1); const th = thR - t * SPAN; p.tx = cx + Math.cos(th) * R; p.ty = headY + Math.sin(th) * R; }
+                        else { const t = (u - f2) / (1 - f2); p.tx = lt.x + (tip.x - lt.x) * t; p.ty = lt.y + (tip.y - lt.y) * t; }
+                    } else if (f < 0.74) {
+                        const a = ((f - 0.52) / 0.22) * Math.PI * 2;
+                        p.tx = cx + Math.cos(a) * holeR; p.ty = headY + Math.sin(a) * holeR;
+                    } else {
+                        const a = Math.random() * Math.PI * 2;
+                        const rr = holeR + 5 + Math.random() * (R - holeR - 10);
+                        p.tx = cx + Math.cos(a) * rr; p.ty = headY + Math.sin(a) * rr;
+                    }
+                });
             }
         }
 
@@ -1339,6 +1369,7 @@
         const shapeMap = {
             'project-playback': 'play',
             'project-create-report': 'stock',
+            'project-pitstop': 'pin',
             'project-needl': 'vinyl',
             'project-vantage': 'crest',
             'project-cpu': 'cpu',
