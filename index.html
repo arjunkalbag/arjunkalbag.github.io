@@ -397,7 +397,7 @@
                     <!-- Tagline -->
                     <p class="text-lg md:text-xl text-gray-400 font-code ml-2 mt-2 reveal-text tracking-widest cursor-default">
                         <span id="nav-engineering" class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 cursor-pointer hover-trigger" data-cursor="link">ENGINEERING</span> •
-                        <span class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300">ECONOMICS</span> •
+                        <span id="nav-projects" class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 hover-trigger cursor-pointer" data-cursor="link">PROJECTS</span> •
                         <span id="nav-sound" class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 hover-trigger cursor-pointer" data-cursor="link">MUSIC</span>
                     </p>
 
@@ -1403,8 +1403,39 @@
         if (locStl) { locStl.addEventListener('mouseenter', () => triggerShape('arch')); locStl.addEventListener('mouseleave', triggerRandom); }
         
         const navEngineering = document.getElementById('nav-engineering');
-        const projectsSection = document.getElementById('projects');
-        if (navEngineering && projectsSection) { navEngineering.addEventListener('click', () => { projectsSection.scrollIntoView({ behavior: 'smooth' }); }); }
+        const cpuTarget = document.getElementById('project-cpu');
+        if (navEngineering && cpuTarget) {
+            navEngineering.addEventListener('click', () => {
+                // Temporarily lift scroll-snap so we land precisely on the CPU project
+                // (it sits mid-section, not on a snap point), then restore snapping.
+                const html = document.documentElement;
+                html.style.scrollSnapType = 'none';
+                cpuTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setTimeout(() => { html.style.scrollSnapType = ''; }, 1000);
+            });
+        }
+
+        // PROJECTS nav → transition to the dedicated projects page
+        const navProjects = document.getElementById('nav-projects');
+        if (navProjects) {
+            let navigated = false;
+            const goProjects = () => { if (navigated) return; navigated = true; window.location.href = 'projects/'; };
+            navProjects.addEventListener('click', () => {
+                gsap.to('#main-content', { opacity: 0, duration: 0.5, ease: 'power2.inOut', onComplete: goProjects });
+                setTimeout(goProjects, 700); // fallback if the tween is interrupted
+            });
+        }
+
+        // Restore visibility when returning via the browser back/forward cache (bfcache):
+        // window.onload (which fades #main-content in) does NOT re-fire on a bfcache restore,
+        // so without this the page would appear blank after pressing Back from /projects/.
+        window.addEventListener('pageshow', (e) => {
+            if (e.persisted) {
+                if (window.gsap) gsap.set('#main-content', { opacity: 1 });
+                else { const mc = document.getElementById('main-content'); if (mc) mc.style.opacity = 1; }
+                const sp = document.getElementById('splash'); if (sp) sp.style.display = 'none';
+            }
+        });
 
         // Music Page Navigation Variables
         const navSound = document.getElementById('nav-sound');
