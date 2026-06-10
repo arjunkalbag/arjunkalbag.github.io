@@ -1313,15 +1313,10 @@
             }
         });
 
-        // MUSIC nav -> transition to the dedicated music page
+        // MUSIC nav -> go straight to the dedicated music page (no transition)
         const navSound = document.getElementById('nav-sound');
         if (navSound) {
-            let musicNav = false;
-            const goMusic = () => { if (musicNav) return; musicNav = true; window.location.href = 'music/'; };
-            navSound.addEventListener('click', () => {
-                gsap.to('#main-content', { opacity: 0, duration: 0.5, ease: 'power2.inOut', onComplete: goMusic });
-                setTimeout(goMusic, 700); // fallback if the tween is interrupted
-            });
+            navSound.addEventListener('click', () => { window.location.href = 'music/'; });
         }
     </script>
 </body>
