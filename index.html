@@ -932,9 +932,9 @@
                 // a transform float would break its mix-blend-exclusion, so it's never selected here
                 if (el.classList.contains('hero-anim') || el.classList.contains('floaty')) return;
                 const dir = Math.random() < 0.5 ? -1 : 1;
-                const amp = (3 + Math.random() * 4) * dir;                                   // 3–7px, up or down
+                const amp = (6 + Math.random() * 5) * dir;                                   // 6–11px, up or down
                 el.style.setProperty('--float-amp', amp.toFixed(1) + 'px');
-                el.style.setProperty('--float-dur', (5 + Math.random() * 3.5).toFixed(1) + 's'); // 5–8.5s
+                el.style.setProperty('--float-dur', (4.5 + Math.random() * 3).toFixed(1) + 's'); // 4.5–7.5s
                 el.style.setProperty('--float-delay', (-Math.random() * 6).toFixed(1) + 's');    // randomized phase
                 el.classList.add('floaty');
             });
