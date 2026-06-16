@@ -263,23 +263,9 @@
             color: transparent;
         }
 
-        /* Splash letters — animated rainbow shimmer + glow */
-        #splash-text-wrap { perspective: 900px; }
-        .splash-letter {
-            display: inline-block;
-            background: linear-gradient(110deg, #60a5fa, #a78bfa, #f472b6, #fb923c, #60a5fa);
-            background-size: 220% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-            animation: splash-shimmer 2.6s linear infinite;
-            filter: drop-shadow(0 0 28px rgba(167,139,250,0.4));
-        }
-        @keyframes splash-shimmer {
-            from { background-position: 0% 0; }
-            to   { background-position: -220% 0; }
-        }
+        /* Pixel splash (canvas-driven) */
+        #splash { background: transparent; }
+        #splash-canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
 
         /* Animated ASCII portrait */
         .ascii-portrait {
@@ -368,12 +354,8 @@
     </button>
 
     <!-- Splash Screen -->
-    <div id="splash" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center">
-        <div id="splash-text-wrap" class="flex overflow-hidden">
-            <span class="splash-letter text-[20vw] font-black leading-none tracking-tighter">A</span>
-            <span class="splash-letter text-[20vw] font-black leading-none tracking-tighter">K</span>
-        </div>
-        <div class="h-[3px] mt-6 w-0 rounded-full" id="splash-line" style="background: linear-gradient(90deg,#60a5fa,#a78bfa,#f472b6,#fb923c);"></div>
+    <div id="splash" class="fixed inset-0 z-50">
+        <canvas id="splash-canvas" class="absolute inset-0"></canvas>
     </div>
 
     <!-- Custom Cursor -->
@@ -984,43 +966,156 @@
             });
         });
 
-        // 3. Splash Screen Animation
+        // 3. Splash Screen — organic pixel "AK": assemble -> smooth chromatic glitch -> dissolve reveal
         window.onload = () => {
-            // Secretly assemble the background particles into "AK" behind the splash
-            formShape('AK');
+            const splash = document.getElementById('splash');
+            const canvas = document.getElementById('splash-canvas');
 
-            gsap.set('.splash-letter', { yPercent: 130, rotateX: -85, scale: 0.7, opacity: 0, transformOrigin: '50% 100%' });
+            const revealHero = (() => {
+                let fired = false;
+                return () => {
+                    if (fired) return; fired = true;
+                    gsap.to('#main-content', { opacity: 1, duration: 0.9, ease: 'power2.out' });
+                    gsap.from('.reveal-text', { y: 50, opacity: 0, stagger: 0.09, duration: 0.8, ease: 'power2.out' });
+                };
+            })();
 
-            const tl = gsap.timeline();
+            if (!splash || !canvas || !canvas.getContext) { revealHero(); if (splash) splash.style.display = 'none'; return; }
 
-            // Letters rise out from behind the line, with a 3D flip
-            tl.to('.splash-letter', {
-                yPercent: 0, rotateX: 0, scale: 1, opacity: 1,
-                duration: 1.1, ease: 'power4.out', stagger: 0.14
-            })
-            .to('#splash-line', { width: 240, duration: 0.9, ease: 'power3.inOut' }, '-=0.55')
-            .to({}, { duration: 0.5 }) // hold
+            const ctx = canvas.getContext('2d');
+            const DPR = Math.min(window.devicePixelRatio || 1, 2);
+            const W = window.innerWidth, H = window.innerHeight;
+            canvas.width = Math.floor(W * DPR); canvas.height = Math.floor(H * DPR);
+            canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+            ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-            // Letters blast off upward + line collapses
-            .set('#splash-text-wrap', { overflow: 'visible' })
-            .to('.splash-letter', {
-                yPercent: -135, scale: 1.4, opacity: 0,
-                duration: 0.7, ease: 'power3.in', stagger: 0.09
-            })
-            .to('#splash-line', { width: 0, opacity: 0, duration: 0.4, ease: 'power2.in' }, '<')
+            const clamp = (v) => v < 0 ? 0 : v > 1 ? 1 : v;
+            const easeOut = (p) => 1 - Math.pow(1 - p, 3);
 
-            // Fade the splash to reveal the particle "AK" underneath
-            .to('#splash', {
-                opacity: 0, duration: 0.6,
-                onComplete: () => { document.getElementById('splash').style.display = 'none'; }
-            }, '-=0.2')
+            function build() {
+                // ---- sample "AK" into a pixel grid ----
+                const CELL = Math.max(9, Math.round(Math.min(W, H) / 58));
+                const off = document.createElement('canvas');
+                off.width = W; off.height = H;
+                const octx = off.getContext('2d', { willReadFrequently: true });
+                const fontPx = Math.min(W * 0.5, H * 0.62);
+                octx.fillStyle = '#fff';
+                octx.textAlign = 'center';
+                octx.textBaseline = 'middle';
+                octx.font = '900 ' + fontPx + 'px Inter, system-ui, sans-serif';
+                octx.fillText('AK', W / 2, H / 2);
+                const img = octx.getImageData(0, 0, W, H).data;
 
-            // Beat on the particle "AK", then burst it into the constellation
-            .add(() => { returnToRandom(); }, '+=0.2')
-            .to('#main-content', { opacity: 1, duration: 1 }, '<')
-            .from('.reveal-text', {
-                y: 50, opacity: 0, stagger: 0.1, duration: 0.8, ease: 'power2.out'
-            }, '-=0.6');
+                const cells = [];
+                let minX = W, maxX = 0, minY = H, maxY = 0;
+                for (let y = 0; y < H; y += CELL) {
+                    for (let x = 0; x < W; x += CELL) {
+                        const sx = Math.min(W - 1, x + (CELL >> 1));
+                        const sy = Math.min(H - 1, y + (CELL >> 1));
+                        if (img[(sy * W + sx) * 4 + 3] > 90) {
+                            cells.push({ hx: x, hy: y });
+                            if (x < minX) minX = x; if (x > maxX) maxX = x;
+                            if (y < minY) minY = y; if (y > maxY) maxY = y;
+                        }
+                    }
+                }
+                const bw = Math.max(1, maxX - minX), bh = Math.max(1, maxY - minY);
+                const cx = W / 2, cy = H / 2;
+                const C1 = [147, 197, 253], C2 = [196, 181, 253]; // #93c5fd -> #c4b5fd
+                cells.forEach(c => {
+                    const ang = Math.random() * Math.PI * 2;
+                    const dist = 220 + Math.random() * Math.max(W, H) * 0.5;
+                    c.sx0 = cx + Math.cos(ang) * dist;
+                    c.sy0 = cy + Math.sin(ang) * dist;
+                    const nx = (c.hx - minX) / bw, ny = (c.hy - minY) / bh;
+                    const m = clamp(ny + (Math.random() - 0.5) * 0.25);
+                    if (Math.random() < 0.07) { c.col = [255, 255, 255]; }
+                    else c.col = [Math.round(C1[0] + (C2[0] - C1[0]) * m), Math.round(C1[1] + (C2[1] - C1[1]) * m), Math.round(C1[2] + (C2[2] - C1[2]) * m)];
+                    c.aDelay = nx * 0.3 + Math.random() * 0.25;
+                    c.seed = Math.random() * Math.PI * 2;
+                    c.band = Math.floor((c.hy - minY) / (CELL * 3));
+                    c.rDelay = nx * 0.25 + Math.random() * 0.18;
+                    const da = Math.atan2(c.hy - cy, c.hx - cx) + (Math.random() - 0.5) * 0.8;
+                    const sp = 230 + Math.random() * 360;
+                    c.vx = Math.cos(da) * sp; c.vy = Math.sin(da) * sp - 120;
+                });
+
+                // ---- timeline (seconds) ----
+                const ASSEMBLE = 1.25, GLITCH = 1.15, REVEAL = 1.25;
+                const tGlitch = ASSEMBLE, tReveal = ASSEMBLE + GLITCH, tEnd = tReveal + REVEAL;
+                let start = null, done = false;
+
+                const finish = () => { if (!done) { done = true; splash.style.display = 'none'; } };
+                setTimeout(() => { revealHero(); finish(); }, (tEnd + 1.5) * 1000); // safety net
+
+                function frame(now) {
+                    if (start === null) start = now;
+                    const t = (now - start) / 1000;
+                    ctx.clearRect(0, 0, W, H);
+
+                    let bgA = t > tReveal ? 1 - clamp((t - tReveal) / 0.7) : 1;
+                    if (bgA > 0) { ctx.fillStyle = 'rgba(5,5,6,' + bgA + ')'; ctx.fillRect(0, 0, W, H); }
+
+                    const gi = (t >= tGlitch && t < tReveal) ? Math.pow(Math.sin(((t - tGlitch) / GLITCH) * Math.PI), 0.7) : 0;
+                    const revP = t > tReveal ? clamp((t - tReveal) / REVEAL) : 0;
+
+                    for (let i = 0; i < cells.length; i++) {
+                        const c = cells[i];
+                        let px, py, alpha = 1, sz = CELL - 1;
+                        if (t < tGlitch) {
+                            const win = Math.max(0.3, ASSEMBLE - 0.1 - c.aDelay);
+                            const p = easeOut(clamp((t - c.aDelay) / win));
+                            px = c.sx0 + (c.hx - c.sx0) * p;
+                            py = c.sy0 + (c.hy - c.sy0) * p;
+                            alpha = clamp(p * 1.3);
+                        } else if (t < tReveal) {
+                            const slice = gi * Math.sin(c.band * 1.3 + t * 9) * (9 + (c.band % 3) * 6);
+                            px = c.hx + slice + (Math.random() - 0.5) * gi * 2.4;
+                            py = c.hy + Math.sin(t * 3 + c.seed) * (0.6 + gi * 1.6);
+                            alpha = 0.9 + Math.sin(t * 6 + c.seed) * 0.08;
+                        } else {
+                            const dp = clamp((revP - c.rDelay) / 0.5);
+                            if (dp >= 1) continue;
+                            const e2 = dp * dp;
+                            px = c.hx + c.vx * e2 * 0.9;
+                            py = c.hy + c.vy * e2 * 0.9 + 260 * e2 * e2;
+                            alpha = 1 - dp;
+                            sz = (CELL - 1) * (1 - dp * 0.7);
+                        }
+                        const col = c.col;
+                        ctx.fillStyle = 'rgba(' + col[0] + ',' + col[1] + ',' + col[2] + ',' + alpha + ')';
+                        ctx.fillRect(px, py, sz, sz);
+                    }
+
+                    // smooth chromatic-aberration ghosts + faint scanlines during glitch
+                    if (gi > 0.04) {
+                        const dx = gi * 7;
+                        ctx.globalCompositeOperation = 'lighter';
+                        for (let pass = 0; pass < 2; pass++) {
+                            const ox = pass === 0 ? -dx : dx;
+                            ctx.fillStyle = pass === 0 ? 'rgba(255,40,90,' + (gi * 0.5) + ')' : 'rgba(40,210,255,' + (gi * 0.5) + ')';
+                            for (let i = 0; i < cells.length; i++) {
+                                const c = cells[i];
+                                const slice = gi * Math.sin(c.band * 1.3 + t * 9) * (9 + (c.band % 3) * 6);
+                                ctx.fillRect(c.hx + slice + ox, c.hy, CELL - 1, CELL - 1);
+                            }
+                        }
+                        ctx.globalCompositeOperation = 'source-over';
+                        ctx.fillStyle = 'rgba(0,0,0,' + (gi * 0.12) + ')';
+                        for (let yy = 0; yy < H; yy += 3) ctx.fillRect(0, yy, W, 1);
+                    }
+
+                    if (t >= tReveal) revealHero();
+                    if (t >= tEnd) { finish(); return; }
+                    requestAnimationFrame(frame);
+                }
+                requestAnimationFrame(frame);
+            }
+
+            // ensure Inter (the brand weight) is ready so the AK silhouette is crisp
+            if (document.fonts && document.fonts.load) {
+                document.fonts.load('900 100px Inter').then(build).catch(build);
+            } else { build(); }
         };
 
         // 4. Scroll Animations
