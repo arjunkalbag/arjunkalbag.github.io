@@ -136,6 +136,33 @@
         }
         .font-inktera { font-family: 'Inktera Demo', sans-serif; }
 
+        /* hero name floats vertically via `top` (relative positioning), NOT transform —
+           a transform animation would promote a compositor layer and break the name's
+           mix-blend-exclusion (the inversion over the portrait). `top` is paint-only, so
+           the blend survives, and it doesn't collide with the GSAP reveal's transform. */
+        @keyframes heroFloat {
+            0%, 100% { top: 0; }
+            50%      { top: -12px; }
+        }
+        .hero-anim { position: relative; }
+        @media (prefers-reduced-motion: no-preference) {
+            .hero-anim { animation: heroFloat 7s ease-in-out infinite; }
+        }
+
+        /* gentle ambient float applied to text blocks across the page. Per-element
+           amplitude / duration / phase are randomized in JS (CSS vars) so the page
+           undulates organically instead of bobbing in lockstep. */
+        @keyframes floaty {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(var(--float-amp, -6px)); }
+        }
+        @media (prefers-reduced-motion: no-preference) {
+            .floaty {
+                animation: floaty var(--float-dur, 6s) ease-in-out infinite;
+                animation-delay: var(--float-delay, 0s);
+            }
+        }
+
         /* Hobsky display font (Pitstop wordmark) + theme-aware Pitstop accent */
         @font-face {
             font-family: 'Hobsky';
@@ -380,7 +407,7 @@
                     </p>
                     
                     <div class="hover-trigger" data-cursor="text">
-                        <h1 class="text-[15vw] leading-[0.8] font-black tracking-tighter text-white mix-blend-exclusion reveal-text">
+                        <h1 class="hero-anim text-[15vw] leading-[0.8] font-black tracking-tighter text-white mix-blend-exclusion reveal-text">
                             ARJUN<br />
                             <span class="text-gray-500 hover:text-white transition-colors duration-500">KALBAG</span>
                         </h1>
@@ -889,9 +916,28 @@
                 scale += (tScale - scale) * 0.1;
                 const driftY = Math.sin(t) * 3;
                 const driftX = Math.cos(t * 0.7) * 2;
-                pre.style.transform = `rotateX(${rx + driftX}deg) rotateY(${ry + driftY}deg) scale(${scale})`;
+                const bob = Math.sin(t * 0.8) * 12; // gentle vertical float to match the page
+                pre.style.transform = `translateY(${bob}px) rotateX(${rx + driftX}deg) rotateY(${ry + driftY}deg) scale(${scale})`;
                 requestAnimationFrame(loop);
             })();
+        })();
+
+        // ===== Gentle ambient float on text blocks across the page =====
+        (function () {
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            const root = document.getElementById('main-content') || document.body;
+            const nodes = root.querySelectorAll('h2, h3, h4, h5, h6, p, li, blockquote');
+            nodes.forEach((el) => {
+                // the hero wordmark (#hero h1) keeps its own letter-spacing breathing —
+                // a transform float would break its mix-blend-exclusion, so it's never selected here
+                if (el.classList.contains('hero-anim') || el.classList.contains('floaty')) return;
+                const dir = Math.random() < 0.5 ? -1 : 1;
+                const amp = (3 + Math.random() * 4) * dir;                                   // 3–7px, up or down
+                el.style.setProperty('--float-amp', amp.toFixed(1) + 'px');
+                el.style.setProperty('--float-dur', (5 + Math.random() * 3.5).toFixed(1) + 's'); // 5–8.5s
+                el.style.setProperty('--float-delay', (-Math.random() * 6).toFixed(1) + 's');    // randomized phase
+                el.classList.add('floaty');
+            });
         })();
 
         // Add custom spin animations to Tailwind config or CSS
