@@ -126,6 +126,16 @@
         }
         .font-vantely { font-family: 'Vantely', 'Inter', sans-serif; }
 
+        /* Inktera display font (genre-space) */
+        @font-face {
+            font-family: 'Inktera Demo';
+            src: url('assets/InkteraDemo.otf') format('opentype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        .font-inktera { font-family: 'Inktera Demo', sans-serif; }
+
         /* Hobsky display font (Pitstop wordmark) + theme-aware Pitstop accent */
         @font-face {
             font-family: 'Hobsky';
@@ -652,7 +662,7 @@
                                     <div class="p-2 bg-white/5 rounded-lg text-blue-400">
                                         <i data-lucide="waypoints" class="w-6 h-6"></i>
                                     </div>
-                                    <h3 class="text-3xl font-bold text-white group-hover:text-blue-400 transition-colors">Genre-Space</h3>
+                                    <h3 class="text-4xl font-inktera lowercase text-white group-hover:text-blue-400 transition-colors">genre-space</h3>
                                 </div>
                                 <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
                             </a>

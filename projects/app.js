@@ -299,7 +299,7 @@
     { key: "pitstop", Comp: BlobPitstop, color: "#F5C518", url: "https://usepitstop.netlify.app",
       wm: { text: "PITSTOP", font: "'Hobsky', sans-serif", color: "#000000", size: "9vmin", ls: "0.04em", weight: 400 } },
     { key: "genrespace", Comp: BlobGenreSpace, color: "#7C5CF0", url: "https://genre-space.netlify.app/",
-      wm: { text: "genre-space", font: "'Clash Display', sans-serif", color: "#4A2DB0", size: "5.4vmin", ls: "-0.01em", weight: 600 } }
+      wm: { text: "genre-space", font: "'Inktera Demo', sans-serif", color: "#4A2DB0", size: "7vmin", ls: "0em", weight: 400 } }
   ];
 
   /* ---- shared interaction state ---- */
