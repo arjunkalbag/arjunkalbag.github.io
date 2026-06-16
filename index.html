@@ -163,6 +163,19 @@
             }
         }
 
+        /* hero nav affordance: a soft accent-blue glow pulses through
+           ENGINEERING • PROJECTS • MUSIC in a slow left-to-right wave (staggered
+           per word) to draw the eye to the links. Hovering a word stops the wave
+           and locks it to the full accent + glow. */
+        @keyframes linkPulse {
+            0%, 60%, 100% { color: #9ca3af; text-shadow: 0 0 0 rgba(96, 165, 250, 0); }
+            22%           { color: #a8cdfd; text-shadow: 0 0 12px rgba(96, 165, 250, 0.65); }
+        }
+        @media (prefers-reduced-motion: no-preference) {
+            .nav-pulse { animation: linkPulse 5s ease-in-out infinite; }
+        }
+        .nav-pulse:hover { animation: none; }
+
         /* Hobsky display font (Pitstop wordmark) + theme-aware Pitstop accent */
         @font-face {
             font-family: 'Hobsky';
@@ -415,9 +428,9 @@
 
                     <!-- Tagline -->
                     <p class="text-lg md:text-xl text-gray-400 font-code ml-2 mt-2 reveal-text tracking-widest cursor-default">
-                        <span id="nav-engineering" class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 cursor-pointer hover-trigger" data-cursor="link">ENGINEERING</span> •
-                        <span id="nav-projects" class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 hover-trigger cursor-pointer" data-cursor="link">PROJECTS</span> •
-                        <span id="nav-sound" class="hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 hover-trigger cursor-pointer" data-cursor="link">MUSIC</span>
+                        <span id="nav-engineering" style="animation-delay:0s" class="nav-pulse hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 cursor-pointer hover-trigger" data-cursor="link">ENGINEERING</span> •
+                        <span id="nav-projects" style="animation-delay:0.5s" class="nav-pulse hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 hover-trigger cursor-pointer" data-cursor="link">PROJECTS</span> •
+                        <span id="nav-sound" style="animation-delay:1s" class="nav-pulse hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 hover-trigger cursor-pointer" data-cursor="link">MUSIC</span>
                     </p>
 
                     <!-- Phrase/Description Section -->
