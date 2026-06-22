@@ -176,6 +176,23 @@
         }
         .nav-pulse:hover { animation: none; }
 
+        /* AK Labs brand wordmark font */
+        @font-face {
+            font-family: 'AK Wordmark';
+            src: url('assets/AKWordmark.otf') format('opentype');
+            font-weight: 400; font-style: normal; font-display: swap;
+        }
+        .font-akwordmark { font-family: 'AK Wordmark', 'Bricolage Grotesque', system-ui, sans-serif; letter-spacing: 0.02em; }
+        /* AK Labs tri-circle logo: additive color mixing over the dark bg */
+        .aklabs-logo svg { isolation: isolate; overflow: visible; }
+        .aklabs-logo circle { mix-blend-mode: screen; }
+        /* apps dropdown — smooth grid-rows height expand */
+        .aklabs-panel { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.42s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease; }
+        .aklabs-panel > div { overflow: hidden; min-height: 0; }
+        .aklabs-panel.open { grid-template-rows: 1fr; opacity: 1; }
+        .aklabs-chev { transition: transform 0.3s ease; }
+        .aklabs-toggle.is-open .aklabs-chev { transform: rotate(180deg); }
+
         /* Hobsky display font (Pitstop wordmark) + theme-aware Pitstop accent */
         @font-face {
             font-family: 'Hobsky';
@@ -660,24 +677,6 @@
                             </p>
                         </div>
 
-                        <div id="project-create-report" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
-                            <a href="https://createwellness.github.io" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
-                                <div class="flex items-center gap-3 md:gap-4">
-                                    <img src="assets/symbol-white.svg" alt="Create symbol" class="logo-for-dark h-10 md:h-14 w-auto transition-transform duration-300 group-hover:scale-[1.05]" />
-                                    <img src="assets/symbol-orange.png" alt="Create symbol" class="logo-for-light h-10 md:h-14 w-auto transition-transform duration-300 group-hover:scale-[1.05]" />
-                                    <span class="font-vantely create-text lowercase text-3xl md:text-5xl group-hover:opacity-80 transition-opacity">create report engine</span>
-                                </div>
-                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
-                            </a>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Data Tooling</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Automation</span>
-                            </div>
-                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                Developed a data aggregation and automated reporting platform that transforms raw retail analytics datasets into presentation-ready executive reports.
-                            </p>
-                        </div>
-
                         <div id="project-genrespace" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
                             <div class="flex flex-wrap items-center gap-5 mb-4">
                                 <a href="https://genre-space.netlify.app/" target="_blank" rel="noopener" class="flex items-center gap-3" data-cursor="link">
@@ -697,6 +696,59 @@
                             <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
                                 Researched computational approaches to music genre classification and similarity modeling, analyzing genre taxonomy to quantify relationships between musical styles. Built an interactive web application that visualizes these relationships in a 2D space, enabling real-time exploration of genre clusters and influence networks over time.
                             </p>
+                        </div>
+
+                        <div id="project-aklabs" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
+                            <a href="https://aklaboratories.github.io" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
+                                <div class="flex items-center gap-3 md:gap-4">
+                                    <span class="aklabs-logo block h-11 w-11 md:h-12 md:w-12 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
+                                        <svg viewBox="0 0 42 42" class="w-full h-full" aria-hidden="true">
+                                            <circle cx="16" cy="16" r="11.5" fill="#ff7ac6" />
+                                            <circle cx="26" cy="16.5" r="11.5" fill="#5aa9ff" />
+                                            <circle cx="21" cy="26" r="11.5" fill="#56d6a6" />
+                                        </svg>
+                                    </span>
+                                    <span class="font-akwordmark uppercase text-4xl md:text-5xl text-white group-hover:text-blue-400 transition-colors">AK Labs</span>
+                                </div>
+                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+                            </a>
+                            <div class="flex gap-2 mb-4 flex-wrap">
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Swift</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">SwiftUI</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">macOS</span>
+                            </div>
+                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                                Founded AK Labs, an independent software studio building native macOS applications for music discovery, organization, and creative workflows. Direct product strategy, software architecture, and full-stack application development, with an emphasis on performant system design, intuitive user interfaces, and deep integration with the Apple ecosystem.
+                            </p>
+                            <button id="aklabs-toggle" type="button" aria-expanded="false" aria-controls="aklabs-apps" class="aklabs-toggle inline-flex items-center gap-2 mt-5 text-xs font-code uppercase tracking-widest text-blue-400 border border-blue-400/30 rounded-full px-4 py-2 transition-colors hover:bg-blue-400/10 hover:border-blue-400/60 hover-trigger" data-cursor="link">
+                                <i data-lucide="layers" class="w-4 h-4"></i>
+                                <span>The apps</span>
+                                <i data-lucide="chevron-down" class="aklabs-chev w-4 h-4"></i>
+                            </button>
+                            <div id="aklabs-apps" class="aklabs-panel max-w-2xl">
+                                <div>
+                                    <ul class="mt-6 space-y-5 border-l border-white/10 pl-5">
+                                        <li>
+                                            <a href="https://aklaboratories.github.io/#prism" target="_blank" rel="noopener" class="group/app block hover-trigger" data-cursor="link">
+                                                <span class="inline-flex items-center gap-1.5 text-xl text-white font-code group-hover/app:text-blue-400 transition-colors">Prism <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600 group-hover/app:text-blue-400 transition-colors"></i></span>
+                                                <p class="text-sm text-gray-500 font-code leading-relaxed mt-1 group-hover/app:text-gray-400 transition-colors">Detects the musical key of anything playing in real time and maps it onto the Camelot wheel — harmonic mixes for DJs, chords and scales for producers.</p>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="https://aklaboratories.github.io/#halo" target="_blank" rel="noopener" class="group/app block hover-trigger" data-cursor="link">
+                                                <span class="inline-flex items-center gap-1.5 text-xl text-white font-code group-hover/app:text-blue-400 transition-colors">Halo <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600 group-hover/app:text-blue-400 transition-colors"></i></span>
+                                                <p class="text-sm text-gray-500 font-code leading-relaxed mt-1 group-hover/app:text-gray-400 transition-colors">A see-through now-playing widget with a living mesh-gradient backdrop pulled straight from the album art — works with any audio source.</p>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="https://aklaboratories.github.io/#needlebox" target="_blank" rel="noopener" class="group/app block hover-trigger" data-cursor="link">
+                                                <span class="inline-flex items-center gap-1.5 text-xl text-white font-code group-hover/app:text-blue-400 transition-colors">Needlebox <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600 group-hover/app:text-blue-400 transition-colors"></i></span>
+                                                <p class="text-sm text-gray-500 font-code leading-relaxed mt-1 group-hover/app:text-gray-400 transition-colors">Reads key, BPM and energy with Essentia, auto-sorts your library into harmonic folders, and lays out set running orders along a build → peak → cool arc.</p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
 
                         <div id="project-pitstop" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
@@ -728,23 +780,21 @@
                             </p>
                         </div>
 
-                        <div id="project-needl" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
-                            <a href="https://useneedl.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-start mb-4" data-cursor="link">
-                                <div class="flex items-center gap-3">
-                                    <div class="p-2 bg-white/5 rounded-lg text-blue-400">
-                                        <i data-lucide="disc-3" class="w-6 h-6"></i>
-                                    </div>
-                                    <h3 class="text-4xl font-resolide text-white group-hover:text-blue-400 transition-colors">Needl</h3>
+                        <div id="project-create-report" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
+                            <a href="https://createwellness.github.io" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
+                                <div class="flex items-center gap-3 md:gap-4">
+                                    <img src="assets/symbol-white.svg" alt="Create symbol" class="logo-for-dark h-10 md:h-14 w-auto transition-transform duration-300 group-hover:scale-[1.05]" />
+                                    <img src="assets/symbol-orange.png" alt="Create symbol" class="logo-for-light h-10 md:h-14 w-auto transition-transform duration-300 group-hover:scale-[1.05]" />
+                                    <span class="font-vantely create-text lowercase text-3xl md:text-5xl group-hover:opacity-80 transition-opacity">create report engine</span>
                                 </div>
                                 <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
                             </a>
                             <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">JavaScript</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Three.js</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Web Audio API</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Data Tooling</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Automation</span>
                             </div>
                             <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                Developed a browser-based music player featuring a real-time 3D vinyl visualization, local audio file management, and interactive playback controls. Built with JavaScript, Three.js, and the Web Audio API.
+                                Developed a data aggregation and automated reporting platform that transforms raw retail analytics datasets into presentation-ready executive reports.
                             </p>
                         </div>
 
@@ -762,6 +812,26 @@
                             </div>
                             <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
                                 A premium tutoring service I founded, pairing students with elite tutors from top universities. Built to deliver academic excellence.
+                            </p>
+                        </div>
+
+                        <div id="project-needl" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
+                            <a href="https://useneedl.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-start mb-4" data-cursor="link">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 bg-white/5 rounded-lg text-blue-400">
+                                        <i data-lucide="disc-3" class="w-6 h-6"></i>
+                                    </div>
+                                    <h3 class="text-4xl font-resolide text-white group-hover:text-blue-400 transition-colors">Needl</h3>
+                                </div>
+                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+                            </a>
+                            <div class="flex gap-2 mb-4 flex-wrap">
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">JavaScript</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Three.js</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Web Audio API</span>
+                            </div>
+                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                                Developed a browser-based music player featuring a real-time 3D vinyl visualization, local audio file management, and interactive playback controls. Built with JavaScript, Three.js, and the Web Audio API.
                             </p>
                         </div>
 
@@ -802,6 +872,7 @@
                                 Designed and built a digital record player from scratch, integrating NFC technology to bridge physical media with digital streaming.
                             </p>
                         </div>
+
                     </div>
                 </div>
             </section>
@@ -953,6 +1024,19 @@
                 el.style.setProperty('--float-dur', (5 + Math.random() * 2.5).toFixed(1) + 's'); // 5–7.5s
                 el.style.setProperty('--float-delay', (-Math.random() * 5).toFixed(1) + 's');    // out-of-phase
                 el.classList.add('floaty');
+            });
+        })();
+
+        // ===== AK Labs "the apps" dropdown (smooth grid-rows expand) =====
+        (function () {
+            const btn = document.getElementById('aklabs-toggle');
+            const panel = document.getElementById('aklabs-apps');
+            if (!btn || !panel) return;
+            btn.addEventListener('click', () => {
+                const open = !panel.classList.contains('open');
+                panel.classList.toggle('open', open);
+                btn.classList.toggle('is-open', open);
+                btn.setAttribute('aria-expanded', String(open));
             });
         })();
 
