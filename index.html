@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth snap-y snap-mandatory h-full">
+<html lang="en" class="scroll-smooth h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,6 +47,7 @@
             --accent-blue: #2563eb;
         }
 
+        html { overflow-x: hidden; }
         body {
             background-color: var(--bg-color);
             color: var(--text-primary);
@@ -187,11 +188,61 @@
         .aklabs-logo svg { isolation: isolate; overflow: visible; }
         .aklabs-logo circle { mix-blend-mode: screen; }
         /* apps dropdown — smooth grid-rows height expand */
-        .aklabs-panel { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.42s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease; }
+        .aklabs-panel { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease; }
         .aklabs-panel > div { overflow: hidden; min-height: 0; }
         .aklabs-panel.open { grid-template-rows: 1fr; opacity: 1; }
         .aklabs-chev { transition: transform 0.3s ease; }
         .aklabs-toggle.is-open .aklabs-chev { transform: rotate(180deg); }
+
+        /* ===== Projects "Index" — collapsible category groups ===== */
+        .proj-group-head { border-top: 1px solid rgba(255, 255, 255, 0.08); cursor: pointer; }
+        body.light-mode .proj-group-head { border-top-color: rgba(0, 0, 0, 0.08); }
+        .proj-chev { transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+        .proj-group-head[aria-expanded="true"] .proj-chev { transform: rotate(180deg); }
+        .proj-ord { transition: color 0.3s ease, text-shadow 0.3s ease; }
+        .proj-group-head:hover .proj-ord,
+        .proj-group-head[aria-expanded="true"] .proj-ord { color: #60a5fa; text-shadow: 0 0 10px rgba(96, 165, 250, 0.6); }
+        .proj-meter { display: none; }
+        body.light-mode .proj-meter { background: rgba(0, 0, 0, 0.08); }
+        .proj-meter-fill { display: block; height: 100%; width: var(--fill, 100%); transform: scaleX(0.35); transform-origin: left; background: linear-gradient(90deg, #60a5fa, rgba(96, 165, 250, 0.25)); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .proj-group-head:hover + .proj-meter .proj-meter-fill,
+        .proj-group-head[aria-expanded="true"] + .proj-meter .proj-meter-fill { transform: scaleX(1); }
+        .proj-panel { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease; }
+        .proj-panel-inner { overflow: hidden; min-height: 0; }
+        .proj-panel.open { grid-template-rows: 1fr; opacity: 1; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+        .proj-group-head:focus-visible, .bento-tile a:focus-visible { outline: 2px solid #60a5fa; outline-offset: 4px; border-radius: 4px; }
+
+        /* ===== Project bento tiles ===== */
+        .bento-tile { position: relative; min-height: 12rem; border-radius: 1rem; background: rgba(16, 18, 25, 0.82); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.10); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.85rem; overflow: hidden; transition: border-color 0.3s ease, background 0.3s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        body.light-mode .bento-tile { background: rgba(255, 255, 255, 0.85); border-color: rgba(0, 0, 0, 0.10); }
+        .bento-tile:hover { border-color: rgba(96, 165, 250, 0.5); background: rgba(28, 38, 64, 0.88); transform: translateY(-4px); }
+        body.light-mode .bento-tile:hover { background: rgba(239, 243, 252, 0.92); }
+
+        /* sub-categories are a LIGHTER, distinct format from the collapsible section headers */
+        .proj-group > .proj-meter { display: none; }
+        .proj-group-head:not(.sec-head) { border-top: none; padding-top: 0.4rem; padding-bottom: 0.4rem; }
+        .proj-group-head:not(.sec-head) .proj-ord { font-size: 0.6rem; }
+        .proj-group-head:not(.sec-head) .proj-cat { font-size: 0.95rem; letter-spacing: 0.18em; text-transform: uppercase; color: #9ca3af; }
+        .proj-group-head:not(.sec-head) .proj-chev { width: 1rem; height: 1rem; }
+        .proj-group-head:not(.sec-head) .proj-count { display: none; }
+        .bento-tile.aklabs-tile { overflow: visible; }
+
+        /* cap the per-project display fonts so titles never overflow a tile */
+        .bento-tile .font-hobsky { font-size: 2.25rem; line-height: 1; }
+        .bento-tile .font-vantely { font-size: 1.75rem; }
+        .bento-tile .font-ivy { font-size: 1.85rem; }
+        .bento-tile .font-inktera { font-size: 2rem; }
+        .bento-tile .font-resolide { font-size: 2rem; }
+        .bento-tile .font-akwordmark { font-size: 2.25rem; }
+
+        .tile-index { position: absolute; top: 0.9rem; right: 1rem; font-size: 10px; letter-spacing: 0.15em; color: #4b5563; pointer-events: none; z-index: 1; }
+        /* description expands in BELOW the tile content on hover/focus — never covers the logo/title/tags */
+        .tile-desc { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; }
+        .tile-desc-inner { overflow: hidden; min-height: 0; }
+        .bento-tile:hover .tile-desc, .bento-tile:focus-within .tile-desc, .bento-tile.aklabs-tile .tile-desc { grid-template-rows: 1fr; opacity: 1; }
+        .tile-arrow { display: inline-block; transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+        @media (hover: none) { .tile-desc { grid-template-rows: 1fr; opacity: 1; } }
 
         /* Hobsky display font (Pitstop wordmark) + theme-aware Pitstop accent */
         @font-face {
@@ -240,11 +291,6 @@
         body.light-mode ::-webkit-scrollbar-thumb { background: #ccc; }
         body.light-mode ::-webkit-scrollbar-thumb:hover { background: #999; }
 
-        /* Enforce Snap Stop */
-        section {
-            scroll-snap-stop: always;
-        }
-        
         /* Hide scrollbar when music view is active to prevent scrolling home */
         body.no-scroll {
             overflow: hidden;
@@ -400,6 +446,11 @@
 
         @media (prefers-reduced-motion: reduce) {
             .premium-card, .premium-card:hover, .icon-chip { transition: none !important; transform: none !important; }
+            .proj-panel { grid-template-rows: 1fr !important; opacity: 1 !important; transition: none !important; }
+            .proj-chev, .proj-meter-fill { transition: none !important; }
+            .proj-meter-fill { transform: scaleX(1) !important; }
+            .tile-desc { grid-template-rows: 1fr !important; opacity: 1 !important; transition: none !important; }
+            .bento-tile, .bento-tile:hover, .tile-arrow { transition: none !important; transform: none !important; }
         }
     </style>
 </head>
@@ -428,7 +479,7 @@
         <!-- HOME PAGE VIEW -->
         <div id="home-view">
             <!-- Hero Section -->
-            <section class="h-screen flex flex-col justify-center pt-20 pb-10 relative snap-start px-4 sm:px-8 md:px-12" id="hero">
+            <section class="h-screen flex flex-col justify-center pt-20 pb-10 relative px-6 sm:px-8 md:px-12 lg:px-16" id="hero">
                 <div class="space-y-6 md:space-y-8 parallax-element mt-16 md:mt-32 relative z-10">
                     <p class="text-gray-400 tracking-widest text-sm md:text-base font-code uppercase ml-2 reveal-text">
                         <span id="loc-nyc" class="cursor-pointer transition-all duration-300 hover:text-blue-400 hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]">New York</span>
@@ -490,26 +541,33 @@
             </section>
 
             <!-- About Section -->
-            <section id="about" class="min-h-screen flex flex-col justify-center py-24 md:py-32 relative scroll-section snap-start px-4 sm:px-8 md:px-12">
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
-                    <div class="md:col-span-4 text-gray-500 uppercase tracking-widest text-sm font-bold h-fit font-code">
-                        01 / Statement
-                    </div>
-                    <div class="md:col-span-8 text-xl md:text-2xl lg:text-3xl font-light font-code leading-relaxed text-gray-300 hover-trigger" data-cursor="text">
-                        <p class="mb-6 reveal-up">
-                            I’m a Computer Engineering and Economics student from NYC at Washington University in St. Louis with a strong interest complex systems. My background spans hardware and software systems, data analysis, and market evaluation. These skills have helped me develop a strong ability to bridge technical development with business growth in analytically rigorous environments. In my free time I like to produce music, read, and build side projects.
-                        </p>
+            <section id="about" class="py-12 md:py-20 relative px-6 sm:px-8 md:px-12 lg:px-16">
+                <button id="sec-about-btn" class="proj-group-head sec-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="true" aria-controls="sec-about">
+                    <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">01</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Statement</span></span>
+                    <i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500 shrink-0"></i>
+                </button>
+                <div class="proj-meter"><span class="proj-meter-fill" style="--fill:100%"></span></div>
+                <div id="sec-about" class="proj-panel open" role="region" aria-labelledby="sec-about-btn">
+                    <div class="proj-panel-inner">
+                        <div class="pt-8 text-xl md:text-2xl lg:text-3xl font-light font-code leading-relaxed text-gray-300 max-w-4xl hover-trigger" data-cursor="text">
+                            <p class="mb-6 reveal-up">
+                                I’m a Computer Engineering and Economics student from NYC at Washington University in St. Louis with a strong interest complex systems. My background spans hardware and software systems, data analysis, and market evaluation. These skills have helped me develop a strong ability to bridge technical development with business growth in analytically rigorous environments. In my free time I like to produce music, read, and build side projects.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- Experience Section -->
-            <section class="min-h-screen flex flex-col justify-center py-24 md:py-32 scroll-section snap-start px-4 sm:px-8 md:px-12">
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
-                    <div class="md:col-span-4 text-gray-500 uppercase tracking-widest text-sm font-bold h-fit font-code">
-                        02 / Experience
-                    </div>
-                    <div class="md:col-span-8 space-y-20">
+            <section class="py-12 md:py-20 px-6 sm:px-8 md:px-12 lg:px-16">
+                <button id="sec-exp-btn" class="proj-group-head sec-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="false" aria-controls="sec-exp">
+                    <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">02</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Experience</span></span>
+                    <span class="flex items-center gap-3 shrink-0"><span class="proj-count font-code text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 hidden sm:inline">5 Roles</span><i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500"></i></span>
+                </button>
+                <div class="proj-meter"><span class="proj-meter-fill" style="--fill:100%"></span></div>
+                <div id="sec-exp" class="proj-panel" role="region" aria-labelledby="sec-exp-btn">
+                    <div class="proj-panel-inner">
+                        <div class="pt-8 pl-6 space-y-20">
                         <!-- Experience items -->
                         <div id="exp-create" class="group relative pl-8 border-l border-white/10 hover:border-blue-500 transition-colors duration-300 reveal-up hover-trigger" data-cursor="text">
                             <div class="absolute -left-[20px] top-0 bg-black p-2 rounded-full border border-white/20 group-hover:border-blue-500 group-hover:scale-110 transition-all">
@@ -520,9 +578,8 @@
                                 <img src="assets/create-logo-orange.png" alt="Create Wellness" class="logo-for-light h-9 md:h-12 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
                                 <i data-lucide="arrow-up-right" class="link-arrow w-5 h-5 md:w-7 md:h-7 text-gray-600 group-hover:text-blue-400"></i>
                             </a>
-                            <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 text-gray-400 font-code">
+                            <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4 mb-4 text-gray-400 font-code">
                                 <span class="text-lg font-medium text-blue-400">Product Management & Strategy Intern</span>
-                                <span class="hidden md:block">•</span>
                                 <span class="text-sm">May 2026 – Present</span>
                             </div>
                             <p class="text-lg text-gray-300 max-w-2xl font-code">Developing tools for data-pipelining and automating retail-analytics reporting.</p>
@@ -535,9 +592,8 @@
                                 <h3 class="text-3xl md:text-5xl font-bold text-white mb-2 transition-colors group-hover:text-blue-400">Carter Burden Network</h3>
                                 <i data-lucide="arrow-up-right" class="link-arrow w-5 h-5 md:w-7 md:h-7 text-gray-600 mb-2 group-hover:text-blue-400"></i>
                             </a>
-                            <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 text-gray-400 font-code">
+                            <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4 mb-4 text-gray-400 font-code">
                                 <span class="text-lg font-medium text-blue-400">Board Member</span>
-                                <span class="hidden md:block">•</span>
                                 <span class="text-sm">Jun 2023 – Aug 2025</span>
                             </div>
                             <p class="text-lg text-gray-300 max-w-2xl font-code">Led community engagement including a prom for 250+ seniors. Contributed to strategy & finance across 20+ board meetings.</p>
@@ -550,9 +606,8 @@
                                 <h3 class="text-3xl md:text-5xl font-bold text-white mb-2 transition-colors group-hover:text-blue-400">Infinite Goods</h3>
                                 <i data-lucide="arrow-up-right" class="link-arrow w-5 h-5 md:w-7 md:h-7 text-gray-600 mb-2 group-hover:text-blue-400"></i>
                             </a>
-                            <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 text-gray-400 font-code">
+                            <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4 mb-4 text-gray-400 font-code">
                                 <span class="text-lg font-medium text-blue-400">Business Development Intern</span>
-                                <span class="hidden md:block">•</span>
                                 <span class="text-sm">May 2023 – Jan 2024</span>
                             </div>
                             <p class="text-lg text-gray-300 max-w-2xl font-code">Backend automation for onboarding, 350% integration speedup. Led cold outreach to 100+ founders.</p>
@@ -562,9 +617,8 @@
                                 <i data-lucide="globe" class="w-5 h-5 text-gray-400 group-hover:text-blue-400"></i>
                             </div>
                             <h3 class="text-3xl md:text-5xl font-bold text-white mb-2">SAVNY</h3>
-                            <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 text-gray-400 font-code">
+                            <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4 mb-4 text-gray-400 font-code">
                                 <span class="text-lg font-medium text-blue-400">Co-founder & Head</span>
-                                <span class="hidden md:block">•</span>
                                 <span class="text-sm">Oct 2023 – Jun 2025</span>
                             </div>
                             <p class="text-lg text-gray-300 max-w-2xl font-code">Organized 250+ students for community service. Coordinated 30+ service opportunities and cultural programming.</p>
@@ -574,27 +628,33 @@
                                 <i data-lucide="music" class="w-5 h-5 text-gray-400 group-hover:text-blue-400"></i>
                             </div>
                             <h3 class="text-3xl md:text-5xl font-bold text-white mb-2">NYU Music Tech</h3>
-                            <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-4 text-gray-400 font-code">
+                            <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4 mb-4 text-gray-400 font-code">
                                 <span class="text-lg font-medium text-blue-400">Research Assistant</span>
-                                <span class="hidden md:block">•</span>
                                 <span class="text-sm">Jan 2024 – Jun 2025</span>
                             </div>
                             <p class="text-lg text-gray-300 max-w-2xl font-code">Engineered multi-channel audio systems. Executed post-production & 45-track arrangement for Harvestworks concert.</p>
+                        </div>
                         </div>
                     </div>
                 </div>
             </section>
 
             <!-- WashU Section -->
-            <section class="min-h-screen flex flex-col justify-center py-24 md:py-32 bg-white/5 rounded-3xl mx-[-1rem] md:mx-0 px-4 md:px-12 backdrop-blur-sm scroll-section snap-start">
-                <div class="mb-16 reveal-up">
-                    <span class="text-blue-400 uppercase tracking-widest text-sm font-bold block mb-4 font-code">03 / Campus Life</span>
-                    <h2 class="text-4xl md:text-6xl font-black text-white">WASHINGTON UNIVERSITY</h2>
-                    <p class="text-xl text-gray-400 mt-2 font-code">Class of 2029 • St. Louis, MO</p>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Row 1 -->
+            <section class="py-12 md:py-20 px-6 sm:px-8 md:px-12 lg:px-16">
+                <button id="sec-campus-btn" class="proj-group-head sec-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="false" aria-controls="sec-campus">
+                    <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">03</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Campus Life</span></span>
+                    <span class="flex items-center gap-3 shrink-0"><span class="proj-count font-code text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 hidden sm:inline">8 Roles</span><i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500"></i></span>
+                </button>
+                <div class="proj-meter"><span class="proj-meter-fill" style="--fill:100%"></span></div>
+                <div id="sec-campus" class="proj-panel" role="region" aria-labelledby="sec-campus-btn">
+                    <div class="proj-panel-inner">
+                        <div class="mt-6 bg-white/5 rounded-3xl backdrop-blur-sm p-6 md:p-10">
+                            <div class="mb-12 reveal-up">
+                                <h2 class="text-4xl md:text-6xl font-black text-white">WASHINGTON UNIVERSITY</h2>
+                                <p class="text-xl text-gray-400 mt-2 font-code">Class of 2029 • St. Louis, MO</p>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                <!-- Row 1 -->
                     <div id="washu-arch" class="premium-card bg-black/40 p-6 rounded-2xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 group reveal-up hover-trigger" data-cursor="text">
                         <div class="icon-chip w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-blue-500/10">
                             <i data-lucide="landmark" class="w-6 h-6 text-gray-500 group-hover:text-blue-400 transition-colors"></i>
@@ -652,32 +712,32 @@
                         <h4 class="text-lg font-bold text-gray-200 group-hover:text-white transition-colors">Ashoka</h4>
                         <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Social Chair</p>
                     </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <!-- Projects Section -->
-            <section id="projects" class="min-h-screen flex flex-col justify-center py-24 md:py-32 scroll-section snap-start px-4 sm:px-8 md:px-12">
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
-                    <div class="md:col-span-4 text-gray-500 uppercase tracking-widest text-sm font-bold h-fit font-code">
-                        04 / Projects
-                    </div>
-                    <div class="md:col-span-8 space-y-12">
-                        <div id="project-playback" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
-                            <a href="https://tryplayback.xyz" target="_blank" rel="noopener" class="flex justify-between items-start mb-4" data-cursor="link">
-                                <img src="assets/playback-logo.png" alt="Playback" class="logo-for-dark h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
-                                <img src="assets/playback-logo-dark.png" alt="Playback" class="logo-for-light h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
-                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
-                            </a>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Product Design</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Hardware</span>
-                            </div>
-                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                Work in progress music hardware.
-                            </p>
-                        </div>
-
-                        <div id="project-genrespace" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
+            <section id="projects" class="py-12 md:py-20 px-6 sm:px-8 md:px-12 lg:px-16">
+                <button id="sec-projects-btn" class="proj-group-head sec-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="false" aria-controls="sec-projects">
+                    <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">04</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Projects</span></span>
+                    <span class="flex items-center gap-3 shrink-0"><span class="proj-count font-code text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 hidden sm:inline">9 Projects</span><i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500"></i></span>
+                </button>
+                <div class="proj-meter"><span class="proj-meter-fill" style="--fill:100%"></span></div>
+                <div id="sec-projects" class="proj-panel" role="region" aria-labelledby="sec-projects-btn">
+                    <div class="proj-panel-inner">
+                        <div class="pt-8 space-y-6">
+                        <div class="proj-group reveal-up">
+                            <button id="grp-web-btn" class="proj-group-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="true" aria-controls="grp-web">
+                                <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">04.1</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Web &amp; Software</span></span>
+                                <span class="flex items-center gap-3 shrink-0"><span class="proj-count font-code text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 hidden sm:inline">5 Projects</span><i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500"></i></span>
+                            </button>
+                            <div class="proj-meter"><span class="proj-meter-fill" style="--fill:100%"></span></div>
+                            <div id="grp-web" class="proj-panel open" role="region" aria-labelledby="grp-web-btn">
+                                <div class="proj-panel-inner grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 items-start">
+                                    <div id="project-genrespace" class="group bento-tile premium-card hover-trigger sm:col-span-2" data-cursor="text">
+                            <span class="tile-index font-code">04.1.1</span>
                             <div class="flex flex-wrap items-center gap-5 mb-4">
                                 <a href="https://genre-space.netlify.app/" target="_blank" rel="noopener" class="flex items-center gap-3" data-cursor="link">
                                     <div class="p-2 bg-white/5 rounded-lg text-blue-400">
@@ -693,12 +753,107 @@
                                 <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Research</span>
                                 <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Data Viz</span>
                             </div>
-                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
                                 Researched computational approaches to music genre classification and similarity modeling, analyzing genre taxonomy to quantify relationships between musical styles. Built an interactive web application that visualizes these relationships in a 2D space, enabling real-time exploration of genre clusters and influence networks over time.
-                            </p>
+                            </p></div></div>
                         </div>
-
-                        <div id="project-aklabs" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
+                                    <div id="project-pitstop" class="group bento-tile premium-card hover-trigger pitstop-tile" data-cursor="text">
+                            <span class="tile-index font-code">04.1.2</span>
+                            <a href="https://usepitstop.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
+                                <div class="pitstop-accent flex items-center gap-0 md:gap-1">
+                                    <span class="block h-16 w-16 md:h-24 md:w-24 shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
+                                        <svg viewBox="0 0 120 120" class="w-full h-full overflow-visible" aria-hidden="true">
+                                            <defs>
+                                                <filter id="pitstop-blob-warp" x="-60%" y="-60%" width="220%" height="220%">
+                                                    <feTurbulence type="fractalNoise" baseFrequency="0.016 0.022" numOctaves="3" seed="7" result="n">
+                                                        <animate attributeName="baseFrequency" dur="13s" values="0.016 0.022;0.026 0.013;0.011 0.028;0.016 0.022" repeatCount="indefinite" />
+                                                    </feTurbulence>
+                                                    <feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G" />
+                                                </filter>
+                                            </defs>
+                                            <circle cx="60" cy="60" r="30" fill="currentColor" filter="url(#pitstop-blob-warp)" />
+                                        </svg>
+                                    </span>
+                                    <span class="font-hobsky uppercase text-5xl md:text-7xl leading-none tracking-tight">Pitstop</span>
+                                </div>
+                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
+                            </a>
+                            <div class="flex gap-2 mb-4 flex-wrap">
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Geospatial</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Routing</span>
+                            </div>
+                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                                Pitstop maps the best places to stop along your travel route based on user input. It leverages dynamic geospatial routing and real-time telemetry to optimize your detours.
+                            </p></div></div>
+                        </div>
+                                    <div id="project-create-report" class="group bento-tile premium-card hover-trigger" data-cursor="text">
+                            <span class="tile-index font-code">04.1.3</span>
+                            <a href="https://createwellness.github.io" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
+                                <div class="flex items-center gap-3 md:gap-4">
+                                    <img src="assets/symbol-white.svg" alt="Create symbol" class="logo-for-dark h-10 md:h-14 w-auto transition-transform duration-300 group-hover:scale-[1.05]" />
+                                    <img src="assets/symbol-orange.png" alt="Create symbol" class="logo-for-light h-10 md:h-14 w-auto transition-transform duration-300 group-hover:scale-[1.05]" />
+                                    <span class="font-vantely create-text lowercase text-3xl md:text-5xl group-hover:opacity-80 transition-opacity">create report engine</span>
+                                </div>
+                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
+                            </a>
+                            <div class="flex gap-2 mb-4 flex-wrap">
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Data Tooling</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Automation</span>
+                            </div>
+                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                                Developed a data aggregation and automated reporting platform that transforms raw retail analytics datasets into presentation-ready executive reports.
+                            </p></div></div>
+                        </div>
+                                    <div id="project-vantage" class="group bento-tile premium-card hover-trigger" data-cursor="text">
+                            <span class="tile-index font-code">04.1.4</span>
+                            <a href="https://vantageprep.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
+                                <div class="flex items-center gap-4 md:gap-5">
+                                    <img src="assets/vantage-logo.png" alt="Vantage Prep" class="h-24 md:h-32 w-auto transition-transform duration-300 group-hover:scale-[1.04]" />
+                                    <span class="font-ivy font-semibold text-3xl md:text-5xl tracking-wide text-white group-hover:text-blue-400 transition-colors">Vantage Prep</span>
+                                </div>
+                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
+                            </a>
+                            <div class="flex gap-2 mb-4 flex-wrap">
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Founder</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">EdTech</span>
+                            </div>
+                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                                A premium tutoring service I founded, pairing students with elite tutors from top universities. Built to deliver academic excellence.
+                            </p></div></div>
+                        </div>
+                                    <div id="project-needl" class="group bento-tile premium-card hover-trigger" data-cursor="text">
+                            <span class="tile-index font-code">04.1.5</span>
+                            <a href="https://useneedl.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-start mb-4" data-cursor="link">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 bg-white/5 rounded-lg text-blue-400">
+                                        <i data-lucide="disc-3" class="w-6 h-6"></i>
+                                    </div>
+                                    <h3 class="text-4xl font-resolide text-white group-hover:text-blue-400 transition-colors">Needl</h3>
+                                </div>
+                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
+                            </a>
+                            <div class="flex gap-2 mb-4 flex-wrap">
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">JavaScript</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Three.js</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Web Audio API</span>
+                            </div>
+                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                                Developed a browser-based music player featuring a real-time 3D vinyl visualization, local audio file management, and interactive playback controls. Built with JavaScript, Three.js, and the Web Audio API.
+                            </p></div></div>
+                        </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="proj-group reveal-up">
+                            <button id="grp-native-btn" class="proj-group-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="false" aria-controls="grp-native">
+                                <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">04.2</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Native Apps</span></span>
+                                <span class="flex items-center gap-3 shrink-0"><span class="proj-count font-code text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 hidden sm:inline">1 Studio · 3 Apps</span><i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500"></i></span>
+                            </button>
+                            <div class="proj-meter"><span class="proj-meter-fill" style="--fill:20%"></span></div>
+                            <div id="grp-native" class="proj-panel" role="region" aria-labelledby="grp-native-btn">
+                                <div class="proj-panel-inner grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 items-start">
+                                    <div id="project-aklabs" class="group bento-tile premium-card hover-trigger sm:col-span-2 lg:col-span-3 aklabs-tile" data-cursor="text">
+                            <span class="tile-index font-code">04.2.1</span>
                             <a href="https://aklaboratories.github.io" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
                                 <div class="flex items-center gap-3 md:gap-4">
                                     <span class="aklabs-logo block h-11 w-11 md:h-12 md:w-12 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
@@ -710,16 +865,16 @@
                                     </span>
                                     <span class="font-akwordmark uppercase text-4xl md:text-5xl text-white group-hover:text-blue-400 transition-colors">AK Labs</span>
                                 </div>
-                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
                             </a>
                             <div class="flex gap-2 mb-4 flex-wrap">
                                 <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Swift</span>
                                 <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">SwiftUI</span>
                                 <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">macOS</span>
                             </div>
-                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
                                 Founded AK Labs, an independent software studio building native macOS applications for music discovery, organization, and creative workflows. Direct product strategy, software architecture, and full-stack application development, with an emphasis on performant system design, intuitive user interfaces, and deep integration with the Apple ecosystem.
-                            </p>
+                            </p></div></div>
                             <button id="aklabs-toggle" type="button" aria-expanded="false" aria-controls="aklabs-apps" class="aklabs-toggle inline-flex items-center gap-2 mt-5 text-xs font-code uppercase tracking-widest text-blue-400 border border-blue-400/30 rounded-full px-4 py-2 transition-colors hover:bg-blue-400/10 hover:border-blue-400/60 hover-trigger" data-cursor="link">
                                 <i data-lucide="layers" class="w-4 h-4"></i>
                                 <span>The apps</span>
@@ -750,92 +905,34 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div id="project-pitstop" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
-                            <a href="https://usepitstop.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
-                                <div class="pitstop-accent flex items-center gap-0 md:gap-1">
-                                    <span class="block h-16 w-16 md:h-24 md:w-24 shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
-                                        <svg viewBox="0 0 120 120" class="w-full h-full overflow-visible" aria-hidden="true">
-                                            <defs>
-                                                <filter id="pitstop-blob-warp" x="-60%" y="-60%" width="220%" height="220%">
-                                                    <feTurbulence type="fractalNoise" baseFrequency="0.016 0.022" numOctaves="3" seed="7" result="n">
-                                                        <animate attributeName="baseFrequency" dur="13s" values="0.016 0.022;0.026 0.013;0.011 0.028;0.016 0.022" repeatCount="indefinite" />
-                                                    </feTurbulence>
-                                                    <feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G" />
-                                                </filter>
-                                            </defs>
-                                            <circle cx="60" cy="60" r="30" fill="currentColor" filter="url(#pitstop-blob-warp)" />
-                                        </svg>
-                                    </span>
-                                    <span class="font-hobsky uppercase text-5xl md:text-7xl leading-none tracking-tight">Pitstop</span>
                                 </div>
-                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+                            </div>
+                        </div>
+                        <div class="proj-group reveal-up">
+                            <button id="grp-hw-btn" class="proj-group-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="false" aria-controls="grp-hw">
+                                <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">04.3</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Hardware &amp; Systems</span></span>
+                                <span class="flex items-center gap-3 shrink-0"><span class="proj-count font-code text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 hidden sm:inline">3 Builds</span><i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500"></i></span>
+                            </button>
+                            <div class="proj-meter"><span class="proj-meter-fill" style="--fill:60%"></span></div>
+                            <div id="grp-hw" class="proj-panel" role="region" aria-labelledby="grp-hw-btn">
+                                <div class="proj-panel-inner grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 items-start">
+                                    <div id="project-playback" class="group bento-tile premium-card hover-trigger" data-cursor="text">
+                            <span class="tile-index font-code">04.3.1</span>
+                            <a href="https://tryplayback.xyz" target="_blank" rel="noopener" class="flex justify-between items-start mb-4" data-cursor="link">
+                                <img src="assets/playback-logo.png" alt="Playback" class="logo-for-dark h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
+                                <img src="assets/playback-logo-dark.png" alt="Playback" class="logo-for-light h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
+                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
                             </a>
                             <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Geospatial</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Routing</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Product Design</span>
+                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Hardware</span>
                             </div>
-                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                Pitstop maps the best places to stop along your travel route based on user input. It leverages dynamic geospatial routing and real-time telemetry to optimize your detours.
-                            </p>
+                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                                Work in progress music hardware.
+                            </p></div></div>
                         </div>
-
-                        <div id="project-create-report" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
-                            <a href="https://createwellness.github.io" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
-                                <div class="flex items-center gap-3 md:gap-4">
-                                    <img src="assets/symbol-white.svg" alt="Create symbol" class="logo-for-dark h-10 md:h-14 w-auto transition-transform duration-300 group-hover:scale-[1.05]" />
-                                    <img src="assets/symbol-orange.png" alt="Create symbol" class="logo-for-light h-10 md:h-14 w-auto transition-transform duration-300 group-hover:scale-[1.05]" />
-                                    <span class="font-vantely create-text lowercase text-3xl md:text-5xl group-hover:opacity-80 transition-opacity">create report engine</span>
-                                </div>
-                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
-                            </a>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Data Tooling</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Automation</span>
-                            </div>
-                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                Developed a data aggregation and automated reporting platform that transforms raw retail analytics datasets into presentation-ready executive reports.
-                            </p>
-                        </div>
-
-                        <div id="project-vantage" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
-                            <a href="https://vantageprep.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
-                                <div class="flex items-center gap-4 md:gap-5">
-                                    <img src="assets/vantage-logo.png" alt="Vantage Prep" class="h-24 md:h-32 w-auto transition-transform duration-300 group-hover:scale-[1.04]" />
-                                    <span class="font-ivy font-semibold text-3xl md:text-5xl tracking-wide text-white group-hover:text-blue-400 transition-colors">Vantage Prep</span>
-                                </div>
-                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
-                            </a>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Founder</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">EdTech</span>
-                            </div>
-                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                A premium tutoring service I founded, pairing students with elite tutors from top universities. Built to deliver academic excellence.
-                            </p>
-                        </div>
-
-                        <div id="project-needl" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
-                            <a href="https://useneedl.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-start mb-4" data-cursor="link">
-                                <div class="flex items-center gap-3">
-                                    <div class="p-2 bg-white/5 rounded-lg text-blue-400">
-                                        <i data-lucide="disc-3" class="w-6 h-6"></i>
-                                    </div>
-                                    <h3 class="text-4xl font-resolide text-white group-hover:text-blue-400 transition-colors">Needl</h3>
-                                </div>
-                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
-                            </a>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">JavaScript</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Three.js</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Web Audio API</span>
-                            </div>
-                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                Developed a browser-based music player featuring a real-time 3D vinyl visualization, local audio file management, and interactive playback controls. Built with JavaScript, Three.js, and the Web Audio API.
-                            </p>
-                        </div>
-
-                        <div id="project-cpu" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
+                                    <div id="project-cpu" class="group bento-tile premium-card hover-trigger sm:col-span-2" data-cursor="text">
+                            <span class="tile-index font-code">04.3.2</span>
                             <div class="flex justify-between items-start mb-4">
                                 <div class="flex items-center gap-3">
                                     <div class="p-2 bg-white/5 rounded-lg text-blue-400">
@@ -843,18 +940,18 @@
                                     </div>
                                     <h3 class="text-3xl font-bold text-white group-hover:text-blue-400 transition-colors">16-Bit CPU Architecture</h3>
                                 </div>
-                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
                             </div>
                             <div class="flex gap-2 mb-4 flex-wrap">
                                 <span class="text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Computer Engineering</span>
                                 <span class="text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Hardware</span>
                             </div>
-                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
                                 A 2-year independent study building a 16-bit CPU from scratch using advanced computer & electrical engineering principles. Currently under active development.
-                            </p>
+                            </p></div></div>
                         </div>
-
-                        <div id="project-record" class="group border-t border-white/20 pt-8 reveal-up hover-trigger" data-cursor="text">
+                                    <div id="project-record" class="group bento-tile premium-card hover-trigger" data-cursor="text">
+                            <span class="tile-index font-code">04.3.3</span>
                             <a href="https://github.com/arjunkalbag/DIRECT" target="_blank" rel="noopener" class="flex justify-between items-start mb-4" data-cursor="link">
                                 <div class="flex items-center gap-3">
                                     <div class="p-2 bg-white/5 rounded-lg text-blue-400">
@@ -862,23 +959,26 @@
                                     </div>
                                     <h3 class="text-3xl font-bold text-white group-hover:text-blue-400 transition-colors">IoT Digital Record Player</h3>
                                 </div>
-                                <i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i>
+                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
                             </a>
                             <div class="flex gap-2 mb-4 flex-wrap">
                                 <span class="text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">IoT</span>
                                 <span class="text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">NFC</span>
                             </div>
-                            <p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
+                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
                                 Designed and built a digital record player from scratch, integrating NFC technology to bridge physical media with digital streaming.
-                            </p>
+                            </p></div></div>
                         </div>
-
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </div>
                 </div>
             </section>
 
             <!-- Footer -->
-            <footer class="py-20 border-t border-white/10 mt-20 reveal-up snap-start px-4 sm:px-8 md:px-12">
+            <footer class="py-20 border-t border-white/10 mt-20 reveal-up px-6 sm:px-8 md:px-12 lg:px-16">
                 <div class="flex flex-col items-start gap-8">
                     <div class="flex gap-4">
                         <a href="https://linkedin.com/in/arjun-kalbag/" target="_blank" class="footer-icon hover-trigger text-gray-300" data-cursor="link" aria-label="LinkedIn">
@@ -1037,6 +1137,66 @@
                 panel.classList.toggle('open', open);
                 btn.classList.toggle('is-open', open);
                 btn.setAttribute('aria-expanded', String(open));
+            });
+        })();
+
+        // ===== Collapsible outline — section heads (multi-open) + project category heads (one-at-a-time) =====
+        (function () {
+            var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            function setOpen(head, open) {
+                head.setAttribute('aria-expanded', String(open));
+                var p = document.getElementById(head.getAttribute('aria-controls'));
+                if (p) p.classList.toggle('open', open);
+            }
+            function refreshST(head) {
+                if (!window.ScrollTrigger) return;
+                var p = document.getElementById(head.getAttribute('aria-controls'));
+                var fn = function () { try { ScrollTrigger.refresh(); } catch (e) {} };
+                if (p) p.addEventListener('transitionend', fn, { once: true });
+                else requestAnimationFrame(fn);
+            }
+            function bindAccordion(heads, oneAtATime) {
+                if (!heads.length) return null;
+                if (reduce) { heads.forEach(function (h) { setOpen(h, true); }); return null; }
+                function toggle(head) {
+                    var willOpen = head.getAttribute('aria-expanded') !== 'true';
+                    if (oneAtATime) heads.forEach(function (h) { setOpen(h, h === head ? willOpen : false); });
+                    else setOpen(head, willOpen);
+                    refreshST(head);
+                }
+                // native <button> heads already fire click on Enter/Space, so click covers keyboard
+                heads.forEach(function (head) { head.addEventListener('click', function () { toggle(head); }); });
+                return toggle;
+            }
+            var catHeads = Array.prototype.slice.call(document.querySelectorAll('.proj-group-head:not(.sec-head)'));
+            var secHeads = Array.prototype.slice.call(document.querySelectorAll('.sec-head'));
+            var toggleCat = bindAccordion(catHeads, true);
+            var toggleSec = bindAccordion(secHeads, false);
+            window.__openProjGroup = function (controlsId) {
+                var head = catHeads.find(function (h) { return h.getAttribute('aria-controls') === controlsId; });
+                if (head && head.getAttribute('aria-expanded') !== 'true' && toggleCat) toggleCat(head);
+            };
+            window.__openSection = function (controlsId) {
+                var head = secHeads.find(function (h) { return h.getAttribute('aria-controls') === controlsId; });
+                if (head && head.getAttribute('aria-expanded') !== 'true' && toggleSec) toggleSec(head);
+            };
+            if (window.ScrollTrigger) requestAnimationFrame(function () { try { ScrollTrigger.refresh(); } catch (e) {} });
+        })();
+
+        // ===== Magnetic arrow on project tiles (cheap signature flourish) =====
+        (function () {
+            if (!window.matchMedia) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(pointer: coarse)').matches) return;
+            document.querySelectorAll('.bento-tile').forEach(function (tile) {
+                var arrow = tile.querySelector('.tile-arrow');
+                if (!arrow) return;
+                tile.addEventListener('pointermove', function (e) {
+                    var r = arrow.getBoundingClientRect();
+                    var cx = Math.max(-5, Math.min(5, (e.clientX - (r.left + r.width / 2)) * 0.15));
+                    var cy = Math.max(-5, Math.min(5, (e.clientY - (r.top + r.height / 2)) * 0.15));
+                    arrow.style.transform = 'translate(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px)';
+                });
+                tile.addEventListener('pointerleave', function () { arrow.style.transform = ''; });
             });
         })();
 
@@ -1534,12 +1694,14 @@
         const cpuTarget = document.getElementById('project-cpu');
         if (navEngineering && cpuTarget) {
             navEngineering.addEventListener('click', () => {
-                // Temporarily lift scroll-snap so we land precisely on the CPU project
-                // (it sits mid-section, not on a snap point), then restore snapping.
-                const html = document.documentElement;
-                html.style.scrollSnapType = 'none';
-                cpuTarget.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                setTimeout(() => { html.style.scrollSnapType = ''; }, 1000);
+                // CPU lives inside the collapsible Projects section -> Hardware group;
+                // open both first so the target is laid out and reachable, then scroll.
+                const grp = document.getElementById('grp-hw');
+                const sec = document.getElementById('sec-projects');
+                const needWait = !(grp && grp.classList.contains('open')) || !(sec && sec.classList.contains('open'));
+                if (window.__openSection) window.__openSection('sec-projects');
+                if (window.__openProjGroup) window.__openProjGroup('grp-hw');
+                setTimeout(() => cpuTarget.scrollIntoView({ behavior: 'smooth', block: 'start' }), needWait ? 480 : 0);
             });
         }
 
