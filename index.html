@@ -1143,10 +1143,24 @@
         // ===== Collapsible outline — section heads (multi-open) + project category heads (one-at-a-time) =====
         (function () {
             var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            function setInnerOverflow(p, val) { var i = p.querySelector('.proj-panel-inner'); if (i) i.style.overflow = val; }
             function setOpen(head, open) {
                 head.setAttribute('aria-expanded', String(open));
                 var p = document.getElementById(head.getAttribute('aria-controls'));
-                if (p) p.classList.toggle('open', open);
+                if (!p) return;
+                if (open) {
+                    p.classList.add('open');
+                    // once fully expanded, let hovered tiles grow without being clipped by the panel
+                    var onEnd = function (e) {
+                        if (e.target !== p || e.propertyName !== 'grid-template-rows') return;
+                        p.removeEventListener('transitionend', onEnd);
+                        if (p.classList.contains('open')) setInnerOverflow(p, 'visible');
+                    };
+                    p.addEventListener('transitionend', onEnd);
+                } else {
+                    setInnerOverflow(p, '');   // restore clipping so the collapse animates cleanly
+                    p.classList.remove('open');
+                }
             }
             function refreshST(head) {
                 if (!window.ScrollTrigger) return;
@@ -1157,7 +1171,7 @@
             }
             function bindAccordion(heads, oneAtATime) {
                 if (!heads.length) return null;
-                if (reduce) { heads.forEach(function (h) { setOpen(h, true); }); return null; }
+                if (reduce) { heads.forEach(function (h) { h.setAttribute('aria-expanded', 'true'); var p = document.getElementById(h.getAttribute('aria-controls')); if (p) { p.classList.add('open'); setInnerOverflow(p, 'visible'); } }); return null; }
                 function toggle(head) {
                     var willOpen = head.getAttribute('aria-expanded') !== 'true';
                     if (oneAtATime) heads.forEach(function (h) { setOpen(h, h === head ? willOpen : false); });
@@ -1180,6 +1194,8 @@
                 var head = secHeads.find(function (h) { return h.getAttribute('aria-controls') === controlsId; });
                 if (head && head.getAttribute('aria-expanded') !== 'true' && toggleSec) toggleSec(head);
             };
+            // panels open on load (markup) have no transition to fire — let them overflow now
+            document.querySelectorAll('.proj-panel.open').forEach(function (p) { setInnerOverflow(p, 'visible'); });
             if (window.ScrollTrigger) requestAnimationFrame(function () { try { ScrollTrigger.refresh(); } catch (e) {} });
         })();
 
