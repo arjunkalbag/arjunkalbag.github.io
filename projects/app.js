@@ -488,7 +488,9 @@
         var span = H("span", { "class": "ch" });
         // render "A" as an upside-down uppercase V (a chevron peak), like the brand wordmark
         if (wm.flipA && (ch === "A" || ch === "a")) {
-          var v = H("span", null, ["V"]); v.style.display = "inline-block"; v.style.transform = "rotate(180deg)"; span.appendChild(v);
+          // letter-spacing 0 on the inner span: otherwise the V's trailing letter-spacing
+          // rides along the 180° rotation and lands on the LEFT, opening a gap before the ∧
+          var v = H("span", null, ["V"]); v.style.display = "inline-block"; v.style.letterSpacing = "0"; v.style.transform = "rotate(180deg)"; span.appendChild(v);
         } else {
           span.appendChild(document.createTextNode(ch === " " ? "\u00a0" : ch));
         }
