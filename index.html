@@ -1509,6 +1509,7 @@
         let interactionMode = 'random';
         let isAKMode = false;
         let isLightMode = false;
+        const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
         // Playful multi-color particle palettes
         const darkPalette = [[96,165,250],[167,139,250],[244,114,182],[45,212,191],[251,191,36],[52,211,153],[34,211,238]];
@@ -1549,7 +1550,7 @@
         function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; initParticles(); }
         function initParticles() {
             particles = [];
-            const particleCount = width < 768 ? 200 : 400; 
+            const particleCount = reduceMotion ? (width < 768 ? 70 : 110) : (width < 768 ? 110 : 180); 
             for (let i = 0; i < particleCount; i++) {
                 particles.push({ x: Math.random() * width, y: Math.random() * height, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, size: Math.random() * 2 + 1, z: Math.random() * 2, tx: 0, ty: 0, colorIndex: Math.floor(Math.random() * 7) });
             }
@@ -1689,13 +1690,40 @@
             ctx.clearRect(0, 0, width, height);
             ctx.fillStyle = isLightMode ? '#e5e5e5' : '#050505';
             ctx.fillRect(0, 0, width, height);
-            particles.forEach((p, i) => {
-                if (interactionMode === 'shape') { p.x += (p.tx - p.x) * 0.08; p.y += (p.ty - p.y) * 0.08; } else { const currentSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy); const normalSpeed = 0.5; if (currentSpeed > normalSpeed) { p.vx *= 0.94; p.vy *= 0.94; } if (p.x < 0 || p.x > width) p.vx *= -1; if (p.y < 0 || p.y > height) p.vy *= -1; const dx = mouseX - p.x; const dy = mouseY - p.y; const distance = Math.sqrt(dx * dx + dy * dy); const forceDistance = 150; if (distance < forceDistance) { const force = (forceDistance - distance) / forceDistance; const forceDirectionX = dx / distance; const forceDirectionY = dy / distance; p.x -= forceDirectionX * force * 3; p.y -= forceDirectionY * force * 3; } p.x += p.vx; p.y += p.vy; }
-                const opacity = 0.2 + (p.z * 0.2); const particleR = isLightMode ? 37 : 96; const particleG = isLightMode ? 99 : 165; const particleB = isLightMode ? 235 : 250;
-                ctx.fillStyle = `rgba(${particleR}, ${particleG}, ${particleB}, ${interactionMode === 'shape' ? 0.6 : opacity})`;
+            const cr = isLightMode ? 37 : 96, cg = isLightMode ? 99 : 165, cb = isLightMode ? 235 : 250;
+            // --- update + draw the dots ---
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                if (interactionMode === 'shape') { p.x += (p.tx - p.x) * 0.08; p.y += (p.ty - p.y) * 0.08; }
+                else {
+                    const currentSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+                    if (currentSpeed > 0.5) { p.vx *= 0.94; p.vy *= 0.94; }
+                    if (p.x < 0 || p.x > width) p.vx *= -1;
+                    if (p.y < 0 || p.y > height) p.vy *= -1;
+                    const dx = mouseX - p.x, dy = mouseY - p.y, distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 150 && distance > 0) { const force = (150 - distance) / 150; p.x -= (dx / distance) * force * 3; p.y -= (dy / distance) * force * 3; }
+                    p.x += p.vx; p.y += p.vy;
+                }
+                const opacity = 0.2 + (p.z * 0.2);
+                ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${interactionMode === 'shape' ? 0.6 : opacity})`;
                 ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-                if (interactionMode === 'random') { for (let j = i + 1; j < particles.length; j++) { const p2 = particles[j]; const dx2 = p.x - p2.x; const dy2 = p.y - p2.y; const dist = Math.sqrt(dx2 * dx2 + dy2 * dy2); if (dist < 150) { const lineR = isLightMode ? 37 : 96; const lineG = isLightMode ? 99 : 165; const lineB = isLightMode ? 235 : 250; ctx.strokeStyle = `rgba(${lineR}, ${lineG}, ${lineB}, ${0.15 * (1 - dist / 150)})`; ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); ctx.stroke(); } } }
-            });
+            }
+            // --- connection web: one batched path + a single stroke (was a stroke() per pair) ---
+            if (interactionMode === 'random' && !reduceMotion) {
+                const maxD2 = 150 * 150;
+                ctx.strokeStyle = `rgba(${cr}, ${cg}, ${cb}, 0.085)`;
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const p2 = particles[j];
+                        const dx = p.x - p2.x, dy = p.y - p2.y;
+                        if (dx * dx + dy * dy < maxD2) { ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); }
+                    }
+                }
+                ctx.stroke();
+            }
             requestAnimationFrame(draw);
         }
 
