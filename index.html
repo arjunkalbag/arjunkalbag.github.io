@@ -351,7 +351,7 @@
     measure(); render(0, 0);
     window.addEventListener('resize', function () { measure(); });
     var raf, start = null, running = true;
-    var REVEAL_AT = 1400, DISSOLVE = 650;
+    var REVEAL_AT = 1400, DISSOLVE = 360;
     var kill = function () { running = false; if (raf) cancelAnimationFrame(raf); if (splash && splash.parentNode) splash.remove(); };
     if (reduce) {
       splash.style.transition = 'opacity .5s ease';
@@ -364,7 +364,7 @@
       if (start === null) start = ts;
       var el = ts - start, diss = Math.max(0, Math.min(1, (el - REVEAL_AT) / DISSOLVE));
       render(el, diss);
-      if (diss > 0.72) splash.style.opacity = String(Math.max(0, 1 - (diss - 0.72) / 0.28));
+      if (diss > 0.35) splash.style.opacity = String(Math.max(0, 1 - (diss - 0.35) / 0.65));
       if (diss >= 1) { kill(); return; }
       raf = requestAnimationFrame(loop);
     }
