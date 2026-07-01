@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Arjun Kalbag</title>
+<script>try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark');}catch(e){}</script>
 
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -29,119 +30,129 @@
 
 <style>
   :root {
-    --bg: #ffffff;
-    --ink: #111111;
-    --mut: #6b6b6b;
-    --faint: #a2a2a2;
-    --line: rgba(0,0,0,0.11);
+    --bg: #ffffff; --ink: #111111; --body: #333333;
+    --mut: #6b6b6b; --faint: #a2a2a2; --line: rgba(0,0,0,0.11);
+    --sel-bg: #111111; --sel-fg: #ffffff;
+  }
+  html.dark {
+    --bg: #0c0c0c; --ink: #f2f2f2; --body: #c9c9c9;
+    --mut: #8f8f8f; --faint: #5f5f5f; --line: rgba(255,255,255,0.13);
+    --sel-bg: #f2f2f2; --sel-fg: #0c0c0c;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
   body {
-    background: var(--bg);
-    color: var(--ink);
+    background: var(--bg); color: var(--ink);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-    line-height: 1.5;
-    opacity: 0;
-    animation: fade 0.8s ease forwards;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    line-height: 1.5; opacity: 0; animation: fade 0.8s ease forwards;
+    transition: background .45s ease, color .45s ease;
   }
   @keyframes fade { to { opacity: 1; } }
-  ::selection { background: #111; color: #fff; }
+  ::selection { background: var(--sel-bg); color: var(--sel-fg); }
 
   .wrap { max-width: 720px; margin: 0 auto; padding: clamp(3.5rem, 12vh, 8rem) 24px 6rem; }
-
   .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
   a { color: inherit; text-decoration: none; }
-  a.u { transition: opacity .2s ease; }
   a.u:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
   .arr { font-size: 0.85em; opacity: 0.55; }
 
-  /* ---- header ---- */
-  .name {
-    font-weight: 800;
-    font-size: clamp(3.2rem, 13vw, 6.4rem);
-    letter-spacing: -0.045em;
-    line-height: 0.9;
+  /* theme toggle */
+  #theme-toggle {
+    position: fixed; top: 1.4rem; right: 1.4rem; z-index: 50;
+    width: 40px; height: 40px; display: grid; place-items: center;
+    border: 1px solid var(--line); border-radius: 999px;
+    background: var(--bg); color: var(--ink); cursor: pointer;
+    transition: border-color .2s ease, background .45s ease, color .45s ease;
   }
-  .meta {
-    margin-top: 1.6rem;
-    font-size: 0.82rem;
-    letter-spacing: 0.04em;
-    color: var(--mut);
-  }
-  .meta .sep { color: var(--faint); margin: 0 0.5em; }
-  .tagline {
-    margin-top: 1.4rem;
-    font-size: clamp(1.15rem, 3.5vw, 1.5rem);
-    font-weight: 500;
-    letter-spacing: -0.01em;
-    max-width: 30ch;
-  }
+  #theme-toggle:hover { border-color: var(--ink); }
+  #theme-toggle svg { width: 17px; height: 17px; }
+  #theme-toggle .sun { display: none; }
+  html.dark #theme-toggle .moon { display: none; }
+  html.dark #theme-toggle .sun { display: block; }
+
+  /* header */
+  .name { font-weight: 800; font-size: clamp(3.2rem, 13vw, 6.4rem); letter-spacing: -0.045em; line-height: 0.9; }
+  .metaline { margin-top: 1.6rem; font-size: 0.82rem; letter-spacing: 0.04em; color: var(--mut); }
+  .metaline .sep { color: var(--faint); margin: 0 0.5em; }
+  .tagline { margin-top: 1.4rem; font-size: clamp(1.15rem, 3.5vw, 1.5rem); font-weight: 500; letter-spacing: -0.01em; max-width: 30ch; }
   .social { margin-top: 1.8rem; display: flex; gap: 1.6rem; font-size: 0.86rem; }
 
-  /* ---- sections ---- */
-  section { margin-top: clamp(3.5rem, 8vh, 5.5rem); }
+  /* sections + dropdowns */
+  section, details.dd { margin-top: clamp(3.4rem, 8vh, 5.2rem); }
   .label {
-    display: flex; align-items: baseline; justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
     font-size: 0.7rem; letter-spacing: 0.24em; text-transform: uppercase;
-    color: var(--faint); padding-bottom: 1.4rem; margin-bottom: 1.6rem;
-    border-bottom: 1px solid var(--line);
+    color: var(--faint); padding-bottom: 1.4rem; border-bottom: 1px solid var(--line);
   }
+  section > .label { margin-bottom: 1.6rem; }
   .label .side { letter-spacing: 0.18em; }
+  a.side:hover { color: var(--ink); }
 
-  .lede { font-size: 1.08rem; color: #333; line-height: 1.7; max-width: 60ch; }
+  details.dd > summary { list-style: none; cursor: pointer; }
+  details.dd > summary::-webkit-details-marker { display: none; }
+  details.dd > summary .label { transition: color .2s ease; }
+  details.dd > summary:hover .label { color: var(--ink); }
+  .chev { width: 13px; height: 13px; opacity: 0.6; transition: transform .35s cubic-bezier(.16,1,.3,1); flex-shrink: 0; }
+  details.dd[open] > summary .chev { transform: rotate(180deg); }
+  .dd-body { padding-top: 1.7rem; }
+  details.dd[open] > .dd-body { animation: ddin .55s cubic-bezier(.16,1,.3,1); }
+  @keyframes ddin { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
 
-  /* ---- list rows ---- */
+  .lede { font-size: 1.08rem; color: var(--body); line-height: 1.7; max-width: 60ch; }
+
+  /* rows */
   .row { padding: 1.15rem 0; border-top: 1px solid var(--line); }
   .row:first-child { border-top: none; padding-top: 0; }
   .row-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1.5rem; }
   .row-title { font-weight: 600; font-size: 1.05rem; letter-spacing: -0.01em; }
-  .row-sub { color: var(--mut); font-weight: 400; }
   .row-when { font-size: 0.76rem; color: var(--faint); white-space: nowrap; letter-spacing: 0.02em; flex-shrink: 0; }
   .row-desc { color: var(--mut); font-size: 0.92rem; line-height: 1.55; margin-top: 0.4rem; max-width: 62ch; }
   .row-apps { margin-top: 0.6rem; font-size: 0.86rem; color: var(--mut); }
   .row-apps b { font-weight: 600; color: var(--ink); }
 
-  .grp { font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink); font-weight: 600; margin: 2.4rem 0 0.4rem; }
-  .grp:first-of-type { margin-top: 0; }
-
-  /* education roles */
-  .roles { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 2rem; margin-top: 1.2rem; }
+  /* washu roles */
+  .roles { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 2rem; }
   .role { display: flex; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-top: 1px solid var(--line); font-size: 0.9rem; }
   .role span:last-child { color: var(--faint); font-size: 0.8rem; text-align: right; }
   @media (max-width: 560px) { .roles { grid-template-columns: 1fr; } }
 
-  /* ---- footer + old-site button ---- */
-  footer { margin-top: clamp(4.5rem, 10vh, 7rem); padding-top: 2rem; border-top: 1px solid var(--line); }
+  /* other pages */
+  .pages { display: flex; flex-wrap: wrap; gap: 1.8rem; font-size: 0.9rem; }
+  .pages a { font-weight: 500; }
+
+  /* footer + old button */
+  footer { margin-top: clamp(4rem, 10vh, 6.5rem); padding-top: 2rem; border-top: 1px solid var(--line); }
   .colophon { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 0.78rem; color: var(--faint); }
   .colophon .social { margin: 0; font-size: 0.82rem; }
   .oldwrap { margin-top: 3rem; display: flex; justify-content: center; }
   .oldbtn {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
     padding: 0.85rem 1.6rem; border: 1px solid var(--ink); border-radius: 999px;
     transition: background .25s ease, color .25s ease;
   }
   .oldbtn:hover { background: var(--ink); color: var(--bg); }
 
-  /* ---- subtle reveal ---- */
+  /* reveal */
   .r { opacity: 0; transform: translateY(14px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
   .r.in { opacity: 1; transform: none; }
-  @media (prefers-reduced-motion: reduce) { .r { opacity: 1; transform: none; transition: none; } body { animation: none; opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .r { opacity: 1; transform: none; transition: none; } body { animation: none; opacity: 1; } .chev, details.dd[open] > .dd-body { transition: none; animation: none; } }
 </style>
 </head>
 <body>
+
+<button id="theme-toggle" aria-label="Toggle light / dark mode">
+  <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+  <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg>
+</button>
+
 <div class="wrap">
 
   <!-- Header -->
   <header>
     <h1 class="name">Arjun<br />Kalbag</h1>
-    <p class="meta mono">
-      New York / St. Louis<span class="sep">·</span>Computer Engineering &amp; Economics, WashU&nbsp;’29
-    </p>
+    <p class="metaline mono">New York / St. Louis<span class="sep">·</span>Computer Engineering &amp; Economics, WashU&nbsp;’29</p>
     <p class="tagline">Building the intersection of hardware, sound, and strategy.</p>
     <nav class="social mono">
       <a class="u" href="https://linkedin.com/in/arjun-kalbag/" target="_blank" rel="noopener">LinkedIn <span class="arr">↗</span></a>
@@ -153,130 +164,74 @@
   <!-- Statement -->
   <section class="r">
     <div class="label mono"><span>Statement</span></div>
-    <p class="lede">I’m a Computer Engineering and Economics student from NYC at Washington University in St. Louis with a strong interest in complex systems. My background spans hardware and software systems, data analysis, and market evaluation — bridging technical development with business growth in analytically rigorous environments. In my free time I produce music, read, and build side projects.</p>
-  </section>
-
-  <!-- Experience -->
-  <section class="r">
-    <div class="label mono"><span>Experience</span></div>
-
-    <div class="row">
-      <div class="row-head">
-        <div class="row-title"><a class="u" href="https://pairyx.co/" target="_blank" rel="noopener">Pairyx <span class="arr">↗</span></a> <span class="row-sub">— Co-Founder &amp; CTO</span></div>
-        <div class="row-when mono">Jun 2026 — Present</div>
-      </div>
-      <p class="row-desc">Building an AI-integrated company connecting creators with early-stage brands through strategic partnerships. Responsible for technical strategy, platform architecture, and product roadmap.</p>
-    </div>
-
-    <div class="row">
-      <div class="row-head">
-        <div class="row-title"><a class="u" href="https://trycreate.co/" target="_blank" rel="noopener">Create Wellness <span class="arr">↗</span></a> <span class="row-sub">— Product Management &amp; Strategy Intern</span></div>
-        <div class="row-when mono">May 2026 — Present</div>
-      </div>
-      <p class="row-desc">Developing tools for data-pipelining and automating retail-analytics reporting.</p>
-    </div>
-
-    <div class="row">
-      <div class="row-head">
-        <div class="row-title"><a class="u" href="https://www.carterburdennetwork.org/" target="_blank" rel="noopener">Carter Burden Network <span class="arr">↗</span></a> <span class="row-sub">— Board Member</span></div>
-        <div class="row-when mono">Jun 2023 — Aug 2025</div>
-      </div>
-      <p class="row-desc">Led community engagement including a prom for 250+ seniors. Contributed to strategy &amp; finance across 20+ board meetings.</p>
-    </div>
-
-    <div class="row">
-      <div class="row-head">
-        <div class="row-title"><a class="u" href="https://www.linkedin.com/company/infinite-goods-eco/" target="_blank" rel="noopener">Infinite Goods <span class="arr">↗</span></a> <span class="row-sub">— Business Development Intern</span></div>
-        <div class="row-when mono">May 2023 — Jan 2024</div>
-      </div>
-      <p class="row-desc">Backend automation for onboarding, 350% integration speedup. Led cold outreach to 100+ founders.</p>
-    </div>
-
-    <div class="row">
-      <div class="row-head">
-        <div class="row-title">SAVNY <span class="row-sub">— Co-Founder &amp; Head</span></div>
-        <div class="row-when mono">Oct 2023 — Jun 2025</div>
-      </div>
-      <p class="row-desc">Organized 250+ students for community service. Coordinated 30+ service opportunities and cultural programming.</p>
-    </div>
-
-    <div class="row">
-      <div class="row-head">
-        <div class="row-title">NYU Music Tech <span class="row-sub">— Research Assistant</span></div>
-        <div class="row-when mono">Jan 2024 — Jun 2025</div>
-      </div>
-      <p class="row-desc">Engineered multi-channel audio systems. Executed post-production &amp; 45-track arrangement for the Harvestworks concert.</p>
-    </div>
+    <p class="lede">I’m a Computer Engineering and Economics student from NYC at Washington University in St. Louis. My background spans hardware and software systems as well as data analysis. In my free time I like to produce music, read, and build side projects. Building <a class="u" href="https://pairyx.co/" target="_blank" rel="noopener">Pairyx</a>.</p>
   </section>
 
   <!-- Projects -->
-  <section class="r">
-    <div class="label mono"><span>Projects</span><a class="side u" href="/projects/">Interactive carousel ↗</a></div>
-
-    <div class="grp mono">Web &amp; Software</div>
-    <div class="row">
-      <div class="row-head"><div class="row-title"><a class="u" href="https://pairyx.co/" target="_blank" rel="noopener">Pairyx <span class="arr">↗</span></a></div><div class="row-when mono">AI · Creator Economy</div></div>
-      <p class="row-desc">AI-integrated platform connecting creators with early-stage brands through strategic partnerships.</p>
-    </div>
-    <div class="row">
-      <div class="row-head"><div class="row-title"><a class="u" href="https://genre-space.netlify.app/" target="_blank" rel="noopener">genre-space <span class="arr">↗</span></a></div><div class="row-when mono">Research · Data Viz</div></div>
-      <p class="row-desc">Computational research on music-genre similarity, visualized as an interactive 2D map of genre clusters and influence over time. <a class="u" href="assets/genre-explosion-paper.pdf" target="_blank" rel="noopener">Read the paper ↗</a></p>
-    </div>
-    <div class="row">
-      <div class="row-head"><div class="row-title"><a class="u" href="https://usepitstop.netlify.app/" target="_blank" rel="noopener">Pitstop <span class="arr">↗</span></a></div><div class="row-when mono">Geospatial · Routing</div></div>
-      <p class="row-desc">Maps the best places to stop along a travel route using dynamic geospatial routing and real-time telemetry.</p>
-    </div>
-    <div class="row">
-      <div class="row-head"><div class="row-title"><a class="u" href="https://createwellness.github.io" target="_blank" rel="noopener">Create Report Engine <span class="arr">↗</span></a></div><div class="row-when mono">Data Tooling · Automation</div></div>
-      <p class="row-desc">A data-aggregation and automated reporting platform that turns raw retail analytics into presentation-ready executive reports.</p>
-    </div>
-    <div class="row">
-      <div class="row-head"><div class="row-title"><a class="u" href="https://vantageprep.netlify.app/" target="_blank" rel="noopener">Vantage Prep <span class="arr">↗</span></a></div><div class="row-when mono">Founder · EdTech</div></div>
-      <p class="row-desc">A premium tutoring service pairing students with elite tutors from top universities.</p>
-    </div>
-    <div class="row">
-      <div class="row-head"><div class="row-title"><a class="u" href="https://useneedl.netlify.app/" target="_blank" rel="noopener">Needl <span class="arr">↗</span></a></div><div class="row-when mono">JavaScript · Three.js</div></div>
-      <p class="row-desc">A browser music player with real-time 3D vinyl visualization, local file management, and playback controls.</p>
-    </div>
-
-    <div class="grp mono">Native Apps</div>
-    <div class="row">
-      <div class="row-head"><div class="row-title"><a class="u" href="https://aklaboratories.github.io" target="_blank" rel="noopener">AK Labs <span class="arr">↗</span></a></div><div class="row-when mono">Swift · macOS</div></div>
-      <p class="row-desc">An independent studio building native macOS apps for music discovery, organization, and creative workflows.</p>
-      <p class="row-apps mono"><b>Prism</b> — real-time key detection on the Camelot wheel &nbsp;·&nbsp; <b>Halo</b> — glass now-playing widget &nbsp;·&nbsp; <b>Needlebox</b> — key/BPM library sorter &amp; set builder</p>
-    </div>
-
-    <div class="grp mono">Hardware &amp; Systems</div>
-    <div class="row">
-      <div class="row-head"><div class="row-title"><a class="u" href="https://tryplayback.xyz" target="_blank" rel="noopener">Playback <span class="arr">↗</span></a></div><div class="row-when mono">Product Design · Hardware</div></div>
-      <p class="row-desc">Music hardware, in progress.</p>
-    </div>
-    <div class="row">
-      <div class="row-head"><div class="row-title">16-Bit CPU Architecture</div><div class="row-when mono">Computer Engineering</div></div>
-      <p class="row-desc">A two-year independent study building a 16-bit CPU from scratch. Under active development.</p>
-    </div>
-    <div class="row">
-      <div class="row-head"><div class="row-title"><a class="u" href="https://github.com/arjunkalbag/DIRECT" target="_blank" rel="noopener">IoT Digital Record Player <span class="arr">↗</span></a></div><div class="row-when mono">IoT · NFC</div></div>
-      <p class="row-desc">A digital record player built from scratch, using NFC to bridge physical media with digital streaming.</p>
-    </div>
-  </section>
-
-  <!-- Music -->
-  <section class="r">
-    <div class="label mono"><span>Music</span><a class="side u" href="/music/">Open the player ↗</a></div>
-    <p class="lede">I produce under <a class="u" href="https://soundcloud.com/prodarjun" target="_blank" rel="noopener">prodarjun <span class="arr">↗</span></a>. Releases: <em>arjunkalbag!</em>, <em>shimmer</em>, <em>woodlands</em>, <em>capstone</em>, and <em>evangelical</em>.</p>
-  </section>
-
-  <!-- Education -->
-  <section class="r">
-    <div class="label mono"><span>Education</span></div>
-    <div class="row" style="padding-top:0;border-top:none">
-      <div class="row-head">
-        <div class="row-title">Washington University in St. Louis</div>
-        <div class="row-when mono">Class of 2029</div>
+  <details class="dd r">
+    <summary><span class="label mono"><span>Projects</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+    <div class="dd-body">
+      <div class="row">
+        <div class="row-head"><div class="row-title"><a class="u" href="https://pairyx.co/" target="_blank" rel="noopener">Pairyx <span class="arr">↗</span></a></div><div class="row-when mono">AI · Creator Economy</div></div>
+        <p class="row-desc">Building an AI-integrated company connecting creators with early-stage brands through strategic partnerships. Responsible for technical strategy, platform architecture, and product roadmap.</p>
       </div>
-      <p class="row-desc">B.S. Computer Engineering &amp; Economics · St. Louis, MO</p>
+      <div class="row">
+        <div class="row-head"><div class="row-title"><a class="u" href="https://genre-space.netlify.app/" target="_blank" rel="noopener">genre-space <span class="arr">↗</span></a></div><div class="row-when mono">Research · Data Viz</div></div>
+        <p class="row-desc">Computational research on music-genre similarity, visualized as an interactive 2D map of genre clusters and influence over time. <a class="u" href="assets/genre-explosion-paper.pdf" target="_blank" rel="noopener">Read the paper ↗</a></p>
+      </div>
+      <div class="row">
+        <div class="row-head"><div class="row-title"><a class="u" href="https://aklaboratories.github.io" target="_blank" rel="noopener">AK Labs <span class="arr">↗</span></a></div><div class="row-when mono">Swift · macOS</div></div>
+        <p class="row-desc">An independent studio building native macOS apps for music discovery, organization, and creative workflows.</p>
+        <p class="row-apps mono"><b>Prism</b> — real-time key detection on the Camelot wheel &nbsp;·&nbsp; <b>Halo</b> — glass now-playing widget &nbsp;·&nbsp; <b>Needlebox</b> — key/BPM library sorter &amp; set builder</p>
+      </div>
+      <div class="row">
+        <div class="row-head"><div class="row-title"><a class="u" href="https://tryplayback.xyz" target="_blank" rel="noopener">Playback <span class="arr">↗</span></a></div><div class="row-when mono">Product Design · Hardware</div></div>
+        <p class="row-desc">Music hardware, in progress.</p>
+      </div>
+      <div class="row">
+        <div class="row-head"><div class="row-title"><a class="u" href="https://vantageprep.netlify.app/" target="_blank" rel="noopener">Vantage Prep <span class="arr">↗</span></a></div><div class="row-when mono">Founder · EdTech</div></div>
+        <p class="row-desc">A premium tutoring service pairing students with elite tutors from top universities.</p>
+      </div>
     </div>
+  </details>
+
+  <!-- Sites -->
+  <details class="dd r">
+    <summary><span class="label mono"><span>Sites</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+    <div class="dd-body">
+      <div class="row">
+        <div class="row-head"><div class="row-title"><a class="u" href="https://usepitstop.netlify.app/" target="_blank" rel="noopener">Pitstop <span class="arr">↗</span></a></div><div class="row-when mono">Geospatial · Routing</div></div>
+        <p class="row-desc">Maps the best places to stop along a travel route using dynamic geospatial routing and real-time telemetry.</p>
+      </div>
+      <div class="row">
+        <div class="row-head"><div class="row-title"><a class="u" href="https://createwellness.github.io" target="_blank" rel="noopener">Create Report Engine <span class="arr">↗</span></a></div><div class="row-when mono">Data Tooling · Automation</div></div>
+        <p class="row-desc">A data-aggregation and automated reporting platform that turns raw retail analytics into presentation-ready executive reports.</p>
+      </div>
+      <div class="row">
+        <div class="row-head"><div class="row-title"><a class="u" href="https://useneedl.netlify.app/" target="_blank" rel="noopener">Needl <span class="arr">↗</span></a></div><div class="row-when mono">JavaScript · Three.js</div></div>
+        <p class="row-desc">A browser music player with real-time 3D vinyl visualization, local file management, and playback controls.</p>
+      </div>
+    </div>
+  </details>
+
+  <!-- Hardware -->
+  <details class="dd r">
+    <summary><span class="label mono"><span>Hardware</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+    <div class="dd-body">
+      <div class="row">
+        <div class="row-head"><div class="row-title">16-Bit CPU Architecture</div><div class="row-when mono">Computer Engineering</div></div>
+        <p class="row-desc">A two-year independent study building a 16-bit CPU from scratch. Under active development.</p>
+      </div>
+      <div class="row">
+        <div class="row-head"><div class="row-title"><a class="u" href="https://github.com/arjunkalbag/DIRECT" target="_blank" rel="noopener">IoT Digital Record Player <span class="arr">↗</span></a></div><div class="row-when mono">IoT · NFC</div></div>
+        <p class="row-desc">A digital record player built from scratch, using NFC to bridge physical media with digital streaming.</p>
+      </div>
+    </div>
+  </details>
+
+  <!-- At WashU -->
+  <section class="r">
+    <div class="label mono"><span>At WashU</span></div>
     <div class="roles">
       <div class="role"><span>Arch Consulting</span><span>Associate</span></div>
       <div class="role"><span>Consult Your Community</span><span>Client Recruitment Dir.</span></div>
@@ -289,6 +244,16 @@
     </div>
   </section>
 
+  <!-- Other Pages -->
+  <section class="r">
+    <div class="label mono"><span>Other Pages</span></div>
+    <nav class="pages">
+      <a class="u" href="/music/">Music Page <span class="arr">↗</span></a>
+      <a class="u" href="/projects/">Projects Page <span class="arr">↗</span></a>
+      <a class="u" href="/photography.html">Photography Page <span class="arr">↗</span></a>
+    </nav>
+  </section>
+
   <!-- Footer -->
   <footer>
     <div class="colophon mono">
@@ -299,21 +264,27 @@
       </nav>
       <span>© <span id="yr">2026</span> Arjun Kalbag</span>
     </div>
-    <div class="oldwrap">
-      <a class="oldbtn" href="/old.html">Old website ↗</a>
-    </div>
+    <div class="oldwrap"><a class="oldbtn" href="/old.html">Old website ↗</a></div>
   </footer>
 
 </div>
 
 <script>
+  // theme toggle
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-toggle');
+    btn.addEventListener('click', function () {
+      root.classList.toggle('dark');
+      try { localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light'); } catch (e) {}
+    });
+  })();
   // subtle reveal on scroll
   (function () {
     var els = document.querySelectorAll('.r');
     if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
     els.forEach(function (e) { io.observe(e); });
   })();
 </script>
