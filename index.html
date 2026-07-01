@@ -27,7 +27,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
 
 <style>
   :root {
@@ -58,8 +58,8 @@
     animation: splashOut .85s ease 3.1s forwards;
   }
   #splash pre {
-    position: absolute; inset: 0; margin: 0; color: #0a0a0a;
-    font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500;
+    position: absolute; inset: 0; margin: 0; color: #000000;
+    font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 700;
     white-space: pre; overflow: hidden; user-select: none; pointer-events: none;
   }
   @keyframes splashOut { to { opacity: 0; visibility: hidden; pointer-events: none; } }
@@ -320,20 +320,21 @@
       pre.style.fontSize = fs + 'px'; pre.style.lineHeight = fs + 'px';
       var probe = document.createElement('span');
       probe.textContent = '0000000000';
-      probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font-weight:500;font-size:' + fs + 'px;font-family:' + getComputedStyle(pre).fontFamily;
+      probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font-weight:700;font-size:' + fs + 'px;font-family:' + getComputedStyle(pre).fontFamily;
       document.body.appendChild(probe);
       charW = probe.getBoundingClientRect().width / 10 || fs * 0.6;
       document.body.removeChild(probe);
-      charH = fs;
+      charH = Math.max(1, Math.round(fs * 0.92));
+      pre.style.lineHeight = charH + 'px';
       cols = Math.ceil(W / charW) + 1; rows = Math.ceil(H / charH) + 1;
     }
     function render(t) {
       var s = t * 0.001, cx = W / 2, cy = H / 2, base = Math.min(W, H);
-      var pulse = 1 + Math.sin(s * 1.6) * 0.12;
+      var pulse = 1 + Math.sin(s * 1.5) * 0.10;
       var b = [
-        [cx + Math.cos(s * 0.90) * base * 0.15, cy + Math.sin(s * 1.10) * base * 0.15, base * 0.15 * pulse],
-        [cx + Math.cos(s * 1.30 + 2) * base * 0.20, cy + Math.sin(s * 0.70 + 1) * base * 0.13, base * 0.13 * pulse],
-        [cx + Math.cos(s * 0.60 + 4) * base * 0.12, cy + Math.sin(s * 1.50 + 3) * base * 0.17, base * 0.11 * pulse]
+        [cx + Math.cos(s * 0.80) * base * 0.09, cy + Math.sin(s * 1.00) * base * 0.09, base * 0.19 * pulse],
+        [cx + Math.cos(s * 1.20 + 2) * base * 0.11, cy + Math.sin(s * 0.65 + 1) * base * 0.08, base * 0.17 * pulse],
+        [cx + Math.cos(s * 0.50 + 4) * base * 0.07, cy + Math.sin(s * 1.35 + 3) * base * 0.10, base * 0.15 * pulse]
       ];
       var out = '';
       for (var j = 0; j < rows; j++) {
@@ -341,8 +342,8 @@
         for (var i = 0; i < cols; i++) {
           var px = i * charW, f = 0;
           for (var k = 0; k < 3; k++) { var dx = px - b[k][0], dy = py - b[k][1]; f += (b[k][2] * b[k][2]) / (dx * dx + dy * dy + 1); }
-          if (f < 0.9) { out += ' '; }
-          else { var idx = Math.floor((f - 0.9) * 2.2) + 1; out += RAMP[idx < RAMP.length ? idx : RAMP.length - 1]; }
+          if (f < 1.25) { out += ' '; }
+          else { var idx = Math.floor((f - 1.25) * 6) + 2; out += RAMP[idx < RAMP.length ? idx : RAMP.length - 1]; }
         }
         out += '\n';
       }
