@@ -51,37 +51,43 @@
   }
   ::selection { background: var(--sel-bg); color: var(--sel-fg); }
 
-  /* abstract kinetic splash: an off-center orbital system — a faint outer ring,
-     thin arcs spinning at different speeds, dots orbiting a core — assembles and
-     turns, then implodes via an iris wipe collapsing to the pivot. No lettering. */
+  /* abstract kinetic splash: two tilted elliptical orbital planes precess around
+     an off-center core while arcs spin and dots orbit — then the field implodes
+     via an iris wipe to the pivot. Fully abstract, no lettering. */
   #splash {
     position: fixed; inset: 0; z-index: 9999; background: var(--bg); overflow: hidden;
-    animation: splashOut 1s cubic-bezier(.7,0,.24,1) 2.05s forwards;
+    animation: splashOut 1s cubic-bezier(.7,0,.24,1) 2.15s forwards;
   }
-  #splash .sys { position: absolute; left: 38%; top: 45%; width: 0; height: 0; }
+  #splash .sys   { position: absolute; left: 40%; top: 46%; width: 0; height: 0; }
+  #splash .plane { position: absolute; left: 0; top: 0; width: 0; height: 0; }
+  #splash .plane.a { transform: rotate(-15deg) scaleY(.58); animation: precessA 46s linear infinite; }
+  #splash .plane.b { transform: rotate(56deg)  scaleY(.5);  animation: precessB 38s linear infinite reverse; }
   #splash .orb {
-    position: absolute; left: 50%; top: 50%; box-sizing: border-box; border-radius: 50%;
+    position: absolute; left: 0; top: 0; box-sizing: border-box; border-radius: 50%;
     border: 1px solid transparent; transform: translate(-50%,-50%); opacity: 0;
   }
-  #splash .ring  { width: 46vmax; height: 46vmax; border-color: rgba(var(--ink-rgb), .12); animation: fadeIn 1.1s ease .15s both; }
-  #splash .arc1  { width: 33vmax; height: 33vmax; border-top-color: rgba(var(--ink-rgb), .5);  animation: fadeIn 1s ease .35s both, spin 15s linear infinite; }
-  #splash .arc2  { width: 24vmax; height: 24vmax; border-top-color: rgba(var(--ink-rgb), .38); border-bottom-color: rgba(var(--ink-rgb), .38); animation: fadeIn 1s ease .5s both, spin 10s linear infinite reverse; }
-  #splash .arc3  { width: 15vmax; height: 15vmax; border-left-color: rgba(var(--ink-rgb), .6);  animation: fadeIn .9s ease .62s both, spin 6.5s linear infinite; }
-  #splash .core  { position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); transform: translate(-50%,-50%); opacity: 0; animation: fadeIn .8s ease .28s both; }
-  #splash .arm   { position: absolute; left: 50%; top: 50%; width: 0; height: 0; opacity: 0; }
-  #splash .arm .planet { position: absolute; top: 0; border-radius: 50%; background: var(--ink); margin-top: -4px; }
-  #splash .arm1 { animation: fadeIn 1s ease .7s both, orbit 12s linear infinite; }
-  #splash .arm1 .planet { left: 27vmax; width: 8px; height: 8px; margin-left: -4px; }
-  #splash .arm2 { animation: fadeIn 1s ease .9s both, orbit 8s linear -3s infinite reverse; }
-  #splash .arm2 .planet { left: 19vmax; width: 6px; height: 6px; margin-top: -3px; margin-left: -3px; }
-  @keyframes fadeIn { to { opacity: 1; } }
-  @keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
-  @keyframes orbit { to { transform: rotate(360deg); } }
-  @keyframes splashOut { 0% { clip-path: circle(150% at 38% 45%); opacity: 1; } 80% { opacity: 1; } 100% { clip-path: circle(0% at 38% 45%); opacity: 0; visibility: hidden; pointer-events: none; } }
+  #splash .ring-a { width: 42vmax; height: 42vmax; border-color: rgba(var(--ink-rgb), .14); animation: fadeIn 1.1s ease .2s both; }
+  #splash .ring-b { width: 30vmax; height: 30vmax; border-color: rgba(var(--ink-rgb), .16); animation: fadeIn 1.1s ease .35s both; }
+  #splash .arc-a  { width: 42vmax; height: 42vmax; border-top-color: rgba(var(--ink-rgb), .5);  animation: fadeIn 1s ease .45s both, spin 13s linear infinite; }
+  #splash .arc-b  { width: 30vmax; height: 30vmax; border-top-color: rgba(var(--ink-rgb), .5); border-bottom-color: rgba(var(--ink-rgb), .3); animation: fadeIn 1s ease .55s both, spin 8s linear infinite reverse; }
+  #splash .core   { position: absolute; left: 0; top: 0; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); transform: translate(-50%,-50%); opacity: 0; animation: fadeIn .8s ease .3s both; }
+  #splash .arm    { position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; }
+  #splash .arm .planet { position: absolute; top: 0; border-radius: 50%; background: var(--ink); }
+  #splash .arm-a  { animation: fadeIn 1s ease .7s both, orbit 11s linear infinite; }
+  #splash .arm-a .planet { left: 21vmax; width: 8px; height: 8px; margin: -4px 0 0 -4px; }
+  #splash .arm-b  { animation: fadeIn 1s ease .85s both, orbit 7.5s linear -2s infinite reverse; }
+  #splash .arm-b .planet { left: 15vmax; width: 6px; height: 6px; margin: -3px 0 0 -3px; }
+  @keyframes fadeIn   { to { opacity: 1; } }
+  @keyframes spin     { to { transform: translate(-50%,-50%) rotate(360deg); } }
+  @keyframes orbit    { to { transform: rotate(360deg); } }
+  @keyframes precessA { to { transform: rotate(345deg) scaleY(.58); } }
+  @keyframes precessB { to { transform: rotate(416deg) scaleY(.5); } }
+  @keyframes splashOut { 0% { clip-path: circle(150% at 40% 46%); opacity: 1; } 80% { opacity: 1; } 100% { clip-path: circle(0% at 40% 46%); opacity: 0; visibility: hidden; pointer-events: none; } }
   html.splash-skip #splash { display: none; }
   @media (prefers-reduced-motion: reduce) {
     #splash .arm { display: none; }
-    #splash .ring, #splash .arc1, #splash .arc2, #splash .arc3, #splash .core { animation: none; opacity: 1; }
+    #splash .plane.a, #splash .plane.b { animation: none; }
+    #splash .ring-a, #splash .ring-b, #splash .arc-a, #splash .arc-b, #splash .core { animation: none; opacity: 1; }
     #splash { animation: splashOut .5s ease 1s forwards; }
   }
 
@@ -200,13 +206,17 @@
 
 <div id="splash" aria-hidden="true">
   <div class="sys">
-    <span class="orb ring"></span>
-    <span class="orb arc1"></span>
-    <span class="orb arc2"></span>
-    <span class="orb arc3"></span>
+    <div class="plane a">
+      <span class="orb ring-a"></span>
+      <span class="orb arc-a"></span>
+      <span class="arm arm-a"><span class="planet"></span></span>
+    </div>
+    <div class="plane b">
+      <span class="orb ring-b"></span>
+      <span class="orb arc-b"></span>
+      <span class="arm arm-b"><span class="planet"></span></span>
+    </div>
     <span class="core"></span>
-    <span class="arm arm1"><span class="planet"></span></span>
-    <span class="arm arm2"><span class="planet"></span></span>
   </div>
 </div>
 
