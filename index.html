@@ -32,12 +32,12 @@
   :root {
     --bg: #ffffff; --ink: #111111; --body: #333333;
     --mut: #6b6b6b; --faint: #a2a2a2; --line: rgba(0,0,0,0.11);
-    --sel-bg: #111111; --sel-fg: #ffffff; --ink-rgb: 17,17,17;
+    --sel-bg: #111111; --sel-fg: #ffffff; --ink-rgb: 17,17,17; --bar-bg: rgba(255,255,255,0.82);
   }
   html.dark {
     --bg: #0c0c0c; --ink: #f2f2f2; --body: #c9c9c9;
     --mut: #8f8f8f; --faint: #5f5f5f; --line: rgba(255,255,255,0.13);
-    --sel-bg: #f2f2f2; --sel-fg: #0c0c0c; --ink-rgb: 242,242,242;
+    --sel-bg: #f2f2f2; --sel-fg: #0c0c0c; --ink-rgb: 242,242,242; --bar-bg: rgba(12,12,12,0.82);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
@@ -51,7 +51,7 @@
   @keyframes fade { to { opacity: 1; } }
   ::selection { background: var(--sel-bg); color: var(--sel-fg); }
 
-  .wrap { max-width: 720px; margin: 0 auto; padding: clamp(3.5rem, 12vh, 8rem) 24px 6rem; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: clamp(6rem, 13vh, 8.5rem) 24px 6rem; }
   .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
   a { color: inherit; text-decoration: none; }
@@ -62,11 +62,10 @@
 
   /* theme toggle */
   #theme-toggle {
-    position: fixed; top: 1.4rem; right: 1.4rem; z-index: 50;
-    width: 40px; height: 40px; display: grid; place-items: center;
+    width: 38px; height: 38px; flex-shrink: 0; display: grid; place-items: center;
     border: 1px solid var(--line); border-radius: 999px;
-    background: var(--bg); color: var(--ink); cursor: pointer;
-    transition: border-color .2s ease, background .45s ease, color .45s ease;
+    background: transparent; color: var(--ink); cursor: pointer;
+    transition: border-color .2s ease, color .45s ease;
   }
   #theme-toggle:hover { border-color: var(--ink); }
   #theme-toggle svg { width: 17px; height: 17px; }
@@ -74,8 +73,29 @@
   html.dark #theme-toggle .moon { display: none; }
   html.dark #theme-toggle .sun { display: block; }
 
+  /* fixed header bar with collapsing brand */
+  .bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 60;
+    padding: 1.05rem 24px; border-bottom: 1px solid transparent;
+    transition: background .4s ease, border-color .4s ease, padding .4s ease;
+  }
+  .bar.scrolled {
+    background: var(--bar-bg); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-bottom-color: var(--line); padding: 0.65rem 24px;
+  }
+  .bar-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+  .brand {
+    display: inline-block; white-space: nowrap; cursor: pointer; color: var(--ink);
+    font-weight: 800; font-size: 1.6rem; line-height: 1; letter-spacing: -0.03em;
+    transition: letter-spacing .55s cubic-bezier(.65,0,.35,1);
+  }
+  .brand .col { display: inline-block; overflow: hidden; white-space: pre; vertical-align: baseline; transition: max-width .6s cubic-bezier(.65,0,.35,1), opacity .42s ease; }
+  .bar.scrolled .brand { letter-spacing: -0.06em; }
+  .bar.scrolled .brand .col { max-width: 0 !important; opacity: 0; }
+
   /* header */
   .name { font-weight: 800; font-size: clamp(3.2rem, 13vw, 6.4rem); letter-spacing: -0.045em; line-height: 0.9; }
+  .intro .metaline { margin-top: 0; }
   .metaline { margin-top: 1.6rem; font-size: 0.82rem; letter-spacing: 0.04em; color: var(--mut); }
   .metaline .sep { color: var(--faint); margin: 0 0.5em; }
   .tagline { margin-top: 1.4rem; font-size: clamp(1.15rem, 3.5vw, 1.5rem); font-weight: 500; letter-spacing: -0.01em; max-width: 30ch; }
@@ -140,16 +160,20 @@
 </head>
 <body>
 
-<button id="theme-toggle" aria-label="Toggle light / dark mode">
-  <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-  <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg>
-</button>
+<header class="bar" id="site-header">
+  <div class="bar-inner">
+    <a class="brand" id="brand" href="/" aria-label="Arjun Kalbag"><span>A</span><span class="col">rjun</span><span class="col sp"> </span><span>K</span><span class="col">albag</span></a>
+    <button id="theme-toggle" aria-label="Toggle light / dark mode">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg>
+    </button>
+  </div>
+</header>
 
 <div class="wrap">
 
-  <!-- Header -->
-  <header>
-    <h1 class="name">Arjun<br />Kalbag</h1>
+  <!-- Intro -->
+  <div class="intro">
     <p class="metaline mono">New York / St. Louis<span class="sep">·</span>Computer Engineering &amp; Economics, WashU&nbsp;’29</p>
     <p class="tagline">Building the intersection of hardware, sound, and strategy.</p>
     <nav class="social mono">
@@ -157,7 +181,7 @@
       <a class="u" href="https://github.com/arjunkalbag" target="_blank" rel="noopener">GitHub <span class="arr">↗</span></a>
       <a class="u" href="mailto:arjunkalbag07@gmail.com">Email <span class="arr">↗</span></a>
     </nav>
-  </header>
+  </div>
 
   <!-- Statement -->
   <section class="r">
@@ -262,6 +286,25 @@
       root.classList.toggle('dark');
       try { localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light'); } catch (e) {}
     });
+  })();
+  // brand: collapse "Arjun Kalbag" into the "AK" monogram on scroll (and back)
+  (function () {
+    var header = document.getElementById('site-header');
+    var brand = document.getElementById('brand');
+    if (!header || !brand) return;
+    var cols = brand.querySelectorAll('.col');
+    function measure() { cols.forEach(function (c) { c.style.maxWidth = c.scrollWidth + 'px'; }); }
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(measure); } else { measure(); }
+    window.addEventListener('resize', measure);
+    var collapsed = false;
+    function onScroll() {
+      var y = window.scrollY || window.pageYOffset || 0;
+      if (!collapsed && y > 46) { collapsed = true; header.classList.add('scrolled'); }
+      else if (collapsed && y < 14) { collapsed = false; header.classList.remove('scrolled'); }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    brand.addEventListener('click', function (e) { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
   })();
   // subtle reveal on scroll
   (function () {
