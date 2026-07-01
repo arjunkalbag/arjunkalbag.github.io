@@ -351,12 +351,12 @@
     measure(); render(0, 0);
     window.addEventListener('resize', function () { measure(); });
     var raf, start = null, running = true;
-    var REVEAL_AT = 2600, DISSOLVE = 950;
+    var REVEAL_AT = 1400, DISSOLVE = 650;
     var kill = function () { running = false; if (raf) cancelAnimationFrame(raf); if (splash && splash.parentNode) splash.remove(); };
     if (reduce) {
       splash.style.transition = 'opacity .5s ease';
-      setTimeout(function () { splash.style.opacity = '0'; }, 1100);
-      setTimeout(kill, 1700);
+      setTimeout(function () { splash.style.opacity = '0'; }, 600);
+      setTimeout(kill, 1100);
       return;
     }
     function loop(ts) {
