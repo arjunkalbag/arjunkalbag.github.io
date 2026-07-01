@@ -111,8 +111,10 @@
   .row-title { font-weight: 600; font-size: 1.05rem; letter-spacing: -0.01em; }
   .row-when { font-size: 0.76rem; color: var(--faint); white-space: nowrap; letter-spacing: 0.02em; flex-shrink: 0; }
   .row-desc { color: var(--mut); font-size: 0.92rem; line-height: 1.55; margin-top: 0.4rem; max-width: 62ch; }
-  .row-apps { margin-top: 0.6rem; font-size: 0.86rem; color: var(--mut); }
-  .row-apps b { font-weight: 600; color: var(--ink); }
+  .apps { list-style: none; margin-top: 0.95rem; padding-left: 1.05rem; border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 0.75rem; }
+  .apps li { display: flex; flex-direction: column; gap: 0.15rem; }
+  .apps b { font-weight: 600; font-size: 0.9rem; color: var(--ink); letter-spacing: -0.01em; }
+  .apps span { font-size: 0.82rem; color: var(--mut); line-height: 1.45; }
 
   /* other pages */
   .pages { display: flex; flex-wrap: wrap; gap: 1.8rem; font-size: 0.9rem; }
@@ -164,9 +166,8 @@
   </section>
 
   <!-- Projects -->
-  <details class="dd r">
-    <summary><span class="label mono"><span>Projects</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span></summary>
-    <div class="dd-body">
+  <section class="r">
+    <div class="label mono"><span>Projects</span></div>
       <div class="row">
         <div class="row-head"><div class="row-title"><a class="u" href="https://pairyx.co/" target="_blank" rel="noopener">Pairyx <span class="arr">↗</span></a></div><div class="row-when mono">AI · Creator Economy</div></div>
         <p class="row-desc">Building an AI-integrated company connecting creators with early-stage brands through strategic partnerships. Responsible for technical strategy, platform architecture, and product roadmap.</p>
@@ -178,7 +179,11 @@
       <div class="row">
         <div class="row-head"><div class="row-title"><a class="u" href="https://aklaboratories.github.io" target="_blank" rel="noopener">AK Labs <span class="arr">↗</span></a></div><div class="row-when mono">Swift · macOS</div></div>
         <p class="row-desc">An independent studio building native macOS apps for music discovery, organization, and creative workflows.</p>
-        <p class="row-apps mono"><b>Prism</b> — real-time key detection on the Camelot wheel &nbsp;·&nbsp; <b>Halo</b> — glass now-playing widget &nbsp;·&nbsp; <b>Needlebox</b> — key/BPM library sorter &amp; set builder</p>
+        <ul class="apps">
+          <li><b>Prism</b><span>Real-time musical key detection mapped onto the Camelot wheel.</span></li>
+          <li><b>Halo</b><span>A glass now-playing widget with a living album-art backdrop.</span></li>
+          <li><b>Needlebox</b><span>Key/BPM library sorter and harmonic set builder.</span></li>
+        </ul>
       </div>
       <div class="row">
         <div class="row-head"><div class="row-title"><a class="u" href="https://tryplayback.xyz" target="_blank" rel="noopener">Playback <span class="arr">↗</span></a></div><div class="row-when mono">Product Design · Hardware</div></div>
@@ -188,8 +193,7 @@
         <div class="row-head"><div class="row-title"><a class="u" href="https://vantageprep.netlify.app/" target="_blank" rel="noopener">Vantage Prep <span class="arr">↗</span></a></div><div class="row-when mono">Founder · EdTech</div></div>
         <p class="row-desc">A premium tutoring service pairing students with elite tutors from top universities.</p>
       </div>
-    </div>
-  </details>
+  </section>
 
   <!-- Sites -->
   <details class="dd r">
