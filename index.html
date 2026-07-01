@@ -114,7 +114,7 @@
 
   details.dd > summary { list-style: none; cursor: pointer; }
   details.dd > summary::-webkit-details-marker { display: none; }
-  details.dd > summary .label { transition: color .2s ease; }
+  details.dd > summary .label { justify-content: flex-start; gap: 0.5rem; transition: color .2s ease; }
   details.dd > summary:hover .label { color: var(--ink); }
   .chev { width: 13px; height: 13px; opacity: 0.6; transition: transform .35s cubic-bezier(.16,1,.3,1); flex-shrink: 0; }
   details.dd[open] > summary .chev { transform: rotate(180deg); }
@@ -127,6 +127,7 @@
   /* rows */
   .row { padding: 1.15rem 0; border-top: 1px solid var(--line); }
   .row:first-child { border-top: none; padding-top: 0; }
+  .label + .row { border-top: none; padding-top: 0; }
   .row-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1.5rem; }
   .row-title { font-weight: 600; font-size: 1.05rem; letter-spacing: -0.01em; }
   .row-when { font-size: 0.76rem; color: var(--faint); white-space: nowrap; letter-spacing: 0.02em; flex-shrink: 0; }
