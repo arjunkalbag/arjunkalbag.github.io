@@ -51,20 +51,17 @@
   }
   ::selection { background: var(--sel-bg); color: var(--sel-fg); }
 
-  /* ascii blob splash: a morphing metaball field drawn in monospace characters,
-     black on white; it oozes and pulses, then fades to reveal the page */
+  /* ascii blob splash: a morphing metaball blob in monospace, black on white;
+     it oozes and pulses, then collapses and dissolves to reveal the page (JS) */
   #splash {
-    position: fixed; inset: 0; z-index: 9999; background: #ffffff; overflow: hidden;
-    animation: splashOut .85s ease 3.1s forwards;
+    position: fixed; inset: 0; z-index: 9999; background: #ffffff; overflow: hidden; will-change: opacity;
   }
   #splash pre {
     position: absolute; inset: 0; margin: 0; color: #000000;
     font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 700;
     white-space: pre; overflow: hidden; user-select: none; pointer-events: none;
   }
-  @keyframes splashOut { to { opacity: 0; visibility: hidden; pointer-events: none; } }
   html.splash-skip #splash { display: none; }
-  @media (prefers-reduced-motion: reduce) { #splash { animation: splashOut .5s ease 1.1s forwards; } }
 
   /* interactive dot-grid background (hover lens + click ripple) */
   #dotgrid { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
@@ -302,10 +299,10 @@
 </div>
 
 <script>
-  // splash: a morphing ASCII metaball blob (black on white). Each cell picks a
-  // glyph from a density ramp based on a moving 3-ball field, so the blob oozes
-  // and pulses. It fades out (CSS) to reveal the page; a timeout guarantees the
-  // overlay can never stay stuck if the animation never fires.
+  // splash: a morphing ASCII metaball blob (black on white). A moving 4-ball
+  // field picks glyphs from a density ramp so the blob oozes and pulses; then it
+  // collapses and dissolves (radii shrink to zero while the edge eats inward) to
+  // reveal the page. A timeout guarantees it can never stay stuck over the page.
   (function () {
     var splash = document.getElementById('splash');
     var pre = document.getElementById('ascii');
@@ -317,7 +314,7 @@
     function measure() {
       W = window.innerWidth; H = window.innerHeight;
       var fs = Math.max(10, Math.min(15, Math.round(W / 110)));
-      pre.style.fontSize = fs + 'px'; pre.style.lineHeight = fs + 'px';
+      pre.style.fontSize = fs + 'px';
       var probe = document.createElement('span');
       probe.textContent = '0000000000';
       probe.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font-weight:700;font-size:' + fs + 'px;font-family:' + getComputedStyle(pre).fontFamily;
@@ -328,40 +325,50 @@
       pre.style.lineHeight = charH + 'px';
       cols = Math.ceil(W / charW) + 1; rows = Math.ceil(H / charH) + 1;
     }
-    function render(t) {
+    function render(t, diss) {
       var s = t * 0.001, cx = W / 2, cy = H / 2, base = Math.min(W, H);
-      var pulse = 1 + Math.sin(s * 1.5) * 0.10;
+      var pulse = 1 + Math.sin(s * 1.5) * 0.10, rs = 1 - diss, thr = 1.25 + diss * 2.5;
       var b = [
-        [cx + Math.cos(s * 0.80) * base * 0.09, cy + Math.sin(s * 1.00) * base * 0.09, base * 0.19 * pulse],
-        [cx + Math.cos(s * 1.20 + 2) * base * 0.11, cy + Math.sin(s * 0.65 + 1) * base * 0.08, base * 0.17 * pulse],
-        [cx + Math.cos(s * 0.50 + 4) * base * 0.07, cy + Math.sin(s * 1.35 + 3) * base * 0.10, base * 0.15 * pulse]
+        [cx + Math.cos(s * 0.80) * base * 0.10, cy + Math.sin(s * 1.00) * base * 0.10, base * 0.17 * pulse * rs],
+        [cx + Math.cos(s * 1.20 + 2) * base * 0.13, cy + Math.sin(s * 0.65 + 1) * base * 0.09, base * 0.15 * pulse * rs],
+        [cx + Math.cos(s * 0.50 + 4) * base * 0.08, cy + Math.sin(s * 1.35 + 3) * base * 0.12, base * 0.14 * pulse * rs],
+        [cx + Math.cos(s * 1.50 + 1) * base * 0.12, cy + Math.sin(s * 0.90 + 5) * base * 0.11, base * 0.12 * pulse * rs]
       ];
       var out = '';
       for (var j = 0; j < rows; j++) {
         var py = j * charH;
         for (var i = 0; i < cols; i++) {
           var px = i * charW, f = 0;
-          for (var k = 0; k < 3; k++) { var dx = px - b[k][0], dy = py - b[k][1]; f += (b[k][2] * b[k][2]) / (dx * dx + dy * dy + 1); }
-          if (f < 1.25) { out += ' '; }
-          else { var idx = Math.floor((f - 1.25) * 6) + 2; out += RAMP[idx < RAMP.length ? idx : RAMP.length - 1]; }
+          for (var k = 0; k < 4; k++) { var dx = px - b[k][0], dy = py - b[k][1]; f += (b[k][2] * b[k][2]) / (dx * dx + dy * dy + 1); }
+          if (f < thr) { out += ' '; }
+          else { var idx = Math.floor((f - thr) * 6) + 2; out += RAMP[idx < RAMP.length ? idx : RAMP.length - 1]; }
         }
         out += '\n';
       }
       pre.textContent = out;
     }
-    measure(); render(0);
+    measure(); render(0, 0);
     window.addEventListener('resize', function () { measure(); });
     var raf, start = null, running = true;
+    var REVEAL_AT = 2600, DISSOLVE = 950;
+    var kill = function () { running = false; if (raf) cancelAnimationFrame(raf); if (splash && splash.parentNode) splash.remove(); };
+    if (reduce) {
+      splash.style.transition = 'opacity .5s ease';
+      setTimeout(function () { splash.style.opacity = '0'; }, 1100);
+      setTimeout(kill, 1700);
+      return;
+    }
     function loop(ts) {
       if (!running || !pre.isConnected) return;
       if (start === null) start = ts;
-      render(ts - start);
+      var el = ts - start, diss = Math.max(0, Math.min(1, (el - REVEAL_AT) / DISSOLVE));
+      render(el, diss);
+      if (diss > 0.72) splash.style.opacity = String(Math.max(0, 1 - (diss - 0.72) / 0.28));
+      if (diss >= 1) { kill(); return; }
       raf = requestAnimationFrame(loop);
     }
-    if (!reduce) raf = requestAnimationFrame(loop);
-    var kill = function () { running = false; if (raf) cancelAnimationFrame(raf); if (splash && splash.parentNode) splash.remove(); };
-    splash.addEventListener('animationend', function (e) { if (e.animationName === 'splashOut') kill(); });
-    setTimeout(kill, 4300);
+    raf = requestAnimationFrame(loop);
+    setTimeout(kill, REVEAL_AT + DISSOLVE + 700);
   })();
   // theme toggle
   (function () {
