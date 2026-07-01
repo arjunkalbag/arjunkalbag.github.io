@@ -85,16 +85,12 @@
   }
   .bar-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
   .brand {
-    display: inline-grid; overflow: hidden; white-space: nowrap; cursor: pointer; color: var(--ink);
+    display: inline-block; white-space: nowrap; cursor: pointer; color: var(--ink);
     font-weight: 800; font-size: 1.6rem; line-height: 1.35; letter-spacing: -0.01em;
-    max-width: var(--full, 14ch); transition: max-width 1s cubic-bezier(.22,1,.36,1);
   }
-  .brand > span { grid-area: 1 / 1; justify-self: start; white-space: nowrap; }
-  .brand .bfull { transition: opacity .45s ease; }
-  .brand .bmark { opacity: 0; transition: opacity .6s ease .12s; }
-  .bar.scrolled .brand { max-width: var(--ak, 3ch); }
-  .bar.scrolled .brand .bfull { opacity: 0; }
-  .bar.scrolled .brand .bmark { opacity: 1; }
+  .brand .i, .brand .c { display: inline-block; vertical-align: bottom; }
+  .brand .c { overflow: hidden; white-space: pre; transition: max-width 1s cubic-bezier(.16,1,.3,1); }
+  .bar.scrolled .brand .c { max-width: 0 !important; }
 
   /* header */
   .name { font-weight: 800; font-size: clamp(3.2rem, 13vw, 6.4rem); letter-spacing: -0.045em; line-height: 0.9; }
@@ -166,7 +162,7 @@
 
 <header class="bar" id="site-header">
   <div class="bar-inner">
-    <a class="brand" id="brand" href="/" aria-label="Arjun Kalbag"><span class="bfull">Arjun Kalbag</span><span class="bmark" aria-hidden="true">AK</span></a>
+    <a class="brand" id="brand" href="/" aria-label="Arjun Kalbag"><span class="i">A</span><span class="c">rjun</span><span class="c cs"> </span><span class="i">K</span><span class="c">albag</span></a>
     <button id="theme-toggle" aria-label="Toggle light / dark mode">
       <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
       <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg>
@@ -296,11 +292,13 @@
     var header = document.getElementById('site-header');
     var brand = document.getElementById('brand');
     if (!header || !brand) return;
-    var full = brand.querySelector('.bfull');
-    var mark = brand.querySelector('.bmark');
+    var cs = brand.querySelectorAll('.c');
     function measure() {
-      brand.style.setProperty('--full', (Math.ceil(full.getBoundingClientRect().width) + 1) + 'px');
-      brand.style.setProperty('--ak', (Math.ceil(mark.getBoundingClientRect().width) + 1) + 'px');
+      var was = header.classList.contains('scrolled');
+      if (was) header.classList.remove('scrolled');
+      cs.forEach(function (c) { c.style.maxWidth = 'none'; });
+      cs.forEach(function (c) { c.style.maxWidth = (Math.ceil(c.getBoundingClientRect().width) + 1) + 'px'; });
+      if (was) header.classList.add('scrolled');
     }
     if (document.fonts && document.fonts.ready) { document.fonts.ready.then(measure); } else { measure(); }
     window.addEventListener('resize', measure);
