@@ -296,19 +296,22 @@
     if (!header || !brand) return;
     var cs = brand.querySelectorAll('.c');
     function measure() {
-      var was = header.classList.contains('scrolled');
-      if (was) header.classList.remove('scrolled');
-      cs.forEach(function (c) { c.style.maxWidth = 'none'; });
-      cs.forEach(function (c) { c.style.maxWidth = (Math.ceil(c.getBoundingClientRect().width) + 1) + 'px'; });
-      if (was) header.classList.add('scrolled');
+      // scrollWidth reports each collapsing span's natural (overflow) width even
+      // while it's clamped to 0, so we can measure WITHOUT toggling .scrolled.
+      // Toggling forced a reflow in the expanded state and re-fired the collapse
+      // transition — that's what made the logo flicker on mobile, where the URL
+      // bar hiding/showing dispatches a resize on nearly every scroll.
+      cs.forEach(function (c) { c.style.maxWidth = (c.scrollWidth + 2) + 'px'; });
     }
     if (document.fonts && document.fonts.ready) { document.fonts.ready.then(measure); } else { measure(); }
-    window.addEventListener('resize', measure);
+    // Width is rem-based (viewport-independent), so no resize re-measure — it only
+    // caused churn on mobile. One more pass after load covers late font swaps.
+    window.addEventListener('load', measure);
     var collapsed = false;
     function onScroll() {
       var y = window.scrollY || window.pageYOffset || 0;
-      if (!collapsed && y > 46) { collapsed = true; header.classList.add('scrolled'); }
-      else if (collapsed && y < 14) { collapsed = false; header.classList.remove('scrolled'); }
+      if (!collapsed && y > 72) { collapsed = true; header.classList.add('scrolled'); }
+      else if (collapsed && y < 20) { collapsed = false; header.classList.remove('scrolled'); }
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
