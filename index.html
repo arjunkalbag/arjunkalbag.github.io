@@ -309,7 +309,7 @@
     if (!splash || !pre) return;
     if (document.documentElement.classList.contains('splash-skip')) return;
     var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    var RAMP = ' .:-=+*#%@';
+    var RAMP = ' .\'`^",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$';
     var W, H, cols, rows, charW, charH;
     function measure() {
       W = window.innerWidth; H = window.innerHeight;
@@ -326,22 +326,23 @@
       cols = Math.ceil(W / charW) + 1; rows = Math.ceil(H / charH) + 1;
     }
     function render(t, diss) {
-      var s = t * 0.001, cx = W / 2, cy = H / 2, base = Math.min(W, H);
-      var pulse = 1 + Math.sin(s * 1.5) * 0.10, rs = 1 - diss, thr = 1.25 + diss * 2.5;
-      var b = [
-        [cx + Math.cos(s * 0.80) * base * 0.10, cy + Math.sin(s * 1.00) * base * 0.10, base * 0.17 * pulse * rs],
-        [cx + Math.cos(s * 1.20 + 2) * base * 0.13, cy + Math.sin(s * 0.65 + 1) * base * 0.09, base * 0.15 * pulse * rs],
-        [cx + Math.cos(s * 0.50 + 4) * base * 0.08, cy + Math.sin(s * 1.35 + 3) * base * 0.12, base * 0.14 * pulse * rs],
-        [cx + Math.cos(s * 1.50 + 1) * base * 0.12, cy + Math.sin(s * 0.90 + 5) * base * 0.11, base * 0.12 * pulse * rs]
-      ];
+      var s = t * 0.001, base = Math.min(W, H), L = RAMP.length;
+      var cx = W / 2 + Math.sin(s * 0.8) * base * 0.03, cy = H / 2 + Math.cos(s * 0.9) * base * 0.03;
+      var pulse = 1 + Math.sin(s * 1.5) * 0.08, rs = 1 - diss, thr = 1.0 + diss * 3.2;
+      var R0 = base * 0.19 * pulse * rs, spin = s * 0.7, spin2 = s * 0.45;
+      var a1 = 0.42 + 0.10 * Math.sin(s * 1.2);
       var out = '';
       for (var j = 0; j < rows; j++) {
-        var py = j * charH;
+        var py = j * charH, dy = py - cy;
         for (var i = 0; i < cols; i++) {
-          var px = i * charW, f = 0;
-          for (var k = 0; k < 4; k++) { var dx = px - b[k][0], dy = py - b[k][1]; f += (b[k][2] * b[k][2]) / (dx * dx + dy * dy + 1); }
+          var dx = i * charW - cx;
+          var r = Math.sqrt(dx * dx + dy * dy) + 1;
+          var th = Math.atan2(dy, dx);
+          var Rb = R0 * (1 + a1 * Math.cos(6 * th + spin) + 0.16 * Math.cos(3 * th - spin2));
+          if (Rb <= 0) { out += ' '; continue; }
+          var f = (Rb * Rb) / (r * r);
           if (f < thr) { out += ' '; }
-          else { var idx = Math.floor((f - thr) * 6) + 2; out += RAMP[idx < RAMP.length ? idx : RAMP.length - 1]; }
+          else { var idx = Math.floor((f - thr) * 17) + 8; out += RAMP[idx < L ? idx : L - 1]; }
         }
         out += '\n';
       }
