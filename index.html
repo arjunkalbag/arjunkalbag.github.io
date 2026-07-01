@@ -26,7 +26,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
 <style>
   :root {
@@ -53,7 +53,6 @@
 
   .wrap { max-width: 720px; margin: 0 auto; padding: clamp(6rem, 13vh, 8.5rem) 24px 6rem; }
   .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
-  @font-face { font-family: 'AK Display'; src: url('assets/Nicholas.otf') format('opentype'); font-display: swap; }
 
   a { color: inherit; text-decoration: none; }
   a.u:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
@@ -86,18 +85,13 @@
   }
   .bar-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
   .brand {
-    display: inline-grid; align-items: center; white-space: nowrap; cursor: pointer; color: var(--ink);
-    font-family: 'AK Display', 'Playfair Display', serif; text-transform: uppercase;
-    font-weight: 400; font-size: 1.85rem; line-height: 1.3; letter-spacing: 0.01em;
+    display: inline-block; white-space: nowrap; cursor: pointer; color: var(--ink);
+    font-family: 'Instrument Serif', Georgia, serif; text-transform: uppercase;
+    font-weight: 400; font-size: 2.1rem; line-height: 1.3; letter-spacing: 0.02em;
   }
-  .brand > .wm, .brand > .akmark { grid-area: 1 / 1; justify-self: start; align-self: center; }
-  .wm { transition: opacity .5s ease; }
   .brand .i, .brand .c { display: inline-block; vertical-align: bottom; }
-  .brand .c { overflow: hidden; white-space: pre; transition: max-width 1.5s cubic-bezier(.16,1,.3,1); }
-  .akmark { height: 1.3em; width: auto; opacity: 0; pointer-events: none; transition: opacity .5s ease; }
+  .brand .c { overflow: hidden; white-space: pre; transition: max-width 2s cubic-bezier(.16,1,.3,1); }
   .bar.scrolled .brand .c { max-width: 0 !important; }
-  .bar.scrolled .wm { opacity: 0; transition: opacity .5s ease .95s; }
-  .bar.scrolled .akmark { opacity: 1; transition: opacity .65s ease 1.05s; }
 
   /* header */
   .name { font-weight: 800; font-size: clamp(3.2rem, 13vw, 6.4rem); letter-spacing: -0.045em; line-height: 0.9; }
@@ -169,7 +163,7 @@
 
 <header class="bar" id="site-header">
   <div class="bar-inner">
-    <a class="brand" id="brand" href="/" aria-label="Arjun Kalbag"><span class="wm"><span class="i">A</span><span class="c">rjun</span><span class="c cs"> </span><span class="i">K</span><span class="c">albag</span></span><svg class="akmark" viewBox="294 294 1460 1460" fill="currentColor" aria-hidden="true"><path d="M 902.15 579.431 C 967.362 577.558 1038.88 579.17 1104.55 579.106 L 1228.59 579.129 C 1255.23 579.132 1281.39 578.673 1308.02 579.617 C 1308.11 582.081 1308.79 598.173 1306.53 598.29 C 1269.8 600.445 1238.45 608.87 1211.43 635.344 C 1171.56 674.405 1169.69 718.589 1169.56 770.032 L 1169.63 833.94 C 1169.69 857.148 1172.35 880.769 1158.45 900.681 C 1147.22 916.768 1135.73 932.573 1124.26 948.484 L 1013.19 1101.61 C 1004.19 1113.77 993.089 1130.25 983.711 1141.46 C 952.969 1178.22 930.244 1215.32 924.547 1263.9 C 924.279 1266.19 924.837 1282.75 922.263 1285.44 C 859.008 1287.5 781.639 1282.52 719.119 1285.32 C 710.681 1285.71 702.29 1286.8 694.034 1288.59 C 672.773 1293.37 650.987 1307.57 639.081 1325.87 C 632.788 1335.54 624.949 1352.58 623.533 1363.91 C 621.77 1366.28 618.101 1375.44 616.804 1378.76 C 596.532 1430.61 545.519 1468.46 489.104 1467.92 C 468.46 1467.72 446.481 1467.98 425.238 1467.97 L 316.388 1468.05 C 316.03 1460.91 316.006 1454.78 316.092 1447.62 C 410.341 1443.15 430.573 1382.97 459.925 1307.61 C 482.125 1250.61 505.701 1193.04 528.206 1136.08 L 624.441 893.211 L 667.543 784.415 C 684.964 740.063 700.869 691.912 734.307 656.446 C 780.551 607.398 834.525 582.092 902.15 579.431 z M 819.5 1119.92 L 935.758 1119.8 C 953.145 1119.77 971.646 1119.96 989.069 1119.34 C 990.977 1119.27 991.08 1118.39 992.588 1116.98 C 994.791 1114.92 996.037 1111.38 996.067 1108.31 C 996.227 1092.09 996.081 1075.68 996.07 1059.45 L 996.118 961.553 L 996.158 856.962 C 996.151 795.399 1006.02 742.04 921.966 747.977 C 920.451 748.079 918.937 748.212 917.427 748.374 C 908.549 751.605 902.353 753.112 893.664 757.219 C 871.078 767.892 851.111 790.826 841.05 813.574 C 820.084 860.979 801.922 910.454 782.389 958.465 L 754.701 1026.49 C 743.944 1053.22 723.746 1095.68 762.322 1115.15 C 776.09 1122.1 803.087 1120.01 819.5 1119.92 z"/><path d="M 1544.78 579.464 C 1589.48 578.224 1634.72 579.836 1679.48 579.12 C 1696.15 578.853 1715.34 578.384 1731.77 580.114 C 1732.23 586.579 1734.83 597.693 1725.58 598.52 C 1718.26 599.176 1710.88 599.299 1703.61 600.516 C 1677.32 604.849 1653.29 617.978 1635.44 637.752 C 1618.73 655.928 1595.97 690.45 1580.97 711.134 C 1547.38 756.834 1514.13 802.782 1481.23 848.977 L 1431.49 917.281 C 1406.32 951.232 1381.12 976.912 1383.46 1021.46 C 1384.36 1035.86 1388.5 1049.86 1395.57 1062.43 C 1404.33 1077.89 1425.16 1106.45 1435.97 1121.72 C 1457.71 1152.37 1479.29 1183.13 1500.7 1214 L 1586.98 1338.28 C 1616.3 1380.27 1641.2 1429.99 1695.71 1441.73 C 1706.68 1444.09 1721.46 1444.81 1730.49 1450.87 C 1733.35 1452.79 1731.91 1464.87 1731.71 1468.11 C 1685.39 1466.67 1636.68 1468.91 1590.17 1467.93 C 1572.37 1467.16 1552.19 1469.25 1534.66 1467.39 C 1500.1 1463.71 1466.6 1448.31 1443.4 1422.09 C 1426.34 1402.81 1411.72 1379.3 1396.89 1358.12 L 1308.16 1229.85 C 1297.17 1214.13 1280.74 1189.07 1269.12 1174.46 C 1268.98 1174.1 1268.84 1173.74 1268.7 1173.38 C 1254.46 1157.61 1191.1 1047.26 1170.3 1058.6 C 1169.13 1064.99 1169.42 1072.19 1169.6 1078.73 C 1170.37 1108.29 1169.54 1137.81 1169.36 1167.38 L 1169.44 1252.26 C 1169.37 1280.65 1167.66 1317.89 1173.12 1343.3 C 1184.9 1398.12 1227.45 1439.9 1283.5 1446.03 C 1306.11 1448.51 1308.92 1445.36 1307.82 1468.14 C 1290.82 1467.45 1271.7 1467.97 1254.54 1467.99 L 1170.69 1467.87 C 1152.7 1467.89 1129.39 1469.26 1112.09 1466.64 C 1046.83 1456.77 991.67 1394.64 990.912 1328.53 C 990.393 1283.19 987.685 1240.94 1016.38 1202.55 C 1031.92 1181.3 1047.84 1160.2 1063.49 1139 L 1164.17 1001.18 L 1342.28 756.632 L 1395.63 683.922 C 1437.41 625.911 1464.75 582.345 1544.78 579.464 z"/></svg></a>
+    <a class="brand" id="brand" href="/" aria-label="Arjun Kalbag"><span class="i">A</span><span class="c">rjun</span><span class="c cs"> </span><span class="i">K</span><span class="c">albag</span></a>
     <button id="theme-toggle" aria-label="Toggle light / dark mode">
       <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
       <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"/></svg>
