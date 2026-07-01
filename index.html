@@ -51,7 +51,9 @@
   @keyframes fade { to { opacity: 1; } }
   ::selection { background: var(--sel-bg); color: var(--sel-fg); }
 
-  .wrap { max-width: 720px; margin: 0 auto; padding: clamp(6rem, 13vh, 8.5rem) 24px 6rem; }
+  /* interactive dot-grid background (hover lens + click ripple) */
+  #dotgrid { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: clamp(6rem, 13vh, 8.5rem) 24px 6rem; position: relative; z-index: 1; }
   .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
   @font-face { font-family: 'Inktera'; src: url('assets/InkteraDemo.otf') format('opentype'); font-display: swap; }
 
@@ -161,6 +163,8 @@
 </style>
 </head>
 <body>
+
+<canvas id="dotgrid" aria-hidden="true"></canvas>
 
 <header class="bar" id="site-header">
   <div class="bar-inner">
@@ -288,6 +292,80 @@
       root.classList.toggle('dark');
       try { localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light'); } catch (e) {}
     });
+  })();
+  // interactive dot-grid background: a faint grid that draws toward the cursor
+  // (hover lens) and sends a ripple of light outward on click. Fixed behind all
+  // content; pointer-events pass through, so window-level listeners drive it.
+  (function () {
+    var cv = document.getElementById('dotgrid');
+    if (!cv) return;
+    var ctx = cv.getContext('2d');
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var SP = 30, R = 150, dots = [], W = 0, H = 0, dpr = 1, mx = -9999, my = -9999, ripples = [], idle = false;
+    var BASE_A = 0.13, PEAK_A = 0.6, BASE_R = 1.25, PEAK_R = 2.3, PULL = 7, PUSH = 10, SIG = 46, SPEED = 0.42, LIFE = 1050;
+    function rgb() { return document.documentElement.classList.contains('dark') ? '242,242,242' : '17,17,17'; }
+    function smooth(f) { return f * f * (3 - 2 * f); }
+    function build() {
+      W = window.innerWidth; H = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cv.width = W * dpr; cv.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      dots.length = 0;
+      var cols = Math.round(W / SP), rows = Math.round(H / SP);
+      var ox = (W - (cols - 1) * SP) / 2, oy = (H - (rows - 1) * SP) / 2;
+      for (var r = 0; r < rows; r++) for (var c = 0; c < cols; c++) {
+        dots.push({ hx: ox + c * SP, hy: oy + r * SP, x: ox + c * SP, y: oy + r * SP, vx: 0, vy: 0, b: 0 });
+      }
+      idle = false;
+    }
+    function drawStatic() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = 'rgba(' + rgb() + ',' + BASE_A + ')';
+      for (var i = 0; i < dots.length; i++) { ctx.beginPath(); ctx.arc(dots[i].hx, dots[i].hy, BASE_R, 0, 6.2832); ctx.fill(); }
+    }
+    function frame() {
+      if (!idle) {
+        var now = performance.now(), motion = 0, col = rgb();
+        ripples = ripples.filter(function (rp) { return now - rp.t < LIFE; });
+        ctx.clearRect(0, 0, W, H);
+        for (var i = 0; i < dots.length; i++) {
+          var d = dots[i], dispx = 0, dispy = 0, tb = 0;
+          var dx = mx - d.hx, dy = my - d.hy, dm = Math.sqrt(dx * dx + dy * dy);
+          if (dm < R) { var f = smooth(1 - dm / R); tb = Math.max(tb, f * 0.9); if (dm > 0.001) { dispx += dx / dm * f * f * PULL; dispy += dy / dm * f * f * PULL; } }
+          for (var j = 0; j < ripples.length; j++) {
+            var rp = ripples[j], el = now - rp.t, ring = el * SPEED, amp = Math.max(0, 1 - el / LIFE);
+            var ex = d.hx - rp.x, ey = d.hy - rp.y, er = Math.sqrt(ex * ex + ey * ey);
+            var band = Math.exp(-((er - ring) * (er - ring)) / (2 * SIG * SIG)) * amp;
+            if (band > 0.004) { tb = Math.max(tb, band); if (er > 0.001) { dispx += ex / er * band * PUSH; dispy += ey / er * band * PUSH; } }
+          }
+          var tx = d.hx + dispx, ty = d.hy + dispy;
+          d.vx = (d.vx + (tx - d.x) * 0.14) * 0.78; d.vy = (d.vy + (ty - d.y) * 0.14) * 0.78;
+          d.x += d.vx; d.y += d.vy;
+          var pb = d.b; d.b += (tb - d.b) * (tb > d.b ? 0.35 : 0.08);
+          motion += Math.abs(d.vx) + Math.abs(d.vy) + Math.abs(d.b - pb);
+          var a = BASE_A + (PEAK_A - BASE_A) * d.b, rad = BASE_R + (PEAK_R - BASE_R) * d.b;
+          ctx.beginPath(); ctx.arc(d.x, d.y, rad, 0, 6.2832);
+          ctx.fillStyle = 'rgba(' + col + ',' + a.toFixed(3) + ')'; ctx.fill();
+        }
+        if (ripples.length === 0 && motion < 0.02) idle = true;
+      }
+      requestAnimationFrame(frame);
+    }
+    build();
+    var mo = new MutationObserver(function () { idle = false; });
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    if (reduce) {
+      drawStatic();
+      window.addEventListener('resize', function () { build(); drawStatic(); });
+      mo.disconnect();
+      new MutationObserver(function () { drawStatic(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+      return;
+    }
+    window.addEventListener('resize', build);
+    window.addEventListener('pointermove', function (e) { mx = e.clientX; my = e.clientY; idle = false; }, { passive: true });
+    window.addEventListener('pointerdown', function (e) { ripples.push({ x: e.clientX, y: e.clientY, t: performance.now() }); idle = false; }, { passive: true });
+    document.addEventListener('mouseleave', function () { mx = -9999; my = -9999; idle = false; });
+    requestAnimationFrame(frame);
   })();
   // brand: collapse "Arjun Kalbag" into the "AK" monogram on scroll (and back)
   (function () {
