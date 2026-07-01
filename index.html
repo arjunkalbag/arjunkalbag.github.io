@@ -1,1837 +1,321 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth h-full">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arjun Kalbag</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Arjun Kalbag</title>
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    <!-- SEO + link preview -->
-    <meta name="description" content="Arjun Kalbag — engineering, projects, and music.">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Arjun Kalbag">
-    <meta property="og:description" content="Engineering, projects, and music.">
-    <meta property="og:image" content="https://arjunkalbag.xyz/og-image.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:url" content="https://arjunkalbag.xyz/">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Arjun Kalbag">
-    <meta name="twitter:description" content="Engineering, projects, and music.">
-    <meta name="twitter:image" content="https://arjunkalbag.xyz/og-image.jpg">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@300;400;500&family=EB+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+<!-- SEO + link preview -->
+<meta name="description" content="Arjun Kalbag — engineering, projects, and music." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Arjun Kalbag" />
+<meta property="og:description" content="Engineering, projects, and music." />
+<meta property="og:image" content="https://arjunkalbag.xyz/og-image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:url" content="https://arjunkalbag.xyz/" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Arjun Kalbag" />
+<meta name="twitter:description" content="Engineering, projects, and music." />
+<meta name="twitter:image" content="https://arjunkalbag.xyz/og-image.jpg" />
 
-    <!-- GSAP for Animations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/ScrollTrigger.min.js"></script>
-    <!-- Add GSAP Observer Plugin -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/Observer.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-    <style>
-        :root {
-            --bg-color: #050505;
-            --text-primary: #e0e0e0;
-            --text-secondary: #9ca3af; /* gray-400 */
-            --card-bg: rgba(0,0,0,0.4);
-            --border-color: rgba(255,255,255,0.1);
-            --particle-color: 255, 255, 255;
-            --accent-blue: #60a5fa;
-        }
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #111111;
+    --mut: #6b6b6b;
+    --faint: #a2a2a2;
+    --line: rgba(0,0,0,0.11);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.5;
+    opacity: 0;
+    animation: fade 0.8s ease forwards;
+  }
+  @keyframes fade { to { opacity: 1; } }
+  ::selection { background: #111; color: #fff; }
 
-        body.light-mode {
-            --bg-color: #e5e5e5;
-            --text-primary: #111827; /* gray-900 */
-            --text-secondary: #4b5563; /* gray-600 */
-            --card-bg: rgba(255,255,255,0.6);
-            --border-color: rgba(0,0,0,0.1);
-            --particle-color: 20, 20, 20;
-            --accent-blue: #2563eb;
-        }
+  .wrap { max-width: 720px; margin: 0 auto; padding: clamp(3.5rem, 12vh, 8rem) 24px 6rem; }
 
-        html { overflow-x: hidden; }
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            cursor: none; /* Hide default cursor */
-            transition: background-color 0.5s ease, color 0.5s ease;
-        }
-        
-        /* Light Mode Overrides for Tailwind Classes */
-        body.light-mode .text-white { color: var(--text-primary) !important; }
-        body.light-mode .text-gray-400 { color: var(--text-secondary) !important; }
-        body.light-mode .text-gray-300 { color: var(--text-secondary) !important; }
-        /* Added override for gray-200 to be black in light mode */
-        body.light-mode .text-gray-200 { color: #000000 !important; }
-        body.light-mode .text-gray-500 { color: #6b7280 !important; }
-        body.light-mode .text-blue-400 { color: var(--accent-blue) !important; }
-        
-        body.light-mode .bg-black { background-color: transparent !important; } 
-        body.light-mode .bg-black\/40 { background-color: var(--card-bg) !important; }
-        body.light-mode .bg-black\/20 { background-color: transparent !important; } /* Added this line */
-        body.light-mode .bg-white\/5 { background-color: rgba(0,0,0,0.05) !important; }
-        
-        body.light-mode .border-white\/10 { border-color: var(--border-color) !important; }
-        body.light-mode .border-white\/20 { border-color: var(--border-color) !important; }
-        body.light-mode .border-white\/5 { border-color: var(--border-color) !important; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
-        /* Inverse Cursor for Light Mode */
-        body.light-mode #cursor { background-color: black; mix-blend-mode: normal; opacity: 0.8; }
-        body.light-mode #cursor-follower { border-color: black; }
+  a { color: inherit; text-decoration: none; }
+  a.u { transition: opacity .2s ease; }
+  a.u:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .arr { font-size: 0.85em; opacity: 0.55; }
 
-        /* Gold Cursor for Music Page - !important to override JS inline styles */
-        #cursor.gold-mode {
-            background-color: #C5A059 !important;
-            mix-blend-mode: normal !important;
-        }
-        #cursor-follower.gold-mode {
-            border-color: #C5A059 !important;
-        }
+  /* ---- header ---- */
+  .name {
+    font-weight: 800;
+    font-size: clamp(3.2rem, 13vw, 6.4rem);
+    letter-spacing: -0.045em;
+    line-height: 0.9;
+  }
+  .meta {
+    margin-top: 1.6rem;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    color: var(--mut);
+  }
+  .meta .sep { color: var(--faint); margin: 0 0.5em; }
+  .tagline {
+    margin-top: 1.4rem;
+    font-size: clamp(1.15rem, 3.5vw, 1.5rem);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    max-width: 30ch;
+  }
+  .social { margin-top: 1.8rem; display: flex; gap: 1.6rem; font-size: 0.86rem; }
 
-        .font-code {
-            font-family: 'JetBrains Mono', monospace;
-        }
+  /* ---- sections ---- */
+  section { margin-top: clamp(3.5rem, 8vh, 5.5rem); }
+  .label {
+    display: flex; align-items: baseline; justify-content: space-between;
+    font-size: 0.7rem; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--faint); padding-bottom: 1.4rem; margin-bottom: 1.6rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .label .side { letter-spacing: 0.18em; }
 
-        /* Resolide Serif display font (used for the Needl project title) */
-        @font-face {
-            font-family: 'Resolide Serif';
-            src: url('assets/ResolideSerif_PERSONAL_USE_ONLY.otf') format('opentype');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-        }
-        .font-resolide { font-family: 'Resolide Serif', serif; }
+  .lede { font-size: 1.08rem; color: #333; line-height: 1.7; max-width: 60ch; }
 
-        /* Classic Ivy-League serif (Vantage Prep) */
-        .font-ivy { font-family: 'EB Garamond', 'Times New Roman', Times, serif; }
+  /* ---- list rows ---- */
+  .row { padding: 1.15rem 0; border-top: 1px solid var(--line); }
+  .row:first-child { border-top: none; padding-top: 0; }
+  .row-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1.5rem; }
+  .row-title { font-weight: 600; font-size: 1.05rem; letter-spacing: -0.01em; }
+  .row-sub { color: var(--mut); font-weight: 400; }
+  .row-when { font-size: 0.76rem; color: var(--faint); white-space: nowrap; letter-spacing: 0.02em; flex-shrink: 0; }
+  .row-desc { color: var(--mut); font-size: 0.92rem; line-height: 1.55; margin-top: 0.4rem; max-width: 62ch; }
+  .row-apps { margin-top: 0.6rem; font-size: 0.86rem; color: var(--mut); }
+  .row-apps b { font-weight: 600; color: var(--ink); }
 
-        /* Create brand font (Nicholas) for the Report Engine title */
-        @font-face {
-            font-family: 'Nicholas';
-            src: url('assets/Nicholas.otf') format('opentype');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-        }
-        .font-nicholas { font-family: 'Nicholas', 'Inter', sans-serif; }
-        .create-text { color: #ffffff; }
-        body.light-mode .create-text { color: #f57e25 !important; }
+  .grp { font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink); font-weight: 600; margin: 2.4rem 0 0.4rem; }
+  .grp:first-of-type { margin-top: 0; }
 
-        /* Vantely display font (Create report engine wordmark) */
-        @font-face {
-            font-family: 'Vantely';
-            src: url('assets/Vantely.ttf') format('truetype');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-        }
-        .font-vantely { font-family: 'Vantely', 'Inter', sans-serif; }
+  /* education roles */
+  .roles { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 2rem; margin-top: 1.2rem; }
+  .role { display: flex; justify-content: space-between; gap: 1rem; padding: 0.5rem 0; border-top: 1px solid var(--line); font-size: 0.9rem; }
+  .role span:last-child { color: var(--faint); font-size: 0.8rem; text-align: right; }
+  @media (max-width: 560px) { .roles { grid-template-columns: 1fr; } }
 
-        /* Inktera display font (genre-space) */
-        @font-face {
-            font-family: 'Inktera Demo';
-            src: url('assets/InkteraDemo.otf') format('opentype');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-        }
-        .font-inktera { font-family: 'Inktera Demo', sans-serif; }
+  /* ---- footer + old-site button ---- */
+  footer { margin-top: clamp(4.5rem, 10vh, 7rem); padding-top: 2rem; border-top: 1px solid var(--line); }
+  .colophon { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; font-size: 0.78rem; color: var(--faint); }
+  .colophon .social { margin: 0; font-size: 0.82rem; }
+  .oldwrap { margin-top: 3rem; display: flex; justify-content: center; }
+  .oldbtn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 0.85rem 1.6rem; border: 1px solid var(--ink); border-radius: 999px;
+    transition: background .25s ease, color .25s ease;
+  }
+  .oldbtn:hover { background: var(--ink); color: var(--bg); }
 
-        /* hero name floats vertically via `top` (relative positioning), NOT transform —
-           a transform animation would promote a compositor layer and break the name's
-           mix-blend-exclusion (the inversion over the portrait). `top` is paint-only, so
-           the blend survives, and it doesn't collide with the GSAP reveal's transform. */
-        @keyframes heroFloat {
-            0%, 100% { top: 0; }
-            50%      { top: -12px; }
-        }
-        .hero-anim { position: relative; }
-        @media (prefers-reduced-motion: no-preference) {
-            .hero-anim { animation: heroFloat 7s ease-in-out infinite; }
-        }
-
-        /* gentle ambient float applied to text blocks across the page. Per-element
-           amplitude / duration / phase are randomized in JS (CSS vars) so the page
-           undulates organically instead of bobbing in lockstep. */
-        @keyframes floaty {
-            0%, 100% { transform: translateY(0); }
-            50%      { transform: translateY(var(--float-amp, -6px)); }
-        }
-        @media (prefers-reduced-motion: no-preference) {
-            .floaty {
-                animation: floaty var(--float-dur, 6s) ease-in-out infinite;
-                animation-delay: var(--float-delay, 0s);
-            }
-        }
-
-        /* hero nav affordance: a soft accent-blue glow pulses through
-           ENGINEERING • PROJECTS • MUSIC in a slow left-to-right wave (staggered
-           per word) to draw the eye to the links. Hovering a word stops the wave
-           and locks it to the full accent + glow. */
-        @keyframes linkPulse {
-            0%, 60%, 100% { color: #9ca3af; text-shadow: 0 0 0 rgba(96, 165, 250, 0); }
-            22%           { color: #a8cdfd; text-shadow: 0 0 12px rgba(96, 165, 250, 0.65); }
-        }
-        @media (prefers-reduced-motion: no-preference) {
-            .nav-pulse { animation: linkPulse 5s ease-in-out infinite; }
-        }
-        .nav-pulse:hover { animation: none; }
-
-        /* AK Labs brand wordmark font */
-        @font-face {
-            font-family: 'AK Wordmark';
-            src: url('assets/AKWordmark.otf') format('opentype');
-            font-weight: 400; font-style: normal; font-display: swap;
-        }
-        .font-akwordmark { font-family: 'AK Wordmark', 'Bricolage Grotesque', system-ui, sans-serif; letter-spacing: 0.02em; }
-        /* AK Labs tri-circle logo: additive color mixing over the dark bg */
-        .aklabs-logo svg { isolation: isolate; overflow: visible; }
-        .aklabs-logo circle { mix-blend-mode: screen; }
-        /* apps dropdown — smooth grid-rows height expand */
-        .aklabs-panel { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease; }
-        .aklabs-panel > div { overflow: hidden; min-height: 0; }
-        .aklabs-panel.open { grid-template-rows: 1fr; opacity: 1; }
-        .aklabs-chev { transition: transform 0.3s ease; }
-        .aklabs-toggle.is-open .aklabs-chev { transform: rotate(180deg); }
-
-        /* ===== Projects "Index" — collapsible category groups ===== */
-        .proj-group-head { border-top: 1px solid rgba(255, 255, 255, 0.08); cursor: pointer; }
-        body.light-mode .proj-group-head { border-top-color: rgba(0, 0, 0, 0.08); }
-        .proj-chev { transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
-        .proj-group-head[aria-expanded="true"] .proj-chev { transform: rotate(180deg); }
-        .proj-ord { transition: color 0.3s ease, text-shadow 0.3s ease; }
-        .proj-group-head:hover .proj-ord,
-        .proj-group-head[aria-expanded="true"] .proj-ord { color: #60a5fa; text-shadow: 0 0 10px rgba(96, 165, 250, 0.6); }
-        .proj-meter { display: none; }
-        body.light-mode .proj-meter { background: rgba(0, 0, 0, 0.08); }
-        .proj-meter-fill { display: block; height: 100%; width: var(--fill, 100%); transform: scaleX(0.35); transform-origin: left; background: linear-gradient(90deg, #60a5fa, rgba(96, 165, 250, 0.25)); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
-        .proj-group-head:hover + .proj-meter .proj-meter-fill,
-        .proj-group-head[aria-expanded="true"] + .proj-meter .proj-meter-fill { transform: scaleX(1); }
-        .proj-panel { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease; }
-        .proj-panel-inner { overflow: hidden; min-height: 0; }
-        .proj-panel.open { grid-template-rows: 1fr; opacity: 1; }
-        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-        .proj-group-head:focus-visible, .bento-tile a:focus-visible { outline: 2px solid #60a5fa; outline-offset: 4px; border-radius: 4px; }
-
-        /* ===== Project bento tiles ===== */
-        .bento-tile { position: relative; min-height: 12rem; border-radius: 1rem; background: rgba(16, 18, 25, 0.82); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.10); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.85rem; overflow: hidden; transition: border-color 0.3s ease, background 0.3s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        body.light-mode .bento-tile { background: rgba(255, 255, 255, 0.85); border-color: rgba(0, 0, 0, 0.10); }
-        /* Web & Software: snugger tiles — hug content rather than a tall fixed height */
-        #grp-web .bento-tile { min-height: 8.5rem; padding: 1.25rem; gap: 0.55rem; }
-        #grp-web .bento-tile .mb-4 { margin-bottom: 0; }
-        .bento-tile:hover { border-color: rgba(96, 165, 250, 0.5); background: rgba(28, 38, 64, 0.88); transform: translateY(-4px); }
-        body.light-mode .bento-tile:hover { background: rgba(239, 243, 252, 0.92); }
-
-        /* sub-categories are a LIGHTER, distinct format from the collapsible section headers */
-        .proj-group > .proj-meter { display: none; }
-        .proj-group-head:not(.sec-head) { border-top: none; padding-top: 0.4rem; padding-bottom: 0.4rem; }
-        .proj-group-head:not(.sec-head) .proj-ord { font-size: 0.6rem; }
-        .proj-group-head:not(.sec-head) .proj-cat { font-size: 0.95rem; letter-spacing: 0.18em; text-transform: uppercase; color: #9ca3af; }
-        .proj-group-head:not(.sec-head) .proj-chev { width: 1rem; height: 1rem; }
-        .proj-group-head:not(.sec-head) .proj-count { display: none; }
-        .bento-tile.aklabs-tile { overflow: visible; }
-
-        /* cap the per-project display fonts so titles never overflow a tile */
-        .bento-tile .font-hobsky { font-size: 2.25rem; line-height: 1; }
-        .bento-tile .font-vantely { font-size: 1.75rem; }
-        .bento-tile .font-ivy { font-size: 1.85rem; }
-        .bento-tile .font-inktera { font-size: 2rem; }
-        .bento-tile .font-resolide { font-size: 2rem; }
-        .bento-tile .font-akwordmark { font-size: 2.25rem; }
-
-        .tile-index { position: absolute; top: 0.9rem; right: 1rem; font-size: 10px; letter-spacing: 0.15em; color: #4b5563; pointer-events: none; z-index: 1; }
-        /* description expands in BELOW the tile content on hover/focus — never covers the logo/title/tags */
-        .tile-desc { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; }
-        .tile-desc-inner { overflow: hidden; min-height: 0; }
-        .bento-tile:hover .tile-desc, .bento-tile:focus-within .tile-desc, .bento-tile.aklabs-tile .tile-desc { grid-template-rows: 1fr; opacity: 1; }
-        .tile-arrow { display: inline-block; transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
-        @media (hover: none) { .tile-desc { grid-template-rows: 1fr; opacity: 1; } }
-
-        /* Hobsky display font (Pitstop wordmark) + theme-aware Pitstop accent */
-        @font-face {
-            font-family: 'Hobsky';
-            src: url('assets/Hobsky.otf') format('opentype');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-        }
-        .font-hobsky { font-family: 'Hobsky', 'Inter', sans-serif; }
-        .pitstop-accent { color: #FBEC5D; }
-        body.light-mode .pitstop-accent { color: #000000 !important; }
-
-        /* Theme-aware logos: *-for-dark shows in dark mode, *-for-light in light mode */
-        .logo-for-light { display: none; }
-        body.light-mode .logo-for-dark { display: none; }
-        body.light-mode .logo-for-light { display: inline-block; }
-
-        /* Custom Cursor */
-        #cursor {
-            pointer-events: none;
-            mix-blend-mode: difference;
-            z-index: 9999;
-        }
-
-        /* Selection Color */
-        ::selection {
-            background-color: var(--text-primary);
-            color: var(--bg-color);
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-color);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-        body.light-mode ::-webkit-scrollbar-thumb { background: #ccc; }
-        body.light-mode ::-webkit-scrollbar-thumb:hover { background: #999; }
-
-        /* Hide scrollbar when music view is active to prevent scrolling home */
-        body.no-scroll {
-            overflow: hidden;
-        }
-
-        /* ===================================================== */
-        /* PREMIUM + PLAYFUL ENHANCEMENTS                         */
-        /* ===================================================== */
-        :root {
-            --accent-violet: #a78bfa;
-        }
-        body.light-mode {
-            --accent-violet: #7c3aed;
-        }
-
-        /* Ambient gradient glow — sits above the canvas, behind content */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: -20%;
-            z-index: 1;
-            pointer-events: none;
-            background:
-                radial-gradient(32% 30% at 12% 8%, rgba(96,165,250,0.18), transparent 60%),
-                radial-gradient(30% 30% at 88% 12%, rgba(244,114,182,0.15), transparent 60%),
-                radial-gradient(34% 34% at 82% 86%, rgba(167,139,250,0.16), transparent 65%),
-                radial-gradient(30% 30% at 14% 90%, rgba(45,212,191,0.14), transparent 62%),
-                radial-gradient(26% 26% at 50% 50%, rgba(251,191,36,0.08), transparent 60%);
-            transition: opacity 0.6s ease;
-            animation: aurora-drift 24s ease-in-out infinite alternate;
-        }
-        body.light-mode::before {
-            background:
-                radial-gradient(32% 30% at 12% 8%, rgba(37,99,235,0.13), transparent 60%),
-                radial-gradient(30% 30% at 88% 12%, rgba(219,39,119,0.11), transparent 60%),
-                radial-gradient(34% 34% at 82% 86%, rgba(124,58,237,0.12), transparent 65%),
-                radial-gradient(30% 30% at 14% 90%, rgba(13,148,136,0.10), transparent 62%),
-                radial-gradient(26% 26% at 50% 50%, rgba(217,119,6,0.07), transparent 60%);
-        }
-        @keyframes aurora-drift {
-            0%   { transform: translate(0, 0) scale(1); }
-            50%  { transform: translate(2%, -1.5%) scale(1.06); }
-            100% { transform: translate(-2%, 2%) scale(1.03); }
-        }
-
-        /* Gradient accent text */
-        .gradient-text {
-            background: linear-gradient(110deg, var(--accent-blue), var(--accent-violet));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-        }
-        .gradient-text-warm {
-            background: linear-gradient(110deg, #fb923c, #f472b6);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-        }
-        .gradient-text-cool {
-            background: linear-gradient(110deg, #2dd4bf, #60a5fa);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-        }
-        .gradient-text-rainbow {
-            background: linear-gradient(110deg, #60a5fa, #a78bfa, #f472b6, #fb923c);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-        }
-
-        /* Pixel splash (canvas-driven) */
-        #splash { background: transparent; }
-        #splash-canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
-
-        /* Animated ASCII portrait */
-        .ascii-portrait {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 6.5px;
-            line-height: 1;
-            letter-spacing: 0.55px;
-            white-space: pre;
-            font-weight: 500;
-            transform-style: preserve-3d;
-            will-change: transform;
-            background: linear-gradient(155deg, #eff6ff 0%, #93c5fd 50%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-            transition: filter 0.45s ease;
-            filter: drop-shadow(0 0 0 rgba(96,165,250,0));
-        }
-        @media (min-width: 1280px) { .ascii-portrait { font-size: 8.3px; letter-spacing: 0.65px; } }
-        @media (min-width: 1536px) { .ascii-portrait { font-size: 10px; letter-spacing: 0.72px; } }
-        #ascii-wrap:hover .ascii-portrait {
-            filter: drop-shadow(0 0 26px rgba(96,165,250,0.55));
-        }
-        body.light-mode .ascii-portrait {
-            background: linear-gradient(155deg, #1e3a8a 0%, #2563eb 50%, #1d4ed8 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-        }
-
-        /* Premium card — playful spring lift + glow on hover */
-        .premium-card {
-            transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-                        box-shadow 0.45s ease,
-                        border-color 0.3s ease,
-                        background-color 0.3s ease !important;
-            will-change: transform;
-        }
-        .premium-card:hover {
-            transform: translateY(-7px) scale(1.018);
-            box-shadow: 0 26px 55px -22px rgba(96,165,250,0.55),
-                        0 0 0 1px rgba(96,165,250,0.15);
-        }
-        body.light-mode .premium-card:hover {
-            box-shadow: 0 26px 55px -22px rgba(37,99,235,0.35),
-                        0 0 0 1px rgba(37,99,235,0.15);
-        }
-        /* Icon chip inside premium cards */
-        .icon-chip {
-            transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
-        }
-        .premium-card:hover .icon-chip {
-            transform: rotate(-8deg) scale(1.08);
-        }
-
-        /* Tag pills — gradient fill flourish on hover */
-        .tag-pill {
-            transition: all 0.3s ease;
-        }
-        .group:hover .tag-pill {
-            border-color: rgba(96,165,250,0.4);
-            color: var(--accent-blue);
-        }
-
-        /* Animated external-link arrow on linked headings */
-        .link-arrow {
-            opacity: 0;
-            transform: translateX(-8px) translateY(2px);
-            transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1), color 0.3s ease;
-        }
-        .group:hover .link-arrow {
-            opacity: 1;
-            transform: translateX(0) translateY(0);
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .premium-card, .premium-card:hover, .icon-chip { transition: none !important; transform: none !important; }
-            .proj-panel { grid-template-rows: 1fr !important; opacity: 1 !important; transition: none !important; }
-            .proj-chev, .proj-meter-fill { transition: none !important; }
-            .proj-meter-fill { transform: scaleX(1) !important; }
-            .tile-desc { grid-template-rows: 1fr !important; opacity: 1 !important; transition: none !important; }
-            .bento-tile, .bento-tile:hover, .tile-arrow { transition: none !important; transform: none !important; }
-        }
-    </style>
+  /* ---- subtle reveal ---- */
+  .r { opacity: 0; transform: translateY(14px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1); }
+  .r.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .r { opacity: 1; transform: none; transition: none; } body { animation: none; opacity: 1; } }
+</style>
 </head>
-<body class="antialiased">
+<body>
+<div class="wrap">
 
-    <!-- Theme Toggle Button -->
-    <button id="theme-toggle" class="fixed top-8 right-8 z-50 p-3 rounded-full border border-white/20 transition-transform duration-300 bg-black/20 hover-trigger" data-cursor="link">
-        <i id="theme-icon" data-lucide="sun" class="w-6 h-6 text-gray-300"></i>
-    </button>
+  <!-- Header -->
+  <header>
+    <h1 class="name">Arjun<br />Kalbag</h1>
+    <p class="meta mono">
+      New York / St. Louis<span class="sep">·</span>Computer Engineering &amp; Economics, WashU&nbsp;’29
+    </p>
+    <p class="tagline">Building the intersection of hardware, sound, and strategy.</p>
+    <nav class="social mono">
+      <a class="u" href="https://linkedin.com/in/arjun-kalbag/" target="_blank" rel="noopener">LinkedIn <span class="arr">↗</span></a>
+      <a class="u" href="https://github.com/arjunkalbag" target="_blank" rel="noopener">GitHub <span class="arr">↗</span></a>
+      <a class="u" href="mailto:arjunkalbag07@gmail.com">Email <span class="arr">↗</span></a>
+    </nav>
+  </header>
 
-    <!-- Splash Screen -->
-    <div id="splash" class="fixed inset-0 z-50">
-        <canvas id="splash-canvas" class="absolute inset-0"></canvas>
+  <!-- Statement -->
+  <section class="r">
+    <div class="label mono"><span>Statement</span></div>
+    <p class="lede">I’m a Computer Engineering and Economics student from NYC at Washington University in St. Louis with a strong interest in complex systems. My background spans hardware and software systems, data analysis, and market evaluation — bridging technical development with business growth in analytically rigorous environments. In my free time I produce music, read, and build side projects.</p>
+  </section>
+
+  <!-- Experience -->
+  <section class="r">
+    <div class="label mono"><span>Experience</span></div>
+
+    <div class="row">
+      <div class="row-head">
+        <div class="row-title"><a class="u" href="https://pairyx.co/" target="_blank" rel="noopener">Pairyx <span class="arr">↗</span></a> <span class="row-sub">— Co-Founder &amp; CTO</span></div>
+        <div class="row-when mono">Jun 2026 — Present</div>
+      </div>
+      <p class="row-desc">Building an AI-integrated company connecting creators with early-stage brands through strategic partnerships. Responsible for technical strategy, platform architecture, and product roadmap.</p>
     </div>
 
-    <!-- Custom Cursor -->
-    <div id="cursor" class="fixed top-0 left-0 w-4 h-4 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2 transition-transform duration-75 ease-out"></div>
-    <div id="cursor-follower" class="fixed top-0 left-0 w-4 h-4 border border-white rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[9998] opacity-0 transition-opacity duration-300"></div>
-
-    <!-- Background Canvas -->
-    <canvas id="bg-canvas" class="fixed inset-0 z-0 opacity-60 pointer-events-none"></canvas>
-
-    <!-- Main Wrapper -->
-    <main class="relative z-10 w-full max-w-[1600px] mx-auto opacity-0" id="main-content">
-        
-        <!-- HOME PAGE VIEW -->
-        <div id="home-view">
-            <!-- Hero Section -->
-            <section class="h-screen flex flex-col justify-center pt-20 pb-10 relative px-6 sm:px-8 md:px-12 lg:px-16" id="hero">
-                <div class="space-y-6 md:space-y-8 parallax-element mt-16 md:mt-32 relative z-10">
-                    <p class="text-gray-400 tracking-widest text-sm md:text-base font-code uppercase ml-2 reveal-text">
-                        <span id="loc-nyc" class="cursor-pointer transition-all duration-300 hover:text-blue-400 hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]">New York</span>
-                        <span class="mx-2">/</span>
-                        <span id="loc-stl" class="cursor-pointer transition-all duration-300 hover:text-blue-400 hover:drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]">St. Louis</span>
-                    </p>
-                    
-                    <div class="hover-trigger" data-cursor="text">
-                        <h1 class="hero-anim text-[15vw] leading-[0.8] font-black tracking-tighter text-white mix-blend-exclusion reveal-text">
-                            ARJUN<br />
-                            <span class="text-gray-500 hover:text-white transition-colors duration-500">KALBAG</span>
-                        </h1>
-                    </div>
-
-                    <!-- Tagline -->
-                    <p class="text-lg md:text-xl text-gray-400 font-code ml-2 mt-2 reveal-text tracking-widest cursor-default">
-                        <span id="nav-engineering" style="animation-delay:0s" class="nav-pulse hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 cursor-pointer hover-trigger" data-cursor="link">ENGINEERING</span> •
-                        <span id="nav-projects" style="animation-delay:0.5s" class="nav-pulse hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 hover-trigger cursor-pointer" data-cursor="link">PROJECTS</span> •
-                        <span id="nav-sound" style="animation-delay:1s" class="nav-pulse hover:text-blue-400 hover:drop-shadow-[0_0_10px_rgba(96,165,250,0.8)] transition-all duration-300 hover-trigger cursor-pointer" data-cursor="link">MUSIC</span>
-                    </p>
-
-                    <!-- Phrase/Description Section -->
-                    <div class="ml-2 mt-6 space-y-3 reveal-text delay-75">
-                        <!-- The Phrase -->
-                        <h2 class="text-2xl md:text-3xl font-medium gradient-text font-code tracking-tight w-fit">
-                            Computer Engineering & Economics at WashU
-                        </h2>
-                        <!-- The Description -->
-                        <p class="text-xl md:text-2xl font-light text-gray-300 max-w-2xl leading-relaxed">
-                            Building the intersection of hardware, sound, and strategy.
-                        </p>
-                    </div>
-
-                    <!-- Social Logos -->
-                    <div class="flex gap-8 pt-8 ml-2 reveal-text delay-100">
-                        <a href="https://linkedin.com/in/arjun-kalbag/" target="_blank" class="text-gray-400 hover:text-[#0077b5] transition-colors hover:scale-110 duration-300 hover-trigger" data-cursor="link" aria-label="LinkedIn">
-                            <svg viewBox="0 0 24 24" class="w-8 h-8" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
-                        </a>
-                        <a href="https://github.com/arjunkalbag" target="_blank" class="text-gray-400 hover:text-white transition-colors hover:scale-110 duration-300 hover-trigger" data-cursor="link" aria-label="GitHub">
-                            <svg viewBox="0 0 24 24" class="w-8 h-8" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.78 0 12.29c0 5.21 3.44 9.63 8.21 11.19.6.11.82-.25.82-.55 0-.27-.01-1-.02-1.96-3.34.72-4.04-1.59-4.04-1.59-.55-1.38-1.34-1.75-1.34-1.75-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.23 1.84 1.23 1.07 1.83 2.81 1.3 3.49 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6.01 0c2.29-1.55 3.29-1.23 3.29-1.23.66 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.81 1.1.81 2.22 0 1.6-.01 2.9-.01 3.29 0 .32.22.69.83.57A12.02 12.02 0 0 0 24 12.29C24 5.78 18.63.5 12 .5z"/></svg>
-                        </a>
-                        <a href="mailto:arjunkalbag07@gmail.com" class="text-gray-400 hover:text-blue-400 transition-colors hover:scale-110 duration-300 hover-trigger" data-cursor="link" aria-label="Email">
-                            <i data-lucide="mail" class="w-8 h-8"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Animated ASCII Portrait -->
-                <div id="ascii-wrap" class="hidden lg:flex absolute right-[-9%] top-1/2 -translate-y-1/2 z-0 items-center justify-center opacity-0 hover-trigger" data-cursor="link" style="perspective: 1100px;">
-                    <pre id="ascii-portrait" aria-label="ASCII portrait of Arjun Kalbag" class="ascii-portrait m-0"></pre>
-                </div>
-
-                <!-- Scroll Indicator -->
-                <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-40 reveal-text delay-300">
-                    <div id="scroll-indicator" class="animate-bounce cursor-pointer hover-trigger" data-cursor="link">
-                        <i data-lucide="mouse" class="w-8 h-8 text-gray-500"></i>
-                    </div>
-                </div>
-            </section>
-
-            <!-- About Section -->
-            <section id="about" class="py-12 md:py-20 relative px-6 sm:px-8 md:px-12 lg:px-16">
-                <button id="sec-about-btn" class="proj-group-head sec-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="true" aria-controls="sec-about">
-                    <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">01</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Statement</span></span>
-                    <i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500 shrink-0"></i>
-                </button>
-                <div class="proj-meter"><span class="proj-meter-fill" style="--fill:100%"></span></div>
-                <div id="sec-about" class="proj-panel open" role="region" aria-labelledby="sec-about-btn">
-                    <div class="proj-panel-inner">
-                        <div class="pt-8 text-xl md:text-2xl lg:text-3xl font-light font-code leading-relaxed text-gray-300 max-w-4xl hover-trigger" data-cursor="text">
-                            <p class="mb-6 reveal-up">
-                                I’m a Computer Engineering and Economics student from NYC at Washington University in St. Louis with a strong interest complex systems. My background spans hardware and software systems, data analysis, and market evaluation. These skills have helped me develop a strong ability to bridge technical development with business growth in analytically rigorous environments. In my free time I like to produce music, read, and build side projects.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Experience Section -->
-            <section class="py-12 md:py-20 px-6 sm:px-8 md:px-12 lg:px-16">
-                <button id="sec-exp-btn" class="proj-group-head sec-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="false" aria-controls="sec-exp">
-                    <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">02</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Experience</span></span>
-                    <span class="flex items-center gap-3 shrink-0"><span class="proj-count font-code text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 hidden sm:inline">5 Roles</span><i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500"></i></span>
-                </button>
-                <div class="proj-meter"><span class="proj-meter-fill" style="--fill:100%"></span></div>
-                <div id="sec-exp" class="proj-panel" role="region" aria-labelledby="sec-exp-btn">
-                    <div class="proj-panel-inner">
-                        <div class="pt-8 pl-6 space-y-20">
-                        <!-- Experience items -->
-                        <div id="exp-pairyx" class="group relative pl-8 border-l border-white/10 hover:border-blue-500 transition-colors duration-300 reveal-up hover-trigger" data-cursor="text">
-                            <div class="absolute -left-[20px] top-0 bg-black p-2 rounded-full border border-white/20 group-hover:border-blue-500 group-hover:scale-110 transition-all">
-                                <i data-lucide="handshake" class="w-5 h-5 text-gray-400 group-hover:text-blue-400"></i>
-                            </div>
-                            <a href="https://pairyx.co/" target="_blank" rel="noopener" class="inline-flex items-center gap-3 mb-2 ml-2 md:ml-4" data-cursor="link">
-                                <span class="inline-flex items-center gap-4 md:gap-7">
-                                    <img src="assets/pairyx-symbol-gold.png" alt="Pairyx" class="logo-for-dark h-8 md:h-10 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
-                                    <img src="assets/pairyx-symbol-blue.png" alt="Pairyx" class="logo-for-light h-8 md:h-10 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
-                                    <img src="assets/pairyx-wordmark-gold.png" alt="Pairyx" class="logo-for-dark h-5 md:h-7 w-auto" />
-                                    <img src="assets/pairyx-wordmark-blue.png" alt="Pairyx" class="logo-for-light h-5 md:h-7 w-auto" />
-                                </span>
-                                <i data-lucide="arrow-up-right" class="link-arrow w-5 h-5 md:w-7 md:h-7 text-gray-600 group-hover:text-blue-400"></i>
-                            </a>
-                            <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4 mb-4 text-gray-400 font-code">
-                                <span class="text-lg font-medium text-blue-400">Co-Founder &amp; CTO</span>
-                                <span class="text-sm">June 2026 – Present</span>
-                            </div>
-                            <p class="text-lg text-gray-300 max-w-2xl font-code">Building an AI-integrated company connecting creators with early-stage brands through strategic partnerships. Responsible for technical strategy, platform architecture, and product roadmap.</p>
-                        </div>
-                        <div id="exp-create" class="group relative pl-8 border-l border-white/10 hover:border-blue-500 transition-colors duration-300 reveal-up hover-trigger" data-cursor="text">
-                            <div class="absolute -left-[20px] top-0 bg-black p-2 rounded-full border border-white/20 group-hover:border-blue-500 group-hover:scale-110 transition-all">
-                                <i data-lucide="asterisk" class="w-5 h-5 text-gray-400 group-hover:text-blue-400"></i>
-                            </div>
-                            <a href="https://trycreate.co/" target="_blank" rel="noopener" class="inline-flex items-center gap-3 mb-2" data-cursor="link">
-                                <img src="assets/create-logo-white.png" alt="Create Wellness" class="logo-for-dark h-9 md:h-12 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
-                                <img src="assets/create-logo-orange.png" alt="Create Wellness" class="logo-for-light h-9 md:h-12 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
-                                <i data-lucide="arrow-up-right" class="link-arrow w-5 h-5 md:w-7 md:h-7 text-gray-600 group-hover:text-blue-400"></i>
-                            </a>
-                            <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4 mb-4 text-gray-400 font-code">
-                                <span class="text-lg font-medium text-blue-400">Product Management & Strategy Intern</span>
-                                <span class="text-sm">May 2026 – Present</span>
-                            </div>
-                            <p class="text-lg text-gray-300 max-w-2xl font-code">Developing tools for data-pipelining and automating retail-analytics reporting.</p>
-                        </div>
-                        <div id="exp-cbn" class="group relative pl-8 border-l border-white/10 hover:border-blue-500 transition-colors duration-300 reveal-up hover-trigger" data-cursor="text">
-                            <div class="absolute -left-[20px] top-0 bg-black p-2 rounded-full border border-white/20 group-hover:border-blue-500 group-hover:scale-110 transition-all">
-                                <i data-lucide="users" class="w-5 h-5 text-gray-400 group-hover:text-blue-400"></i>
-                            </div>
-                            <a href="https://www.carterburdennetwork.org/" target="_blank" rel="noopener" class="inline-flex items-center gap-3" data-cursor="link">
-                                <h3 class="text-3xl md:text-5xl font-bold text-white mb-2 transition-colors group-hover:text-blue-400">Carter Burden Network</h3>
-                                <i data-lucide="arrow-up-right" class="link-arrow w-5 h-5 md:w-7 md:h-7 text-gray-600 mb-2 group-hover:text-blue-400"></i>
-                            </a>
-                            <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4 mb-4 text-gray-400 font-code">
-                                <span class="text-lg font-medium text-blue-400">Board Member</span>
-                                <span class="text-sm">Jun 2023 – Aug 2025</span>
-                            </div>
-                            <p class="text-lg text-gray-300 max-w-2xl font-code">Led community engagement including a prom for 250+ seniors. Contributed to strategy & finance across 20+ board meetings.</p>
-                        </div>
-                        <div id="exp-infinite" class="group relative pl-8 border-l border-white/10 hover:border-blue-500 transition-colors duration-300 reveal-up hover-trigger" data-cursor="text">
-                            <div class="absolute -left-[20px] top-0 bg-black p-2 rounded-full border border-white/20 group-hover:border-blue-500 group-hover:scale-110 transition-all">
-                                <i data-lucide="trending-up" class="w-5 h-5 text-gray-400 group-hover:text-blue-400"></i>
-                            </div>
-                            <a href="https://www.linkedin.com/company/infinite-goods-eco/" target="_blank" rel="noopener" class="inline-flex items-center gap-3" data-cursor="link">
-                                <h3 class="text-3xl md:text-5xl font-bold text-white mb-2 transition-colors group-hover:text-blue-400">Infinite Goods</h3>
-                                <i data-lucide="arrow-up-right" class="link-arrow w-5 h-5 md:w-7 md:h-7 text-gray-600 mb-2 group-hover:text-blue-400"></i>
-                            </a>
-                            <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4 mb-4 text-gray-400 font-code">
-                                <span class="text-lg font-medium text-blue-400">Business Development Intern</span>
-                                <span class="text-sm">May 2023 – Jan 2024</span>
-                            </div>
-                            <p class="text-lg text-gray-300 max-w-2xl font-code">Backend automation for onboarding, 350% integration speedup. Led cold outreach to 100+ founders.</p>
-                        </div>
-                        <div id="exp-savny" class="group relative pl-8 border-l border-white/10 hover:border-blue-500 transition-colors duration-300 reveal-up hover-trigger" data-cursor="text">
-                            <div class="absolute -left-[20px] top-0 bg-black p-2 rounded-full border border-white/20 group-hover:border-blue-500 group-hover:scale-110 transition-all">
-                                <i data-lucide="globe" class="w-5 h-5 text-gray-400 group-hover:text-blue-400"></i>
-                            </div>
-                            <h3 class="text-3xl md:text-5xl font-bold text-white mb-2">SAVNY</h3>
-                            <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4 mb-4 text-gray-400 font-code">
-                                <span class="text-lg font-medium text-blue-400">Co-founder & Head</span>
-                                <span class="text-sm">Oct 2023 – Jun 2025</span>
-                            </div>
-                            <p class="text-lg text-gray-300 max-w-2xl font-code">Organized 250+ students for community service. Coordinated 30+ service opportunities and cultural programming.</p>
-                        </div>
-                        <div id="exp-nyu" class="group relative pl-8 border-l border-white/10 hover:border-blue-500 transition-colors duration-300 reveal-up hover-trigger" data-cursor="text">
-                            <div class="absolute -left-[20px] top-0 bg-black p-2 rounded-full border border-white/20 group-hover:border-blue-500 group-hover:scale-110 transition-all">
-                                <i data-lucide="music" class="w-5 h-5 text-gray-400 group-hover:text-blue-400"></i>
-                            </div>
-                            <h3 class="text-3xl md:text-5xl font-bold text-white mb-2">NYU Music Tech</h3>
-                            <div class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 md:gap-4 mb-4 text-gray-400 font-code">
-                                <span class="text-lg font-medium text-blue-400">Research Assistant</span>
-                                <span class="text-sm">Jan 2024 – Jun 2025</span>
-                            </div>
-                            <p class="text-lg text-gray-300 max-w-2xl font-code">Engineered multi-channel audio systems. Executed post-production & 45-track arrangement for Harvestworks concert.</p>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- WashU Section -->
-            <section class="py-12 md:py-20 px-6 sm:px-8 md:px-12 lg:px-16">
-                <button id="sec-campus-btn" class="proj-group-head sec-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="false" aria-controls="sec-campus">
-                    <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">03</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Campus Life</span></span>
-                    <span class="flex items-center gap-3 shrink-0"><span class="proj-count font-code text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 hidden sm:inline">8 Roles</span><i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500"></i></span>
-                </button>
-                <div class="proj-meter"><span class="proj-meter-fill" style="--fill:100%"></span></div>
-                <div id="sec-campus" class="proj-panel" role="region" aria-labelledby="sec-campus-btn">
-                    <div class="proj-panel-inner">
-                        <div class="mt-6 bg-white/5 rounded-3xl backdrop-blur-sm p-6 md:p-10">
-                            <div class="mb-12 reveal-up">
-                                <h2 class="text-4xl md:text-6xl font-black text-white">WASHINGTON UNIVERSITY</h2>
-                                <p class="text-xl text-gray-400 mt-2 font-code">Class of 2029 • St. Louis, MO</p>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                <!-- Row 1 -->
-                    <div id="washu-arch" class="premium-card bg-black/40 p-6 rounded-2xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 group reveal-up hover-trigger" data-cursor="text">
-                        <div class="icon-chip w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-blue-500/10">
-                            <i data-lucide="landmark" class="w-6 h-6 text-gray-500 group-hover:text-blue-400 transition-colors"></i>
-                        </div>
-                        <h4 class="text-lg font-bold text-gray-200 group-hover:text-white transition-colors">Arch Consulting</h4>
-                        <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Associate</p>
-                    </div>
-                    <div id="washu-cyc" class="premium-card bg-black/40 p-6 rounded-2xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 group reveal-up hover-trigger" data-cursor="text">
-                        <div class="icon-chip w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-blue-500/10">
-                            <i data-lucide="users" class="w-6 h-6 text-gray-500 group-hover:text-blue-400 transition-colors"></i>
-                        </div>
-                        <h4 class="text-lg font-bold text-gray-200 group-hover:text-white transition-colors">Consult Your Community</h4>
-                        <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Client Recruitment Director</p>
-                    </div>
-                    <div id="washu-dsp" class="premium-card bg-black/40 p-6 rounded-2xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 group reveal-up hover-trigger" data-cursor="text">
-                        <div class="icon-chip w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-blue-500/10">
-                            <i data-lucide="briefcase" class="w-6 h-6 text-gray-500 group-hover:text-blue-400 transition-colors"></i>
-                        </div>
-                        <h4 class="text-lg font-bold text-gray-200 group-hover:text-white transition-colors">Delta Sigma Pi Business Fraternity</h4>
-                        <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Brother</p>
-                    </div>
-                    <div id="washu-sae" class="premium-card bg-black/40 p-6 rounded-2xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 group reveal-up hover-trigger" data-cursor="text">
-                        <div class="icon-chip w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-blue-500/10">
-                            <i data-lucide="shield" class="w-6 h-6 text-gray-500 group-hover:text-blue-400 transition-colors"></i>
-                        </div>
-                        <h4 class="text-lg font-bold text-gray-200 group-hover:text-white transition-colors">Sigma Alpha Epsilon</h4>
-                        <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Rush Chairman</p>
-                    </div>
-                    <!-- Row 2 -->
-                    <div id="washu-sif" class="premium-card bg-black/40 p-6 rounded-2xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 group reveal-up hover-trigger" data-cursor="text">
-                        <div class="icon-chip w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-blue-500/10">
-                            <i data-lucide="trending-up" class="w-6 h-6 text-gray-500 group-hover:text-blue-400 transition-colors"></i>
-                        </div>
-                        <h4 class="text-lg font-bold text-gray-200 group-hover:text-white transition-colors">Student Investment Fund</h4>
-                        <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Senior Analyst</p>
-                    </div>
-                    <div id="washu-kwur" class="premium-card bg-black/40 p-6 rounded-2xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 group reveal-up hover-trigger" data-cursor="text">
-                        <div class="icon-chip w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-blue-500/10">
-                            <i data-lucide="radio" class="w-6 h-6 text-gray-500 group-hover:text-blue-400 transition-colors"></i>
-                        </div>
-                        <h4 class="text-lg font-bold text-gray-200 group-hover:text-white transition-colors">KWUR 90.3 FM</h4>
-                        <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Disc Jockey</p>
-                    </div>
-                    <div id="washu-strike" class="premium-card bg-black/40 p-6 rounded-2xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 group reveal-up hover-trigger" data-cursor="text">
-                        <div class="icon-chip w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-blue-500/10">
-                            <i data-lucide="music" class="w-6 h-6 text-gray-500 group-hover:text-blue-400 transition-colors"></i>
-                        </div>
-                        <h4 class="text-lg font-bold text-gray-200 group-hover:text-white transition-colors">Strike Magazine</h4>
-                        <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Music Director</p>
-                    </div>
-                    <div id="washu-ashoka" class="premium-card bg-black/40 p-6 rounded-2xl border border-white/5 hover:border-blue-500/50 hover:bg-black/60 group reveal-up hover-trigger" data-cursor="text">
-                        <div class="icon-chip w-11 h-11 rounded-xl bg-white/5 flex items-center justify-center mb-4 group-hover:bg-blue-500/10">
-                            <i data-lucide="globe" class="w-6 h-6 text-gray-500 group-hover:text-blue-400 transition-colors"></i>
-                        </div>
-                        <h4 class="text-lg font-bold text-gray-200 group-hover:text-white transition-colors">Ashoka</h4>
-                        <p class="text-sm text-gray-500 font-code mt-1 group-hover:text-gray-400">Social Chair</p>
-                    </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Projects Section -->
-            <section id="projects" class="py-12 md:py-20 px-6 sm:px-8 md:px-12 lg:px-16">
-                <button id="sec-projects-btn" class="proj-group-head sec-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="false" aria-controls="sec-projects">
-                    <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">04</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Projects</span></span>
-                    <span class="flex items-center gap-3 shrink-0"><span class="proj-count font-code text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 hidden sm:inline">10 Projects</span><i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500"></i></span>
-                </button>
-                <div class="proj-meter"><span class="proj-meter-fill" style="--fill:100%"></span></div>
-                <div id="sec-projects" class="proj-panel" role="region" aria-labelledby="sec-projects-btn">
-                    <div class="proj-panel-inner">
-                        <div class="pt-8 space-y-6">
-                        <div class="proj-group reveal-up">
-                            <button id="grp-web-btn" class="proj-group-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="false" aria-controls="grp-web">
-                                <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">04.1</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Web &amp; Software</span></span>
-                                <span class="flex items-center gap-3 shrink-0"><span class="proj-count font-code text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 hidden sm:inline">6 Projects</span><i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500"></i></span>
-                            </button>
-                            <div class="proj-meter"><span class="proj-meter-fill" style="--fill:100%"></span></div>
-                            <div id="grp-web" class="proj-panel" role="region" aria-labelledby="grp-web-btn">
-                                <div class="proj-panel-inner grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-3 items-start">
-                                    <div id="project-pairyx" class="group bento-tile premium-card hover-trigger sm:col-span-2" data-cursor="text">
-                                        <span class="tile-index font-code">04.1.1</span>
-                                        <a href="https://pairyx.co/" target="_blank" rel="noopener" class="flex justify-between items-center gap-3 mb-4" data-cursor="link">
-                                            <span class="flex items-center gap-4 sm:gap-6 md:gap-8 ml-0 sm:ml-5 md:ml-8">
-                                                <img src="assets/pairyx-symbol-gold.png" alt="" class="logo-for-dark h-10 md:h-12 w-auto transition-transform duration-300 group-hover:scale-110" />
-                                                <img src="assets/pairyx-symbol-blue.png" alt="" class="logo-for-light h-10 md:h-12 w-auto transition-transform duration-300 group-hover:scale-110" />
-                                                <img src="assets/pairyx-wordmark-gold.png" alt="Pairyx" class="logo-for-dark h-6 md:h-7 w-auto" />
-                                                <img src="assets/pairyx-wordmark-blue.png" alt="Pairyx" class="logo-for-light h-6 md:h-7 w-auto" />
-                                            </span>
-                                            <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
-                                        </a>
-                                        <div class="flex gap-2 mb-4 flex-wrap">
-                                            <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Co-Founder &amp; CTO</span>
-                                            <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">AI</span>
-                                            <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Creator Economy</span>
-                                        </div>
-                                        <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                            Building an AI-integrated company connecting creators with early-stage brands through strategic partnerships. Responsible for technical strategy, platform architecture, and product roadmap.
-                                        </p></div></div>
-                                    </div>
-                                    <div id="project-genrespace" class="group bento-tile premium-card hover-trigger" data-cursor="text">
-                            <span class="tile-index font-code">04.1.2</span>
-                            <div class="flex flex-wrap items-center gap-5 mb-4">
-                                <a href="https://genre-space.netlify.app/" target="_blank" rel="noopener" class="flex items-center gap-3" data-cursor="link">
-                                    <div class="p-2 bg-white/5 rounded-lg text-blue-400">
-                                        <i data-lucide="waypoints" class="w-6 h-6"></i>
-                                    </div>
-                                    <h3 class="text-4xl font-inktera lowercase text-white group-hover:text-blue-400 transition-colors">genre-space</h3>
-                                </a>
-                                <a href="assets/genre-explosion-paper.pdf" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-xs font-code uppercase tracking-widest text-blue-400 border border-blue-400/30 rounded-full px-4 py-2 transition-colors hover:bg-blue-400/10 hover:border-blue-400/60 hover-trigger" data-cursor="link">
-                                    <i data-lucide="file-text" class="w-4 h-4"></i> Read the paper
-                                </a>
-                            </div>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Research</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Data Viz</span>
-                            </div>
-                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                Researched computational approaches to music genre classification and similarity modeling, analyzing genre taxonomy to quantify relationships between musical styles. Built an interactive web application that visualizes these relationships in a 2D space, enabling real-time exploration of genre clusters and influence networks over time.
-                            </p></div></div>
-                        </div>
-                                    <div id="project-pitstop" class="group bento-tile premium-card hover-trigger pitstop-tile" data-cursor="text">
-                            <span class="tile-index font-code">04.1.3</span>
-                            <a href="https://usepitstop.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
-                                <div class="pitstop-accent flex items-center gap-0 md:gap-1">
-                                    <span class="block h-12 w-12 md:h-16 md:w-16 shrink-0 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
-                                        <svg viewBox="0 0 120 120" class="w-full h-full overflow-visible" aria-hidden="true">
-                                            <defs>
-                                                <filter id="pitstop-blob-warp" x="-60%" y="-60%" width="220%" height="220%">
-                                                    <feTurbulence type="fractalNoise" baseFrequency="0.016 0.022" numOctaves="3" seed="7" result="n">
-                                                        <animate attributeName="baseFrequency" dur="13s" values="0.016 0.022;0.026 0.013;0.011 0.028;0.016 0.022" repeatCount="indefinite" />
-                                                    </feTurbulence>
-                                                    <feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G" />
-                                                </filter>
-                                            </defs>
-                                            <circle cx="60" cy="60" r="30" fill="currentColor" filter="url(#pitstop-blob-warp)" />
-                                        </svg>
-                                    </span>
-                                    <span class="font-hobsky uppercase text-4xl md:text-5xl leading-none tracking-tight">Pitstop</span>
-                                </div>
-                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
-                            </a>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Geospatial</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Routing</span>
-                            </div>
-                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                Pitstop maps the best places to stop along your travel route based on user input. It leverages dynamic geospatial routing and real-time telemetry to optimize your detours.
-                            </p></div></div>
-                        </div>
-                                    <div id="project-create-report" class="group bento-tile premium-card hover-trigger" data-cursor="text">
-                            <span class="tile-index font-code">04.1.4</span>
-                            <a href="https://createwellness.github.io" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
-                                <div class="flex items-center gap-3 md:gap-4">
-                                    <img src="assets/symbol-white.svg" alt="Create symbol" class="logo-for-dark h-10 md:h-14 w-auto transition-transform duration-300 group-hover:scale-[1.05]" />
-                                    <img src="assets/symbol-orange.png" alt="Create symbol" class="logo-for-light h-10 md:h-14 w-auto transition-transform duration-300 group-hover:scale-[1.05]" />
-                                    <span class="font-vantely create-text lowercase text-3xl md:text-5xl group-hover:opacity-80 transition-opacity">create report engine</span>
-                                </div>
-                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
-                            </a>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Data Tooling</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Automation</span>
-                            </div>
-                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                Developed a data aggregation and automated reporting platform that transforms raw retail analytics datasets into presentation-ready executive reports.
-                            </p></div></div>
-                        </div>
-                                    <div id="project-vantage" class="group bento-tile premium-card hover-trigger" data-cursor="text">
-                            <span class="tile-index font-code">04.1.5</span>
-                            <a href="https://vantageprep.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
-                                <div class="flex items-center gap-4 md:gap-5">
-                                    <img src="assets/vantage-logo.png" alt="Vantage Prep" class="h-14 md:h-20 w-auto transition-transform duration-300 group-hover:scale-[1.04]" />
-                                    <span class="font-ivy font-semibold text-2xl md:text-4xl tracking-wide text-white group-hover:text-blue-400 transition-colors">Vantage Prep</span>
-                                </div>
-                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
-                            </a>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Founder</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">EdTech</span>
-                            </div>
-                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                A premium tutoring service I founded, pairing students with elite tutors from top universities. Built to deliver academic excellence.
-                            </p></div></div>
-                        </div>
-                                    <div id="project-needl" class="group bento-tile premium-card hover-trigger" data-cursor="text">
-                            <span class="tile-index font-code">04.1.6</span>
-                            <a href="https://useneedl.netlify.app/" target="_blank" rel="noopener" class="flex justify-between items-start mb-4" data-cursor="link">
-                                <div class="flex items-center gap-3">
-                                    <div class="p-2 bg-white/5 rounded-lg text-blue-400">
-                                        <i data-lucide="disc-3" class="w-6 h-6"></i>
-                                    </div>
-                                    <h3 class="text-4xl font-resolide text-white group-hover:text-blue-400 transition-colors">Needl</h3>
-                                </div>
-                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
-                            </a>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">JavaScript</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Three.js</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Web Audio API</span>
-                            </div>
-                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                Developed a browser-based music player featuring a real-time 3D vinyl visualization, local audio file management, and interactive playback controls. Built with JavaScript, Three.js, and the Web Audio API.
-                            </p></div></div>
-                        </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="proj-group reveal-up">
-                            <button id="grp-native-btn" class="proj-group-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="false" aria-controls="grp-native">
-                                <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">04.2</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Native Apps</span></span>
-                                <span class="flex items-center gap-3 shrink-0"><span class="proj-count font-code text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 hidden sm:inline">1 Studio · 3 Apps</span><i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500"></i></span>
-                            </button>
-                            <div class="proj-meter"><span class="proj-meter-fill" style="--fill:20%"></span></div>
-                            <div id="grp-native" class="proj-panel" role="region" aria-labelledby="grp-native-btn">
-                                <div class="proj-panel-inner grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 items-start">
-                                    <div id="project-aklabs" class="group bento-tile premium-card hover-trigger sm:col-span-2 lg:col-span-3 aklabs-tile" data-cursor="text">
-                            <span class="tile-index font-code">04.2.1</span>
-                            <a href="https://aklaboratories.github.io" target="_blank" rel="noopener" class="flex justify-between items-center mb-4" data-cursor="link">
-                                <div class="flex items-center gap-3 md:gap-4">
-                                    <span class="aklabs-logo block h-11 w-11 md:h-12 md:w-12 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
-                                        <svg viewBox="0 0 42 42" class="w-full h-full" aria-hidden="true">
-                                            <circle cx="16" cy="16" r="11.5" fill="#ff7ac6" />
-                                            <circle cx="26" cy="16.5" r="11.5" fill="#5aa9ff" />
-                                            <circle cx="21" cy="26" r="11.5" fill="#56d6a6" />
-                                        </svg>
-                                    </span>
-                                    <span class="font-akwordmark uppercase text-4xl md:text-5xl text-white group-hover:text-blue-400 transition-colors">AK Labs</span>
-                                </div>
-                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
-                            </a>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Swift</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">SwiftUI</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">macOS</span>
-                            </div>
-                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                Founded AK Labs, an independent software studio building native macOS applications for music discovery, organization, and creative workflows. Direct product strategy, software architecture, and full-stack application development, with an emphasis on performant system design, intuitive user interfaces, and deep integration with the Apple ecosystem.
-                            </p></div></div>
-                            <button id="aklabs-toggle" type="button" aria-expanded="false" aria-controls="aklabs-apps" class="aklabs-toggle inline-flex items-center gap-2 mt-5 text-xs font-code uppercase tracking-widest text-blue-400 border border-blue-400/30 rounded-full px-4 py-2 transition-colors hover:bg-blue-400/10 hover:border-blue-400/60 hover-trigger" data-cursor="link">
-                                <i data-lucide="layers" class="w-4 h-4"></i>
-                                <span>The apps</span>
-                                <i data-lucide="chevron-down" class="aklabs-chev w-4 h-4"></i>
-                            </button>
-                            <div id="aklabs-apps" class="aklabs-panel max-w-2xl">
-                                <div>
-                                    <ul class="mt-6 space-y-5 border-l border-white/10 pl-5">
-                                        <li>
-                                            <a href="https://aklaboratories.github.io/#prism" target="_blank" rel="noopener" class="group/app block hover-trigger" data-cursor="link">
-                                                <span class="inline-flex items-center gap-1.5 text-xl text-white font-code group-hover/app:text-blue-400 transition-colors">Prism <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600 group-hover/app:text-blue-400 transition-colors"></i></span>
-                                                <p class="text-sm text-gray-500 font-code leading-relaxed mt-1 group-hover/app:text-gray-400 transition-colors">Detects the musical key of anything playing in real time and maps it onto the Camelot wheel — harmonic mixes for DJs, chords and scales for producers.</p>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="https://aklaboratories.github.io/#halo" target="_blank" rel="noopener" class="group/app block hover-trigger" data-cursor="link">
-                                                <span class="inline-flex items-center gap-1.5 text-xl text-white font-code group-hover/app:text-blue-400 transition-colors">Halo <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600 group-hover/app:text-blue-400 transition-colors"></i></span>
-                                                <p class="text-sm text-gray-500 font-code leading-relaxed mt-1 group-hover/app:text-gray-400 transition-colors">A see-through now-playing widget with a living mesh-gradient backdrop pulled straight from the album art — works with any audio source.</p>
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="https://aklaboratories.github.io/#needlebox" target="_blank" rel="noopener" class="group/app block hover-trigger" data-cursor="link">
-                                                <span class="inline-flex items-center gap-1.5 text-xl text-white font-code group-hover/app:text-blue-400 transition-colors">Needlebox <i data-lucide="arrow-up-right" class="w-4 h-4 text-gray-600 group-hover/app:text-blue-400 transition-colors"></i></span>
-                                                <p class="text-sm text-gray-500 font-code leading-relaxed mt-1 group-hover/app:text-gray-400 transition-colors">Reads key, BPM and energy with Essentia, auto-sorts your library into harmonic folders, and lays out set running orders along a build → peak → cool arc.</p>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="proj-group reveal-up">
-                            <button id="grp-hw-btn" class="proj-group-head w-full flex items-center justify-between gap-4 py-5 group hover-trigger" data-cursor="link" aria-expanded="false" aria-controls="grp-hw">
-                                <span class="flex items-baseline gap-3 md:gap-4"><span class="proj-ord font-code text-xs md:text-sm tracking-widest text-gray-600">04.3</span><span class="proj-cat font-code text-2xl md:text-3xl text-gray-300 group-hover:text-white transition-colors">Hardware &amp; Systems</span></span>
-                                <span class="flex items-center gap-3 shrink-0"><span class="proj-count font-code text-[10px] sm:text-xs uppercase tracking-widest text-gray-500 hidden sm:inline">3 Builds</span><i data-lucide="chevron-down" class="proj-chev w-5 h-5 text-gray-500"></i></span>
-                            </button>
-                            <div class="proj-meter"><span class="proj-meter-fill" style="--fill:60%"></span></div>
-                            <div id="grp-hw" class="proj-panel" role="region" aria-labelledby="grp-hw-btn">
-                                <div class="proj-panel-inner grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 items-start">
-                                    <div id="project-playback" class="group bento-tile premium-card hover-trigger" data-cursor="text">
-                            <span class="tile-index font-code">04.3.1</span>
-                            <a href="https://tryplayback.xyz" target="_blank" rel="noopener" class="flex justify-between items-start mb-4" data-cursor="link">
-                                <img src="assets/playback-logo.png" alt="Playback" class="logo-for-dark h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
-                                <img src="assets/playback-logo-dark.png" alt="Playback" class="logo-for-light h-9 md:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.03]" />
-                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
-                            </a>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Product Design</span>
-                                <span class="tag-pill text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Hardware</span>
-                            </div>
-                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                Work in progress music hardware.
-                            </p></div></div>
-                        </div>
-                                    <div id="project-cpu" class="group bento-tile premium-card hover-trigger sm:col-span-2" data-cursor="text">
-                            <span class="tile-index font-code">04.3.2</span>
-                            <div class="flex justify-between items-start mb-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="p-2 bg-white/5 rounded-lg text-blue-400">
-                                        <i data-lucide="cpu" class="w-6 h-6"></i>
-                                    </div>
-                                    <h3 class="text-3xl font-bold text-white group-hover:text-blue-400 transition-colors">16-Bit CPU Architecture</h3>
-                                </div>
-                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
-                            </div>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Computer Engineering</span>
-                                <span class="text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">Hardware</span>
-                            </div>
-                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                A 2-year independent study building a 16-bit CPU from scratch using advanced computer & electrical engineering principles. Currently under active development.
-                            </p></div></div>
-                        </div>
-                                    <div id="project-record" class="group bento-tile premium-card hover-trigger" data-cursor="text">
-                            <span class="tile-index font-code">04.3.3</span>
-                            <a href="https://github.com/arjunkalbag/DIRECT" target="_blank" rel="noopener" class="flex justify-between items-start mb-4" data-cursor="link">
-                                <div class="flex items-center gap-3">
-                                    <div class="p-2 bg-white/5 rounded-lg text-blue-400">
-                                        <i data-lucide="disc" class="w-6 h-6"></i>
-                                    </div>
-                                    <h3 class="text-3xl font-bold text-white group-hover:text-blue-400 transition-colors">IoT Digital Record Player</h3>
-                                </div>
-                                <span class="tile-arrow"><i data-lucide="arrow-right" class="w-6 h-6 text-gray-600 group-hover:text-white transform -rotate-45 group-hover:rotate-0 transition-transform duration-300"></i></span>
-                            </a>
-                            <div class="flex gap-2 mb-4 flex-wrap">
-                                <span class="text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">IoT</span>
-                                <span class="text-xs font-code px-2 py-1 border border-white/10 rounded-full text-gray-400 uppercase">NFC</span>
-                            </div>
-                            <div class="tile-desc"><div class="tile-desc-inner"><p class="text-lg text-gray-400 leading-relaxed max-w-2xl group-hover:text-gray-200 transition-colors font-code">
-                                Designed and built a digital record player from scratch, integrating NFC technology to bridge physical media with digital streaming.
-                            </p></div></div>
-                        </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                </div>
-            </section>
-
-            <!-- Footer -->
-            <footer class="py-20 border-t border-white/10 mt-20 reveal-up px-6 sm:px-8 md:px-12 lg:px-16">
-                <div class="flex flex-col items-start gap-8">
-                    <div class="flex gap-4">
-                        <a href="https://linkedin.com/in/arjun-kalbag/" target="_blank" class="footer-icon hover-trigger text-gray-300" data-cursor="link" aria-label="LinkedIn">
-                            <svg viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"/></svg>
-                        </a>
-                        <a href="https://github.com/arjunkalbag" target="_blank" class="footer-icon hover-trigger text-gray-300" data-cursor="link" aria-label="GitHub">
-                            <svg viewBox="0 0 24 24" class="w-6 h-6" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.78 0 12.29c0 5.21 3.44 9.63 8.21 11.19.6.11.82-.25.82-.55 0-.27-.01-1-.02-1.96-3.34.72-4.04-1.59-4.04-1.59-.55-1.38-1.34-1.75-1.34-1.75-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.23 1.84 1.23 1.07 1.83 2.81 1.3 3.49 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6.01 0c2.29-1.55 3.29-1.23 3.29-1.23.66 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.8 5.62-5.48 5.92.43.37.81 1.1.81 2.22 0 1.6-.01 2.9-.01 3.29 0 .32.22.69.83.57A12.02 12.02 0 0 0 24 12.29C24 5.78 18.63.5 12 .5z"/></svg>
-                        </a>
-                        <a href="mailto:arjunkalbag07@gmail.com" class="footer-icon hover-trigger" data-cursor="link">
-                            <i data-lucide="mail" class="w-6 h-6 text-gray-300"></i>
-                        </a>
-                    </div>
-                    <div class="text-left">
-                        <p class="text-gray-500 text-sm font-code">Designed & Built by Arjun Kalbag</p>
-                        <p class="text-gray-600 text-xs mt-1 font-code">© 2026 All Rights Reserved</p>
-                    </div>
-                </div>
-            </footer>
-        </div>
-
-
-    </main>
-
-    <!-- JAVASCRIPT LOGIC -->
-    <script>
-        // 1. Initialize Icons
-        lucide.createIcons();
-        gsap.registerPlugin(Observer);
-
-        // ===== Animated ASCII Portrait =====
-        (function () {
-            const wrap = document.getElementById('ascii-wrap');
-            const pre = document.getElementById('ascii-portrait');
-            if (!wrap || !pre) return;
-
-            const COLS = 150;
-            const CHAR_RATIO = 0.6;            // monospace cell width / height
-            const RAMP = " .'^:;-~=+*ox?X#%8@";  // sparse -> dense, richer tonal range
-
-            // Sampled luminance grid (cell = 0..1 brightness, or -1 for transparent).
-            // Stored once so we can re-render per theme without re-decoding the image.
-            let grid = null, gRows = 0;
-            function renderAscii() {
-                if (!grid) return;
-                // Light mode = dark ink on light paper, so invert tones: dark areas get the densest glyphs.
-                const invert = document.body.classList.contains('light-mode');
-                let out = '';
-                for (let y = 0; y < gRows; y++) {
-                    for (let x = 0; x < COLS; x++) {
-                        const cell = grid[y * COLS + x];
-                        if (cell < 0) { out += ' '; continue; } // transparent background
-                        const v = invert ? (1 - cell) : cell;
-                        let idx = Math.round(v * (RAMP.length - 1));
-                        if (idx < 1) idx = 1;   // keep faint areas visible
-                        out += RAMP[idx];
-                    }
-                    out += '\n';
-                }
-                pre.textContent = out;
-            }
-
-            const img = new Image();
-            img.src = 'assets/profile.png';
-            img.onload = () => {
-                // Find the subject's alpha bounding box to crop transparent margins
-                const pw = 220, ph = Math.round(220 * img.height / img.width);
-                const probe = document.createElement('canvas');
-                probe.width = pw; probe.height = ph;
-                const pctx = probe.getContext('2d', { willReadFrequently: true });
-                pctx.drawImage(img, 0, 0, pw, ph);
-                const pd = pctx.getImageData(0, 0, pw, ph).data;
-                let minX = pw, minY = ph, maxX = 0, maxY = 0;
-                for (let y = 0; y < ph; y++) for (let x = 0; x < pw; x++) {
-                    if (pd[(y * pw + x) * 4 + 3] > 40) {
-                        if (x < minX) minX = x; if (x > maxX) maxX = x;
-                        if (y < minY) minY = y; if (y > maxY) maxY = y;
-                    }
-                }
-                if (maxX < minX) { minX = 0; minY = 0; maxX = pw - 1; maxY = ph - 1; }
-                minX = Math.max(0, minX - 2); minY = Math.max(0, minY - 2);
-                maxX = Math.min(pw - 1, maxX + 2); maxY = Math.min(ph - 1, maxY + 2);
-                const sx = minX / pw * img.width, sy = minY / ph * img.height;
-                const sw = (maxX - minX + 1) / pw * img.width, sh = (maxY - minY + 1) / ph * img.height;
-
-                const rows = Math.round(COLS * (sh / sw) * CHAR_RATIO);
-                const c = document.createElement('canvas');
-                c.width = COLS; c.height = rows;
-                const cx = c.getContext('2d', { willReadFrequently: true });
-                cx.drawImage(img, sx, sy, sw, sh, 0, 0, COLS, rows);
-                const d = cx.getImageData(0, 0, COLS, rows).data;
-                grid = new Array(COLS * rows); gRows = rows;
-                for (let p = 0; p < COLS * rows; p++) {
-                    const i = p * 4;
-                    if (d[i + 3] < 60) { grid[p] = -1; continue; }
-                    let lum = (0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]) / 255;
-                    lum = Math.min(1, Math.max(0, (lum - 0.5) * 1.35 + 0.5)); // contrast boost for facial detail
-                    grid[p] = lum;
-                }
-                renderAscii();
-                gsap.to(wrap, { opacity: 1, duration: 1.2, ease: 'power2.out', delay: 0.3 });
-            };
-            img.onerror = () => { wrap.style.display = 'none'; };
-
-            // Re-render with inverted tones whenever the light/dark theme changes.
-            new MutationObserver(renderAscii).observe(document.body, { attributes: true, attributeFilter: ['class'] });
-
-            // 3D mouse-tracking rotation + idle float + hover scale
-            let tRX = 0, tRY = 0, rx = 0, ry = 0, scale = 1, tScale = 1, t = 0;
-            window.addEventListener('mousemove', (e) => {
-                tRY = ((e.clientX / window.innerWidth) - 0.5) * 34;
-                tRX = -((e.clientY / window.innerHeight) - 0.5) * 24;
-            });
-            wrap.addEventListener('mouseenter', () => { tScale = 1.07; });
-            wrap.addEventListener('mouseleave', () => { tScale = 1; });
-            (function loop() {
-                t += 0.02;
-                rx += (tRX - rx) * 0.06;
-                ry += (tRY - ry) * 0.06;
-                scale += (tScale - scale) * 0.1;
-                const driftY = Math.sin(t) * 3;
-                const driftX = Math.cos(t * 0.7) * 2;
-                const bob = Math.sin(t * 0.8) * 12; // gentle vertical float to match the page
-                pre.style.transform = `translateY(${bob}px) rotateX(${rx + driftX}deg) rotateY(${ry + driftY}deg) scale(${scale})`;
-                requestAnimationFrame(loop);
-            })();
-        })();
-
-        // ===== Gentle ambient float — ONLY the two hero header lines =====
-        // (the name floats via .hero-anim/top, the portrait via its own render loop;
-        //  everything else on the page stays still)
-        (function () {
-            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-            const targets = [];
-            ['loc-nyc', 'nav-engineering'].forEach((id) => {          // NEW YORK / ST. LOUIS  and  ENGINEERING • PROJECTS • MUSIC
-                const span = document.getElementById(id);
-                const p = span && span.closest('p');
-                if (p && !targets.includes(p)) targets.push(p);
-            });
-            targets.forEach((el, i) => {
-                const dir = i % 2 === 0 ? -1 : 1;
-                const amp = (6 + Math.random() * 4) * dir;                                   // 6–10px, alternating direction
-                el.style.setProperty('--float-amp', amp.toFixed(1) + 'px');
-                el.style.setProperty('--float-dur', (5 + Math.random() * 2.5).toFixed(1) + 's'); // 5–7.5s
-                el.style.setProperty('--float-delay', (-Math.random() * 5).toFixed(1) + 's');    // out-of-phase
-                el.classList.add('floaty');
-            });
-        })();
-
-        // ===== AK Labs "the apps" dropdown (smooth grid-rows expand) =====
-        (function () {
-            const btn = document.getElementById('aklabs-toggle');
-            const panel = document.getElementById('aklabs-apps');
-            if (!btn || !panel) return;
-            btn.addEventListener('click', () => {
-                const open = !panel.classList.contains('open');
-                panel.classList.toggle('open', open);
-                btn.classList.toggle('is-open', open);
-                btn.setAttribute('aria-expanded', String(open));
-            });
-        })();
-
-        // ===== Collapsible outline — section heads (multi-open) + project category heads (one-at-a-time) =====
-        (function () {
-            var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            function setInnerOverflow(p, val) { var i = p.querySelector('.proj-panel-inner'); if (i) i.style.overflow = val; }
-            function setOpen(head, open) {
-                head.setAttribute('aria-expanded', String(open));
-                var p = document.getElementById(head.getAttribute('aria-controls'));
-                if (!p) return;
-                if (open) {
-                    p.classList.add('open');
-                    // once fully expanded, let hovered tiles grow without being clipped by the panel
-                    var onEnd = function (e) {
-                        if (e.target !== p || e.propertyName !== 'grid-template-rows') return;
-                        p.removeEventListener('transitionend', onEnd);
-                        if (p.classList.contains('open')) setInnerOverflow(p, 'visible');
-                    };
-                    p.addEventListener('transitionend', onEnd);
-                } else {
-                    setInnerOverflow(p, '');   // restore clipping so the collapse animates cleanly
-                    p.classList.remove('open');
-                }
-            }
-            function refreshST(head) {
-                if (!window.ScrollTrigger) return;
-                var p = document.getElementById(head.getAttribute('aria-controls'));
-                var fn = function () { try { ScrollTrigger.refresh(); } catch (e) {} };
-                if (p) p.addEventListener('transitionend', fn, { once: true });
-                else requestAnimationFrame(fn);
-            }
-            function bindAccordion(heads, oneAtATime) {
-                if (!heads.length) return null;
-                if (reduce) { heads.forEach(function (h) { h.setAttribute('aria-expanded', 'true'); var p = document.getElementById(h.getAttribute('aria-controls')); if (p) { p.classList.add('open'); setInnerOverflow(p, 'visible'); } }); return null; }
-                function toggle(head) {
-                    var willOpen = head.getAttribute('aria-expanded') !== 'true';
-                    if (oneAtATime) heads.forEach(function (h) { setOpen(h, h === head ? willOpen : false); });
-                    else setOpen(head, willOpen);
-                    refreshST(head);
-                }
-                // native <button> heads already fire click on Enter/Space, so click covers keyboard
-                heads.forEach(function (head) { head.addEventListener('click', function () { toggle(head); }); });
-                return toggle;
-            }
-            var catHeads = Array.prototype.slice.call(document.querySelectorAll('.proj-group-head:not(.sec-head)'));
-            var secHeads = Array.prototype.slice.call(document.querySelectorAll('.sec-head'));
-            var toggleCat = bindAccordion(catHeads, true);
-            var toggleSec = bindAccordion(secHeads, false);
-            window.__openProjGroup = function (controlsId) {
-                var head = catHeads.find(function (h) { return h.getAttribute('aria-controls') === controlsId; });
-                if (head && head.getAttribute('aria-expanded') !== 'true' && toggleCat) toggleCat(head);
-            };
-            window.__openSection = function (controlsId) {
-                var head = secHeads.find(function (h) { return h.getAttribute('aria-controls') === controlsId; });
-                if (head && head.getAttribute('aria-expanded') !== 'true' && toggleSec) toggleSec(head);
-            };
-            // panels open on load (markup) have no transition to fire — let them overflow now
-            document.querySelectorAll('.proj-panel.open').forEach(function (p) { setInnerOverflow(p, 'visible'); });
-            if (window.ScrollTrigger) requestAnimationFrame(function () { try { ScrollTrigger.refresh(); } catch (e) {} });
-        })();
-
-        // ===== Magnetic arrow on project tiles (cheap signature flourish) =====
-        (function () {
-            if (!window.matchMedia) return;
-            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(pointer: coarse)').matches) return;
-            document.querySelectorAll('.bento-tile').forEach(function (tile) {
-                var arrow = tile.querySelector('.tile-arrow');
-                if (!arrow) return;
-                tile.addEventListener('pointermove', function (e) {
-                    var r = arrow.getBoundingClientRect();
-                    var cx = Math.max(-5, Math.min(5, (e.clientX - (r.left + r.width / 2)) * 0.15));
-                    var cy = Math.max(-5, Math.min(5, (e.clientY - (r.top + r.height / 2)) * 0.15));
-                    arrow.style.transform = 'translate(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px)';
-                });
-                tile.addEventListener('pointerleave', function () { arrow.style.transform = ''; });
-            });
-        })();
-
-        // Add custom spin animations to Tailwind config or CSS
-        const style = document.createElement('style');
-        style.innerHTML = `
-            @keyframes spin-slow {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-            }
-            .animate-spin-slow {
-                animation: spin-slow 60s linear infinite; /* Slower spin (60s) */
-            }
-        `;
-        document.head.appendChild(style);
-
-        const cursor = document.getElementById('cursor');
-        const follower = document.getElementById('cursor-follower');
-        const hoverTriggers = document.querySelectorAll('.hover-trigger');
-
-        let mouseX = 0;
-        let mouseY = 0;
-
-        gsap.set(cursor, { xPercent: -50, yPercent: -50 });
-        gsap.set(follower, { xPercent: -50, yPercent: -50 });
-
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
-            gsap.to(cursor, { x: mouseX, y: mouseY, duration: 0.1 });
-            gsap.to(follower, { x: mouseX, y: mouseY, duration: 0.6, ease: "power2.out" });
-        });
-
-        // Hover Effects (General)
-        document.body.addEventListener('mouseenter', (e) => {
-            if (e.target.closest('.hover-trigger')) {
-                const el = e.target.closest('.hover-trigger');
-                const type = el.getAttribute('data-cursor');
-                if (type === 'text') {
-                    gsap.to(cursor, { scale: 5, backgroundColor: 'white', mixBlendMode: 'difference' });
-                } else if (type === 'link') {
-                    gsap.to(cursor, { scale: 3, backgroundColor: '#3b82f6', mixBlendMode: 'normal', opacity: 0.8 });
-                }
-            }
-        }, true);
-
-        document.body.addEventListener('mouseleave', (e) => {
-            if (e.target.closest('.hover-trigger')) {
-                gsap.to(cursor, { scale: 1, backgroundColor: 'white', mixBlendMode: 'difference', opacity: 1 });
-            }
-        }, true);
-
-        window.addEventListener('click', (e) => {
-            const ripple = document.createElement('div');
-            const isGoldMode = document.getElementById('cursor').classList.contains('gold-mode');
-            
-            ripple.className = 'fixed rounded-full border pointer-events-none z-[99]';
-            ripple.style.borderColor = isGoldMode ? '#C5A059' : 'white';
-            
-            ripple.style.left = `${e.clientX}px`;
-            ripple.style.top = `${e.clientY}px`;
-            ripple.style.width = '40px';
-            ripple.style.height = '40px';
-            ripple.style.transform = 'translate(-50%, -50%) scale(0)';
-            document.body.appendChild(ripple);
-
-            gsap.to(ripple, {
-                scale: 3,
-                opacity: 0,
-                duration: 0.6,
-                onComplete: () => ripple.remove()
-            });
-        });
-
-        // 3. Splash Screen — organic pixel "AK": assemble -> hold -> dissolve reveal
-        window.onload = () => {
-            const splash = document.getElementById('splash');
-            const canvas = document.getElementById('splash-canvas');
-
-            const revealHero = (() => {
-                let fired = false;
-                return () => {
-                    if (fired) return; fired = true;
-                    gsap.to('#main-content', { opacity: 1, duration: 0.9, ease: 'power2.out' });
-                    gsap.from('.reveal-text', { y: 50, opacity: 0, stagger: 0.09, duration: 0.8, ease: 'power2.out' });
-                };
-            })();
-
-            if (!splash || !canvas || !canvas.getContext) { revealHero(); if (splash) splash.style.display = 'none'; return; }
-
-            const ctx = canvas.getContext('2d');
-            const DPR = Math.min(window.devicePixelRatio || 1, 2);
-            const W = window.innerWidth, H = window.innerHeight;
-            canvas.width = Math.floor(W * DPR); canvas.height = Math.floor(H * DPR);
-            canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-            ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-
-            const clamp = (v) => v < 0 ? 0 : v > 1 ? 1 : v;
-            const easeOut = (p) => 1 - Math.pow(1 - p, 3);
-
-            function build() {
-                // ---- sample "AK" into a pixel grid ----
-                const CELL = Math.max(6, Math.round(Math.min(W, H) / 110));
-                const off = document.createElement('canvas');
-                off.width = W; off.height = H;
-                const octx = off.getContext('2d', { willReadFrequently: true });
-                const fontPx = Math.min(W * 0.16, H * 0.22);
-                octx.fillStyle = '#fff';
-                octx.textAlign = 'center';
-                octx.textBaseline = 'middle';
-                octx.font = '900 ' + fontPx + 'px Inter, system-ui, sans-serif';
-                octx.fillText('AK', W / 2, H / 2);
-                const img = octx.getImageData(0, 0, W, H).data;
-
-                const cells = [];
-                let minX = W, maxX = 0, minY = H, maxY = 0;
-                for (let y = 0; y < H; y += CELL) {
-                    for (let x = 0; x < W; x += CELL) {
-                        const sx = Math.min(W - 1, x + (CELL >> 1));
-                        const sy = Math.min(H - 1, y + (CELL >> 1));
-                        if (img[(sy * W + sx) * 4 + 3] > 90) {
-                            cells.push({ hx: x, hy: y });
-                            if (x < minX) minX = x; if (x > maxX) maxX = x;
-                            if (y < minY) minY = y; if (y > maxY) maxY = y;
-                        }
-                    }
-                }
-                const bw = Math.max(1, maxX - minX), bh = Math.max(1, maxY - minY);
-                const cx = W / 2, cy = H / 2;
-                const C1 = [147, 197, 253], C2 = [196, 181, 253]; // #93c5fd -> #c4b5fd
-                cells.forEach(c => {
-                    const ang = Math.random() * Math.PI * 2;
-                    const dist = 220 + Math.random() * Math.max(W, H) * 0.5;
-                    c.sx0 = cx + Math.cos(ang) * dist;
-                    c.sy0 = cy + Math.sin(ang) * dist;
-                    const nx = (c.hx - minX) / bw, ny = (c.hy - minY) / bh;
-                    const m = clamp(ny + (Math.random() - 0.5) * 0.25);
-                    if (Math.random() < 0.07) { c.col = [255, 255, 255]; }
-                    else c.col = [Math.round(C1[0] + (C2[0] - C1[0]) * m), Math.round(C1[1] + (C2[1] - C1[1]) * m), Math.round(C1[2] + (C2[2] - C1[2]) * m)];
-                    c.aDelay = nx * 0.3 + Math.random() * 0.25;
-                    c.seed = Math.random() * Math.PI * 2;
-                    c.band = Math.floor((c.hy - minY) / (CELL * 3));
-                    c.rDelay = nx * 0.25 + Math.random() * 0.18;
-                    const da = Math.atan2(c.hy - cy, c.hx - cx) + (Math.random() - 0.5) * 0.8;
-                    const sp = 230 + Math.random() * 360;
-                    c.vx = Math.cos(da) * sp; c.vy = Math.sin(da) * sp - 120;
-                });
-
-                // ---- timeline (seconds) ----
-                const ASSEMBLE = 1.1, HOLD = 0.7, REVEAL = 1.2;
-                const tReveal = ASSEMBLE + HOLD, tEnd = tReveal + REVEAL;
-                let start = null, done = false;
-
-                const finish = () => { if (!done) { done = true; splash.style.display = 'none'; } };
-                setTimeout(() => { revealHero(); finish(); }, (tEnd + 1.5) * 1000); // safety net
-
-                function frame(now) {
-                    if (start === null) start = now;
-                    const t = (now - start) / 1000;
-                    ctx.clearRect(0, 0, W, H);
-
-                    let bgA = t > tReveal ? 1 - clamp((t - tReveal) / 0.7) : 1;
-                    if (bgA > 0) { ctx.fillStyle = 'rgba(5,5,6,' + bgA + ')'; ctx.fillRect(0, 0, W, H); }
-
-                    const revP = t > tReveal ? clamp((t - tReveal) / REVEAL) : 0;
-
-                    for (let i = 0; i < cells.length; i++) {
-                        const c = cells[i];
-                        let px, py, alpha = 1, sz = CELL - 1;
-                        if (t < ASSEMBLE) {
-                            const win = Math.max(0.3, ASSEMBLE - 0.1 - c.aDelay);
-                            const p = easeOut(clamp((t - c.aDelay) / win));
-                            px = c.sx0 + (c.hx - c.sx0) * p;
-                            py = c.sy0 + (c.hy - c.sy0) * p;
-                            alpha = clamp(p * 1.3);
-                        } else if (t < tReveal) {
-                            // hold — clean, static pixel "AK"
-                            px = c.hx; py = c.hy;
-                        } else {
-                            const dp = clamp((revP - c.rDelay) / 0.5);
-                            if (dp >= 1) continue;
-                            const e2 = dp * dp;
-                            px = c.hx + c.vx * e2 * 0.9;
-                            py = c.hy + c.vy * e2 * 0.9 + 260 * e2 * e2;
-                            alpha = 1 - dp;
-                            sz = (CELL - 1) * (1 - dp * 0.7);
-                        }
-                        const col = c.col;
-                        ctx.fillStyle = 'rgba(' + col[0] + ',' + col[1] + ',' + col[2] + ',' + alpha + ')';
-                        ctx.fillRect(px, py, sz, sz);
-                    }
-
-                    if (t >= tReveal) revealHero();
-                    if (t >= tEnd) { finish(); return; }
-                    requestAnimationFrame(frame);
-                }
-                requestAnimationFrame(frame);
-            }
-
-            // ensure Inter (the brand weight) is ready so the AK silhouette is crisp
-            if (document.fonts && document.fonts.load) {
-                document.fonts.load('900 100px Inter').then(build).catch(build);
-            } else { build(); }
-        };
-
-        // 4. Scroll Animations
-        gsap.registerPlugin(ScrollTrigger);
-
-        gsap.to(".parallax-element", {
-            y: 150,
-            opacity: 0,
-            scrollTrigger: {
-                trigger: "#hero",
-                start: "top top",
-                end: "bottom top",
-                scrub: true
-            }
-        });
-        
-        // Scroll Indicator Click & Fade Logic
-        const scrollIndicator = document.getElementById('scroll-indicator');
-        if (scrollIndicator) {
-            scrollIndicator.addEventListener('click', () => {
-                const aboutSection = document.getElementById('about');
-                if (aboutSection) {
-                    aboutSection.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-        }
-
-        const sections = document.querySelectorAll(".reveal-up");
-        sections.forEach(section => {
-            gsap.from(section, {
-                y: 50,
-                opacity: 0,
-                duration: 0.8,
-                ease: "power2.out",
-                scrollTrigger: {
-                    trigger: section,
-                    start: "top 85%",
-                    toggleActions: "play none none reverse"
-                }
-            });
-        });
-
-        // ... (Particle logic & Draw Function) ...
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let particles = [];
-        let interactionMode = 'random';
-        let isAKMode = false;
-        let isLightMode = false;
-        const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-
-        // Playful multi-color particle palettes
-        const darkPalette = [[96,165,250],[167,139,250],[244,114,182],[45,212,191],[251,191,36],[52,211,153],[34,211,238]];
-        const lightPalette = [[37,99,235],[124,58,237],[219,39,119],[13,148,136],[217,119,6],[5,150,105],[8,145,178]];
-
-        const themeToggle = document.getElementById('theme-toggle');
-        
-        themeToggle.addEventListener('mouseenter', () => {
-            gsap.to(themeToggle, { rotation: 180, duration: 0.3, ease: "power2.out", overwrite: true });
-        });
-
-        themeToggle.addEventListener('mouseleave', () => {
-            gsap.to(themeToggle, { rotation: 0, duration: 0.1, ease: "power2.out", overwrite: true });
-        });
-        
-        themeToggle.addEventListener('click', () => {
-            isLightMode = !isLightMode;
-            document.body.classList.toggle('light-mode');
-            
-            const currentIcon = themeToggle.querySelector('svg');
-            gsap.to(themeToggle, { scale: 0.9, duration: 0.1, yoyo: true, repeat: 1 });
-
-            if (currentIcon) {
-                gsap.to(currentIcon, {
-                    scale: 0, opacity: 0, rotation: 90, duration: 0.2, ease: "power2.in",
-                    onComplete: () => {
-                        const iconName = isLightMode ? 'moon' : 'sun';
-                        themeToggle.innerHTML = `<i data-lucide="${iconName}" class="w-6 h-6 text-gray-300"></i>`;
-                        lucide.createIcons();
-                        const newIcon = themeToggle.querySelector('svg');
-                        gsap.set(newIcon, { scale: 0, opacity: 0, rotation: -90 });
-                        gsap.to(newIcon, { scale: 1, opacity: 1, rotation: 0, duration: 0.4, ease: "back.out(2)" });
-                    }
-                });
-            }
-        });
-
-        function resize() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; initParticles(); }
-        function initParticles() {
-            particles = [];
-            const particleCount = reduceMotion ? (width < 768 ? 70 : 110) : (width < 768 ? 110 : 180); 
-            for (let i = 0; i < particleCount; i++) {
-                particles.push({ x: Math.random() * width, y: Math.random() * height, vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, size: Math.random() * 2 + 1, z: Math.random() * 2, tx: 0, ty: 0, colorIndex: Math.floor(Math.random() * 7) });
-            }
-        }
-        function formShape(type) {
-            interactionMode = 'shape'; const cx = width / 2; const cy = height / 2; const count = particles.length;
-            if (type === 'cpu') {
-                const size = 140; const halfSize = size / 2; const perimeterCount = Math.floor(count * 0.4); const pinCount = Math.floor(count * 0.3); const innerCount = count - perimeterCount - pinCount;
-                particles.forEach((p, i) => {
-                    if (i < perimeterCount) { const perimeterLen = size * 4; const pos = (i / perimeterCount) * perimeterLen; if (pos < size) { p.tx = (cx - halfSize) + pos; p.ty = cy - halfSize; } else if (pos < size * 2) { p.tx = cx + halfSize; p.ty = (cy - halfSize) + (pos - size); } else if (pos < size * 3) { p.tx = (cx + halfSize) - (pos - size * 2); p.ty = cy + halfSize; } else { p.tx = cx - halfSize; p.ty = (cy + halfSize) - (pos - size * 3); } } 
-                    else if (i < perimeterCount + pinCount) { const pinIndex = i - perimeterCount; const pinsPerSide = Math.floor(pinCount / 4); const side = Math.floor(pinIndex / pinsPerSide) % 4; const sideIndex = pinIndex % pinsPerSide; const spacing = size / pinsPerSide; const offset = (sideIndex * spacing) - halfSize + (spacing/2); const pinLen = 25; if (side === 0) { p.tx = cx + offset; p.ty = cy - halfSize - pinLen; } else if (side === 1) { p.tx = cx + halfSize + pinLen; p.ty = cy + offset; } else if (side === 2) { p.tx = cx + offset; p.ty = cy + halfSize + pinLen; } else { p.tx = cx - halfSize - pinLen; p.ty = cy + offset; } } 
-                    else { const innerIndex = i - perimeterCount - pinCount; const gridSide = Math.ceil(Math.sqrt(innerCount)); const step = (size * 0.6) / gridSide; const start = -(size * 0.6) / 2; const row = Math.floor(innerIndex / gridSide); const col = innerIndex % gridSide; p.tx = cx + start + col * step + step/2; p.ty = cy + start + row * step + step/2; }
-                });
-            } else if (type === 'record') { particles.forEach((p, i) => { let radius, angle; if (i < count * 0.3) { radius = 40 + Math.random() * 2; angle = (i / (count * 0.3)) * Math.PI * 2; } else { radius = 100 + Math.random() * 2; angle = ((i - count * 0.3) / (count * 0.7)) * Math.PI * 2; } p.tx = cx + Math.cos(angle) * radius; p.ty = cy + Math.sin(angle) * radius; });
-            } else if (type === 'infinity') { const a = 200; particles.forEach((p, i) => { const t = (i / count) * Math.PI * 2; const denom = 1 + Math.sin(t) * Math.sin(t); p.tx = cx + (a * Math.cos(t)) / denom; p.ty = cy + (a * Math.sin(t) * Math.cos(t)) / denom; });
-            } else if (type === 'cbn') { const letterW = 80; const letterH = 120; const gap = 40; const totalWidth = (letterW * 3) + (gap * 2); const startX = cx - (totalWidth / 2); const strokeWidth = 12; particles.forEach((p, i) => { const group = Math.floor((i / count) * 3); const localI = i % Math.floor(count / 3); const localTotal = Math.floor(count / 3); const progress = localI / localTotal; const jitterX = (Math.random() - 0.5) * strokeWidth; const jitterY = (Math.random() - 0.5) * strokeWidth; let lx = 0, ly = 0; if (group === 0) { const cCenterX = startX + letterW/2; const cCenterY = cy; const angle = Math.PI * 0.2 + progress * (Math.PI * 1.6); lx = cCenterX + Math.cos(angle) * (letterW/2); ly = cCenterY + Math.sin(angle) * (letterH/2); } else if (group === 1) { const bX = startX + letterW + gap; if (progress < 0.4) { lx = bX; ly = cy - letterH/2 + (progress/0.4) * letterH; } else if (progress < 0.7) { const loopProg = (progress - 0.4) / 0.3; const angle = -Math.PI/2 + loopProg * Math.PI; lx = bX + Math.cos(angle) * (letterW * 0.6); ly = cy - letterH/4 + Math.sin(angle) * (letterH/4); } else { const loopProg = (progress - 0.7) / 0.3; const angle = -Math.PI/2 + loopProg * Math.PI; lx = bX + Math.cos(angle) * (letterW * 0.7); ly = cy + letterH/4 + Math.sin(angle) * (letterH/4); } } else { const nX = startX + (letterW + gap) * 2; if (progress < 0.35) { lx = nX; ly = cy + letterH/2 - (progress/0.35) * letterH; } else if (progress < 0.65) { const diagProg = (progress - 0.35) / 0.3; lx = nX + diagProg * letterW; ly = cy - letterH/2 + diagProg * letterH; } else { const vertProg = (progress - 0.65) / 0.35; lx = nX + letterW; ly = cy + letterH/2 - vertProg * letterH; } } p.tx = lx + jitterX; p.ty = ly + jitterY; });
-            } else if (type === 'globe') { const radius = 130; const tilt = 0.5; const silhouetteLimit = Math.floor(count * 0.3); const latLimit = Math.floor(count * 0.6); const latCount = 5; const longCount = 8; particles.forEach((p, i) => { let x, y, z; if (i < silhouetteLimit) { const angle = (i / silhouetteLimit) * Math.PI * 2; p.tx = cx + radius * Math.cos(angle); p.ty = cy + radius * Math.sin(angle); return; } if (i < latLimit) { const subsetSize = latLimit - silhouetteLimit; const idx = i - silhouetteLimit; const latGroupSize = Math.floor(subsetSize / latCount); const latIndex = Math.min(Math.floor(idx / latGroupSize), latCount - 1); const latProg = (idx % latGroupSize) / latGroupSize; const phi = (Math.PI * 0.15) + (latIndex / (latCount - 1)) * (Math.PI * 0.7); const theta = latProg * Math.PI * 2; x = radius * Math.sin(phi) * Math.cos(theta); z = radius * Math.sin(phi) * Math.sin(theta); y = radius * Math.cos(phi); } else { const subsetSize = count - latLimit; const idx = i - latLimit; const longGroupSize = Math.floor(subsetSize / longCount); const longIndex = Math.min(Math.floor(idx / longGroupSize), longCount - 1); const longProg = (idx % longGroupSize) / longGroupSize; const theta = (longIndex / longCount) * Math.PI * 2; const phi = longProg * Math.PI; x = radius * Math.sin(phi) * Math.cos(theta); z = radius * Math.sin(phi) * Math.sin(theta); y = radius * Math.cos(phi); } const rotY = y * Math.cos(tilt) - z * Math.sin(tilt); p.tx = cx + x; p.ty = cy + rotY; });
-            } else if (type === 'nyu') { const torchHeight = 90; const textY = cy + 50; const strokeWidth = 10; const letterW = 50; const letterH = 60; const gap = 20; const totalTextW = (letterW * 3) + (gap * 2); const textStartX = cx - (totalTextW / 2); particles.forEach((p, i) => { const jitterX = (Math.random() - 0.5) * strokeWidth; const jitterY = (Math.random() - 0.5) * strokeWidth; if (i < count * 0.25) { const progress = i / (count * 0.25); const w = 50 * Math.sin(progress * Math.PI); const h = torchHeight; const x = (Math.random() - 0.5) * w; const y = -progress * h; p.tx = cx + x; p.ty = cy + 10 + y; } else { const textIndex = i - Math.floor(count * 0.25); const textTotal = count - Math.floor(count * 0.25); const group = Math.floor((textIndex / textTotal) * 3); const progress = (textIndex % (textTotal/3)) / (textTotal/3); let lx=0, ly=0; if (group === 0) { const currentX = textStartX; if (progress < 0.35) { lx = currentX; ly = textY - letterH/2 + (progress/0.35)*letterH; } else if (progress < 0.7) { const p2 = (progress-0.35)/0.35; lx = currentX + p2*letterW; ly = textY - letterH/2 + p2*letterH; } else { const p3 = (progress-0.7)/0.3; lx = currentX + letterW; ly = textY + letterH/2 - p3*letterH; } } else if (group === 1) { const currentX = textStartX + letterW + gap; if (progress < 0.33) { const p2 = progress/0.33; lx = currentX + (p2 - 0.5)*letterW + (letterW/2); ly = textY - letterH/2 + p2*(letterH/2); } else if (progress < 0.66) { const p2 = (progress-0.33)/0.33; lx = currentX + letterW - (p2*0.5*letterW); ly = textY - letterH/2 + p2*(letterH/2); } else { const p2 = (progress-0.66)/0.34; lx = currentX + letterW/2; ly = textY + (p2 * letterH/2); } } else { const currentX = textStartX + (letterW + gap) * 2; if (progress < 0.4) { lx = currentX; ly = textY - letterH/2 + (progress/0.4)*letterH; } else if (progress < 0.7) { const p2 = (progress-0.4)/0.3; lx = currentX + p2*letterW; ly = textY + letterH/2; } else { const p2 = (progress-0.7)/0.3; lx = currentX + letterW; ly = textY + letterH/2 - p2*letterH; } } p.tx = lx + jitterX; p.ty = ly + jitterY; } });
-            } else if (type === 'community') { particles.forEach((p, i) => { const group = Math.floor((i / count) * 3); const subProgress = (i % Math.floor(count/3)) / Math.floor(count/3); let centerX, centerY, scale; if (group === 0) { centerX = cx; centerY = cy - 10; scale = 1.2; } else if (group === 1) { centerX = cx - 60; centerY = cy + 10; scale = 0.9; } else { centerX = cx + 60; centerY = cy + 10; scale = 0.9; } if (subProgress < 0.3) { const angle = subProgress * (1/0.3) * Math.PI * 2; const r = 15 * scale; p.tx = centerX + Math.cos(angle) * r; p.ty = (centerY - 30 * scale) + Math.sin(angle) * r; } else { const arcProg = (subProgress - 0.3) / 0.7; const angle = Math.PI - (arcProg * Math.PI); const r = 35 * scale; const fillR = r * (0.8 + Math.random()*0.2); p.tx = centerX + Math.cos(angle) * fillR; p.ty = (centerY + 10 * scale) - Math.sin(angle) * fillR * 0.6; } });
-            } else if (type === 'stock') { const points = [{x: -120, y: 60}, {x: -70, y: 20}, {x: -30, y: 50}, {x: 20, y: -20}, {x: 70, y: 10}, {x: 120, y: -70}]; particles.forEach((p, i) => { const segmentCount = points.length - 1; const particlesPerSeg = Math.floor(count / segmentCount); const segIndex = Math.min(Math.floor(i / particlesPerSeg), segmentCount - 1); const prog = (i % particlesPerSeg) / particlesPerSeg; const p1 = points[segIndex]; const p2 = points[segIndex + 1]; const scatter = (Math.random() - 0.5) * 4; p.tx = cx + p1.x + (p2.x - p1.x) * prog + scatter; p.ty = cy + p1.y + (p2.y - p1.y) * prog + scatter; });
-            } else if (type === 'wave') { particles.forEach((p, i) => { const line = Math.floor((i/count) * 3); const prog = (i % Math.floor(count/3)) / Math.floor(count/3); const width = 240; const x = (prog * width) - (width/2); const freq = 0.05; let amp = 40; if (line === 0) amp = 20; if (line === 2) amp = 60; const y = Math.sin(x * freq + (line * Math.PI/4)) * amp; p.tx = cx + x; p.ty = cy + y; });
-            } else if (type === 'music') { const headY = cy + 40; const headR = 15; const stemH = 70; const noteX1 = cx - 30; const noteX2 = cx + 40; particles.forEach((p, i) => { const section = Math.floor((i/count) * 5); const prog = (i % Math.floor(count/5)) / Math.floor(count/5); if (section === 0) { const angle = prog * Math.PI * 2; const r = Math.random() * headR; p.tx = noteX1 + Math.cos(angle) * r; p.ty = headY + Math.sin(angle) * (r*0.8); } else if (section === 1) { const angle = prog * Math.PI * 2; const r = Math.random() * headR; p.tx = noteX2 + Math.cos(angle) * r; p.ty = (headY - 10) + Math.sin(angle) * (r*0.8); } else if (section === 2) { p.tx = noteX1 + 10; p.ty = headY - (prog * stemH); } else if (section === 3) { p.tx = noteX2 + 10; p.ty = (headY - 10) - (prog * stemH); } else { const startX = noteX1 + 10; const startY = headY - stemH; const endX = noteX2 + 10; const endY = (headY - 10) - stemH; const beamThick = 15; const thicknessOffset = (Math.random()) * beamThick; p.tx = startX + (endX - startX) * prog; p.ty = startY + (endY - startY) * prog + thicknessOffset; } });
-            } else if (type === 'AK') { const strokeWidth = 25; const widthA = 120; const widthK = 100; const gap = 40; const totalW = widthA + widthK + gap; const heightLetter = 160; const startX = cx - totalW / 2; const bottomY = cy + heightLetter / 2; const topY = cy - heightLetter / 2; particles.forEach((p, i) => { const isA = i < count * 0.55; const groupI = isA ? i : i - Math.floor(count * 0.55); const groupTotal = isA ? Math.floor(count * 0.55) : count - Math.floor(count * 0.55); const progress = groupI / groupTotal; const jitterX = (Math.random() - 0.5) * strokeWidth; const jitterY = (Math.random() - 0.5) * strokeWidth; if (isA) { if (progress < 0.4) { const legProg = progress / 0.4; const x1 = startX; const y1 = bottomY; const x2 = startX + widthA / 2; const y2 = topY; p.tx = x1 + (x2 - x1) * legProg + jitterX; p.ty = y1 + (y2 - y1) * legProg + jitterY; } else if (progress < 0.8) { const legProg = (progress - 0.4) / 0.4; const x1 = startX + widthA / 2; const y1 = topY; const x2 = startX + widthA; const y2 = bottomY; p.tx = x1 + (x2 - x1) * legProg + jitterX; p.ty = y1 + (y2 - y1) * legProg + jitterY; } else { const barProg = (progress - 0.8) / 0.2; const barY = cy + 20; const x1 = startX + widthA * 0.25; const x2 = startX + widthA * 0.75; p.tx = x1 + (x2 - x1) * barProg + jitterX; p.ty = barY + jitterY; } } else { const startXK = startX + widthA + gap; if (progress < 0.4) { const vProg = progress / 0.4; p.tx = startXK + jitterX; p.ty = topY + (bottomY - topY) * vProg + jitterY; } else if (progress < 0.7) { const dProg = (progress - 0.4) / 0.3; const x1 = startXK + strokeWidth/2; const y1 = cy + 10; const x2 = startXK + widthK; const y2 = topY; p.tx = x1 + (x2 - x1) * dProg + jitterX; p.ty = y1 + (y2 - y1) * dProg + jitterY; } else { const dProg = (progress - 0.7) / 0.3; const x1 = startXK + strokeWidth/2; const y1 = cy + 10; const x2 = startXK + widthK; const y2 = bottomY; p.tx = x1 + (x2 - x1) * dProg + jitterX; p.ty = y1 + (y2 - y1) * dProg + jitterY; } } });
-            } else if (type === 'nyc') { const baseY = cy + 60; const totalW = 320; const startX = cx - totalW / 2; const buildings = [[40, 60], [50, 100], [40, 160], [60, 120], [50, 80], [40, 50], [40, 70]]; particles.forEach((p, i) => { const bIndex = i % buildings.length; const bData = buildings[bIndex]; const bW = bData[0]; const bH = bData[1]; let currentX = startX; for(let k=0; k<bIndex; k++) currentX += buildings[k][0]; p.tx = currentX + Math.random() * bW; p.ty = baseY - Math.random() * bH; });
-            } else if (type === 'arch') { const baseY = cy + 60; const archWidth = 220; const archHeight = 160; const thickness = 25; particles.forEach((p, i) => { const t = (i / count) * 2 - 1; const x = t * (archWidth / 2); const curveY = archHeight * (1 - t*t); const currentThick = thickness * (0.5 + 0.5 * Math.abs(t) * 1.5); const offsetY = (Math.random() - 0.5) * currentThick; p.tx = cx + x; p.ty = baseY - curveY + offsetY; });
-            } else if (type === 'asterisk') {
-                // Create Wellness asterisk — radiating rounded spokes
-                const spokes = 6; const inner = 22; const outer = 155;
-                particles.forEach((p, i) => {
-                    const spoke = i % spokes;
-                    const angle = (spoke / spokes) * Math.PI * 2 - Math.PI / 2;
-                    const r = inner + Math.random() * (outer - inner);
-                    const jitter = (Math.random() - 0.5) * 12;
-                    p.tx = cx + Math.cos(angle) * r + Math.cos(angle + Math.PI / 2) * jitter;
-                    p.ty = cy + Math.sin(angle) * r + Math.sin(angle + Math.PI / 2) * jitter;
-                });
-            } else if (type === 'delta') {
-                // Delta Sigma Pi — triangle (Δ)
-                const size = 200; const h = size * Math.sqrt(3) / 2;
-                const top = { x: cx, y: cy - h / 2 };
-                const left = { x: cx - size / 2, y: cy + h / 2 };
-                const right = { x: cx + size / 2, y: cy + h / 2 };
-                const edges = [[top, right], [right, left], [left, top]];
-                particles.forEach((p, i) => {
-                    const e = edges[i % 3]; const t = (Math.floor(i / 3) % 2 === 0) ? Math.random() : Math.random();
-                    const j = (Math.random() - 0.5) * 8;
-                    p.tx = e[0].x + (e[1].x - e[0].x) * t + j;
-                    p.ty = e[0].y + (e[1].y - e[0].y) * t + j;
-                });
-            } else if (type === 'crest') {
-                // Sigma Alpha Epsilon — shield crest silhouette
-                const pts = [{ x: -105, y: -120 }, { x: 105, y: -120 }, { x: 105, y: 15 }, { x: 55, y: 90 }, { x: 0, y: 135 }, { x: -55, y: 90 }, { x: -105, y: 15 }, { x: -105, y: -120 }];
-                const segs = pts.length - 1;
-                particles.forEach((p, i) => {
-                    const per = Math.floor(count / segs);
-                    const si = Math.min(Math.floor(i / per), segs - 1);
-                    const prog = (i % per) / per;
-                    const a = pts[si]; const b = pts[si + 1];
-                    const j = (Math.random() - 0.5) * 6;
-                    p.tx = cx + a.x + (b.x - a.x) * prog + j;
-                    p.ty = cy + a.y + (b.y - a.y) * prog + j;
-                });
-            } else if (type === 'play') {
-                // Playback — play button (ring + filled triangle)
-                const radius = 135; const ringCount = Math.floor(count * 0.45);
-                const tri = [{ x: -42, y: -66 }, { x: 78, y: 0 }, { x: -42, y: 66 }];
-                particles.forEach((p, i) => {
-                    if (i < ringCount) {
-                        const ang = (i / ringCount) * Math.PI * 2;
-                        const jr = (Math.random() - 0.5) * 4;
-                        p.tx = cx + Math.cos(ang) * (radius + jr);
-                        p.ty = cy + Math.sin(ang) * (radius + jr);
-                    } else {
-                        let r1 = Math.random(); let r2 = Math.random();
-                        const sa = 1 - Math.sqrt(r1); const sb = Math.sqrt(r1) * (1 - r2); const sc = Math.sqrt(r1) * r2;
-                        p.tx = cx + tri[0].x * sa + tri[1].x * sb + tri[2].x * sc;
-                        p.ty = cy + tri[0].y * sa + tri[1].y * sb + tri[2].y * sc;
-                    }
-                });
-            } else if (type === 'vinyl') {
-                // Needl — vinyl record: concentric grooves + center label + hole
-                const grooves = [98, 84, 70, 56, 30, 18];
-                particles.forEach((p, i) => {
-                    if (i < count * 0.06) {
-                        // center hole
-                        const a = Math.random() * Math.PI * 2; const r = Math.random() * 6;
-                        p.tx = cx + Math.cos(a) * r; p.ty = cy + Math.sin(a) * r;
-                    } else {
-                        const g = grooves[i % grooves.length];
-                        const a = Math.random() * Math.PI * 2;
-                        const r = g + (Math.random() - 0.5) * 2.5;
-                        p.tx = cx + Math.cos(a) * r;
-                        p.ty = cy + Math.sin(a) * r;
-                    }
-                });
-            } else if (type === 'pin') {
-                // Pitstop — map location pin: teardrop outline + hollow center + filled head
-                const R = 62, headY = cy - 28, tipY = cy + 115, holeR = 24;
-                const D = tipY - headY;
-                const al = Math.acos(R / D);
-                const thR = Math.atan2(Math.cos(al), Math.sin(al));
-                const SPAN = Math.PI + 2 * thR;            // long arc over the top
-                const rt = { x: cx + R * Math.sin(al), y: headY + R * Math.cos(al) };
-                const lt = { x: cx - R * Math.sin(al), y: headY + R * Math.cos(al) };
-                const tip = { x: cx, y: tipY };
-                const lineLen = Math.hypot(tip.x - rt.x, tip.y - rt.y);
-                const arcLen = R * SPAN;
-                const total = 2 * lineLen + arcLen;
-                const f1 = lineLen / total, f2 = (lineLen + arcLen) / total;
-                particles.forEach((p, i) => {
-                    const f = i / count;
-                    if (f < 0.52) {
-                        const u = f / 0.52;
-                        if (u < f1) { const t = u / f1; p.tx = tip.x + (rt.x - tip.x) * t; p.ty = tip.y + (rt.y - tip.y) * t; }
-                        else if (u < f2) { const t = (u - f1) / (f2 - f1); const th = thR - t * SPAN; p.tx = cx + Math.cos(th) * R; p.ty = headY + Math.sin(th) * R; }
-                        else { const t = (u - f2) / (1 - f2); p.tx = lt.x + (tip.x - lt.x) * t; p.ty = lt.y + (tip.y - lt.y) * t; }
-                    } else if (f < 0.74) {
-                        const a = ((f - 0.52) / 0.22) * Math.PI * 2;
-                        p.tx = cx + Math.cos(a) * holeR; p.ty = headY + Math.sin(a) * holeR;
-                    } else {
-                        const a = Math.random() * Math.PI * 2;
-                        const rr = holeR + 5 + Math.random() * (R - holeR - 10);
-                        p.tx = cx + Math.cos(a) * rr; p.ty = headY + Math.sin(a) * rr;
-                    }
-                });
-            }
-        }
-
-        function returnToRandom() {
-            if (interactionMode === 'random') return;
-            interactionMode = 'random';
-            const cx = width / 2; const cy = height / 2;
-            particles.forEach(p => { const dx = p.x - cx; const dy = p.y - cy; const angle = Math.atan2(dy, dx); const burstSpeed = 8 + Math.random() * 8; p.vx = Math.cos(angle) * burstSpeed; p.vy = Math.sin(angle) * burstSpeed; });
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, width, height);
-            ctx.fillStyle = isLightMode ? '#e5e5e5' : '#050505';
-            ctx.fillRect(0, 0, width, height);
-            const cr = isLightMode ? 37 : 96, cg = isLightMode ? 99 : 165, cb = isLightMode ? 235 : 250;
-            // --- update + draw the dots ---
-            for (let i = 0; i < particles.length; i++) {
-                const p = particles[i];
-                if (interactionMode === 'shape') { p.x += (p.tx - p.x) * 0.08; p.y += (p.ty - p.y) * 0.08; }
-                else {
-                    const currentSpeed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-                    if (currentSpeed > 0.5) { p.vx *= 0.94; p.vy *= 0.94; }
-                    if (p.x < 0 || p.x > width) p.vx *= -1;
-                    if (p.y < 0 || p.y > height) p.vy *= -1;
-                    const dx = mouseX - p.x, dy = mouseY - p.y, distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < 150 && distance > 0) { const force = (150 - distance) / 150; p.x -= (dx / distance) * force * 3; p.y -= (dy / distance) * force * 3; }
-                    p.x += p.vx; p.y += p.vy;
-                }
-                const opacity = 0.2 + (p.z * 0.2);
-                ctx.fillStyle = `rgba(${cr}, ${cg}, ${cb}, ${interactionMode === 'shape' ? 0.6 : opacity})`;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-            }
-            // --- connection web: one batched path + a single stroke (was a stroke() per pair) ---
-            if (interactionMode === 'random' && !reduceMotion) {
-                const maxD2 = 150 * 150;
-                ctx.strokeStyle = `rgba(${cr}, ${cg}, ${cb}, 0.085)`;
-                ctx.lineWidth = 0.5;
-                ctx.beginPath();
-                for (let i = 0; i < particles.length; i++) {
-                    const p = particles[i];
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const p2 = particles[j];
-                        const dx = p.x - p2.x, dy = p.y - p2.y;
-                        if (dx * dx + dy * dy < maxD2) { ctx.moveTo(p.x, p.y); ctx.lineTo(p2.x, p2.y); }
-                    }
-                }
-                ctx.stroke();
-            }
-            requestAnimationFrame(draw);
-        }
-
-        window.addEventListener('resize', resize);
-        resize();
-        draw();
-        
-        window.addEventListener('keydown', (e) => { if (e.key === '0') { if (isAKMode) { isAKMode = false; returnToRandom(); } else { isAKMode = true; formShape('AK'); } } });
-
-        document.querySelectorAll('.footer-icon').forEach(icon => { icon.classList.add('p-4', 'bg-white/5', 'rounded-full', 'hover:bg-white/10', 'hover:scale-110', 'transition-all', 'duration-300', 'group', 'border', 'border-white/10', 'hover:border-blue-500/50'); });
-
-        function triggerShape(type) { if (isAKMode) return; formShape(type); }
-        function triggerRandom() { if (isAKMode) return; returnToRandom(); }
-
-        // Map each hover-target element id to the particle shape it forms
-        const shapeMap = {
-            'project-playback': 'play',
-            'project-create-report': 'stock',
-            'project-genrespace': 'music',
-            'project-pitstop': 'pin',
-            'project-needl': 'vinyl',
-            'project-vantage': 'crest',
-            'project-cpu': 'cpu',
-            'project-record': 'record',
-            'exp-create': 'asterisk',
-            'exp-infinite': 'infinity',
-            'exp-cbn': 'cbn',
-            'exp-savny': 'globe',
-            'exp-nyu': 'nyu',
-            'washu-arch': 'arch',
-            'washu-cyc': 'community',
-            'washu-dsp': 'delta',
-            'washu-sae': 'crest',
-            'washu-sif': 'stock',
-            'washu-kwur': 'wave',
-            'washu-strike': 'music',
-            'washu-ashoka': 'globe'
-        };
-
-        Object.entries(shapeMap).forEach(([id, shape]) => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.addEventListener('mouseenter', () => triggerShape(shape));
-                el.addEventListener('mouseleave', triggerRandom);
-            }
-        });
-        
-        const locNyc = document.getElementById('loc-nyc');
-        const locStl = document.getElementById('loc-stl');
-        if (locNyc) { locNyc.addEventListener('mouseenter', () => triggerShape('nyc')); locNyc.addEventListener('mouseleave', triggerRandom); }
-        if (locStl) { locStl.addEventListener('mouseenter', () => triggerShape('arch')); locStl.addEventListener('mouseleave', triggerRandom); }
-        
-        const navEngineering = document.getElementById('nav-engineering');
-        const cpuTarget = document.getElementById('project-cpu');
-        if (navEngineering && cpuTarget) {
-            navEngineering.addEventListener('click', () => {
-                // CPU lives inside the collapsible Projects section -> Hardware group;
-                // open both first so the target is laid out and reachable, then scroll.
-                const grp = document.getElementById('grp-hw');
-                const sec = document.getElementById('sec-projects');
-                const needWait = !(grp && grp.classList.contains('open')) || !(sec && sec.classList.contains('open'));
-                if (window.__openSection) window.__openSection('sec-projects');
-                if (window.__openProjGroup) window.__openProjGroup('grp-hw');
-                setTimeout(() => cpuTarget.scrollIntoView({ behavior: 'smooth', block: 'start' }), needWait ? 480 : 0);
-            });
-        }
-
-        // PROJECTS nav → transition to the dedicated projects page
-        const navProjects = document.getElementById('nav-projects');
-        if (navProjects) {
-            let navigated = false;
-            const goProjects = () => { if (navigated) return; navigated = true; window.location.href = 'projects/'; };
-            navProjects.addEventListener('click', () => {
-                gsap.to('#main-content', { opacity: 0, duration: 0.5, ease: 'power2.inOut', onComplete: goProjects });
-                setTimeout(goProjects, 700); // fallback if the tween is interrupted
-            });
-        }
-
-        // Restore visibility when returning via the browser back/forward cache (bfcache):
-        // window.onload (which fades #main-content in) does NOT re-fire on a bfcache restore,
-        // so without this the page would appear blank after pressing Back from /projects/.
-        window.addEventListener('pageshow', (e) => {
-            if (e.persisted) {
-                if (window.gsap) gsap.set('#main-content', { opacity: 1 });
-                else { const mc = document.getElementById('main-content'); if (mc) mc.style.opacity = 1; }
-                const sp = document.getElementById('splash'); if (sp) sp.style.display = 'none';
-            }
-        });
-
-        // MUSIC nav -> go straight to the dedicated music page (no transition)
-        const navSound = document.getElementById('nav-sound');
-        if (navSound) {
-            navSound.addEventListener('click', () => { window.location.href = 'music/'; });
-        }
-    </script>
+    <div class="row">
+      <div class="row-head">
+        <div class="row-title"><a class="u" href="https://trycreate.co/" target="_blank" rel="noopener">Create Wellness <span class="arr">↗</span></a> <span class="row-sub">— Product Management &amp; Strategy Intern</span></div>
+        <div class="row-when mono">May 2026 — Present</div>
+      </div>
+      <p class="row-desc">Developing tools for data-pipelining and automating retail-analytics reporting.</p>
+    </div>
+
+    <div class="row">
+      <div class="row-head">
+        <div class="row-title"><a class="u" href="https://www.carterburdennetwork.org/" target="_blank" rel="noopener">Carter Burden Network <span class="arr">↗</span></a> <span class="row-sub">— Board Member</span></div>
+        <div class="row-when mono">Jun 2023 — Aug 2025</div>
+      </div>
+      <p class="row-desc">Led community engagement including a prom for 250+ seniors. Contributed to strategy &amp; finance across 20+ board meetings.</p>
+    </div>
+
+    <div class="row">
+      <div class="row-head">
+        <div class="row-title"><a class="u" href="https://www.linkedin.com/company/infinite-goods-eco/" target="_blank" rel="noopener">Infinite Goods <span class="arr">↗</span></a> <span class="row-sub">— Business Development Intern</span></div>
+        <div class="row-when mono">May 2023 — Jan 2024</div>
+      </div>
+      <p class="row-desc">Backend automation for onboarding, 350% integration speedup. Led cold outreach to 100+ founders.</p>
+    </div>
+
+    <div class="row">
+      <div class="row-head">
+        <div class="row-title">SAVNY <span class="row-sub">— Co-Founder &amp; Head</span></div>
+        <div class="row-when mono">Oct 2023 — Jun 2025</div>
+      </div>
+      <p class="row-desc">Organized 250+ students for community service. Coordinated 30+ service opportunities and cultural programming.</p>
+    </div>
+
+    <div class="row">
+      <div class="row-head">
+        <div class="row-title">NYU Music Tech <span class="row-sub">— Research Assistant</span></div>
+        <div class="row-when mono">Jan 2024 — Jun 2025</div>
+      </div>
+      <p class="row-desc">Engineered multi-channel audio systems. Executed post-production &amp; 45-track arrangement for the Harvestworks concert.</p>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section class="r">
+    <div class="label mono"><span>Projects</span><a class="side u" href="/projects/">Interactive carousel ↗</a></div>
+
+    <div class="grp mono">Web &amp; Software</div>
+    <div class="row">
+      <div class="row-head"><div class="row-title"><a class="u" href="https://pairyx.co/" target="_blank" rel="noopener">Pairyx <span class="arr">↗</span></a></div><div class="row-when mono">AI · Creator Economy</div></div>
+      <p class="row-desc">AI-integrated platform connecting creators with early-stage brands through strategic partnerships.</p>
+    </div>
+    <div class="row">
+      <div class="row-head"><div class="row-title"><a class="u" href="https://genre-space.netlify.app/" target="_blank" rel="noopener">genre-space <span class="arr">↗</span></a></div><div class="row-when mono">Research · Data Viz</div></div>
+      <p class="row-desc">Computational research on music-genre similarity, visualized as an interactive 2D map of genre clusters and influence over time. <a class="u" href="assets/genre-explosion-paper.pdf" target="_blank" rel="noopener">Read the paper ↗</a></p>
+    </div>
+    <div class="row">
+      <div class="row-head"><div class="row-title"><a class="u" href="https://usepitstop.netlify.app/" target="_blank" rel="noopener">Pitstop <span class="arr">↗</span></a></div><div class="row-when mono">Geospatial · Routing</div></div>
+      <p class="row-desc">Maps the best places to stop along a travel route using dynamic geospatial routing and real-time telemetry.</p>
+    </div>
+    <div class="row">
+      <div class="row-head"><div class="row-title"><a class="u" href="https://createwellness.github.io" target="_blank" rel="noopener">Create Report Engine <span class="arr">↗</span></a></div><div class="row-when mono">Data Tooling · Automation</div></div>
+      <p class="row-desc">A data-aggregation and automated reporting platform that turns raw retail analytics into presentation-ready executive reports.</p>
+    </div>
+    <div class="row">
+      <div class="row-head"><div class="row-title"><a class="u" href="https://vantageprep.netlify.app/" target="_blank" rel="noopener">Vantage Prep <span class="arr">↗</span></a></div><div class="row-when mono">Founder · EdTech</div></div>
+      <p class="row-desc">A premium tutoring service pairing students with elite tutors from top universities.</p>
+    </div>
+    <div class="row">
+      <div class="row-head"><div class="row-title"><a class="u" href="https://useneedl.netlify.app/" target="_blank" rel="noopener">Needl <span class="arr">↗</span></a></div><div class="row-when mono">JavaScript · Three.js</div></div>
+      <p class="row-desc">A browser music player with real-time 3D vinyl visualization, local file management, and playback controls.</p>
+    </div>
+
+    <div class="grp mono">Native Apps</div>
+    <div class="row">
+      <div class="row-head"><div class="row-title"><a class="u" href="https://aklaboratories.github.io" target="_blank" rel="noopener">AK Labs <span class="arr">↗</span></a></div><div class="row-when mono">Swift · macOS</div></div>
+      <p class="row-desc">An independent studio building native macOS apps for music discovery, organization, and creative workflows.</p>
+      <p class="row-apps mono"><b>Prism</b> — real-time key detection on the Camelot wheel &nbsp;·&nbsp; <b>Halo</b> — glass now-playing widget &nbsp;·&nbsp; <b>Needlebox</b> — key/BPM library sorter &amp; set builder</p>
+    </div>
+
+    <div class="grp mono">Hardware &amp; Systems</div>
+    <div class="row">
+      <div class="row-head"><div class="row-title"><a class="u" href="https://tryplayback.xyz" target="_blank" rel="noopener">Playback <span class="arr">↗</span></a></div><div class="row-when mono">Product Design · Hardware</div></div>
+      <p class="row-desc">Music hardware, in progress.</p>
+    </div>
+    <div class="row">
+      <div class="row-head"><div class="row-title">16-Bit CPU Architecture</div><div class="row-when mono">Computer Engineering</div></div>
+      <p class="row-desc">A two-year independent study building a 16-bit CPU from scratch. Under active development.</p>
+    </div>
+    <div class="row">
+      <div class="row-head"><div class="row-title"><a class="u" href="https://github.com/arjunkalbag/DIRECT" target="_blank" rel="noopener">IoT Digital Record Player <span class="arr">↗</span></a></div><div class="row-when mono">IoT · NFC</div></div>
+      <p class="row-desc">A digital record player built from scratch, using NFC to bridge physical media with digital streaming.</p>
+    </div>
+  </section>
+
+  <!-- Music -->
+  <section class="r">
+    <div class="label mono"><span>Music</span><a class="side u" href="/music/">Open the player ↗</a></div>
+    <p class="lede">I produce under <a class="u" href="https://soundcloud.com/prodarjun" target="_blank" rel="noopener">prodarjun <span class="arr">↗</span></a>. Releases: <em>arjunkalbag!</em>, <em>shimmer</em>, <em>woodlands</em>, <em>capstone</em>, and <em>evangelical</em>.</p>
+  </section>
+
+  <!-- Education -->
+  <section class="r">
+    <div class="label mono"><span>Education</span></div>
+    <div class="row" style="padding-top:0;border-top:none">
+      <div class="row-head">
+        <div class="row-title">Washington University in St. Louis</div>
+        <div class="row-when mono">Class of 2029</div>
+      </div>
+      <p class="row-desc">B.S. Computer Engineering &amp; Economics · St. Louis, MO</p>
+    </div>
+    <div class="roles">
+      <div class="role"><span>Arch Consulting</span><span>Associate</span></div>
+      <div class="role"><span>Consult Your Community</span><span>Client Recruitment Dir.</span></div>
+      <div class="role"><span>Delta Sigma Pi</span><span>Brother</span></div>
+      <div class="role"><span>Sigma Alpha Epsilon</span><span>Rush Chairman</span></div>
+      <div class="role"><span>Student Investment Fund</span><span>Senior Analyst</span></div>
+      <div class="role"><span>KWUR 90.3 FM</span><span>Disc Jockey</span></div>
+      <div class="role"><span>Strike Magazine</span><span>Music Director</span></div>
+      <div class="role"><span>Ashoka</span><span>Social Chair</span></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="colophon mono">
+      <nav class="social">
+        <a class="u" href="https://linkedin.com/in/arjun-kalbag/" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="u" href="https://github.com/arjunkalbag" target="_blank" rel="noopener">GitHub</a>
+        <a class="u" href="mailto:arjunkalbag07@gmail.com">Email</a>
+      </nav>
+      <span>© <span id="yr">2026</span> Arjun Kalbag</span>
+    </div>
+    <div class="oldwrap">
+      <a class="oldbtn" href="/old.html">Old website ↗</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  // subtle reveal on scroll
+  (function () {
+    var els = document.querySelectorAll('.r');
+    if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
+    els.forEach(function (e) { io.observe(e); });
+  })();
+</script>
 </body>
 </html>
