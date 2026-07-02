@@ -325,12 +325,12 @@
       pre.style.lineHeight = charH + 'px';
       cols = Math.ceil(W / charW) + 1; rows = Math.ceil(H / charH) + 1;
     }
-    function render(t, diss) {
+    function render(t) {
       var s = t * 0.001, base = Math.min(W, H), L = RAMP.length;
-      var cx = W / 2 + Math.sin(s * 0.8) * base * 0.03, cy = H / 2 + Math.cos(s * 0.9) * base * 0.03;
-      var pulse = 1 + Math.sin(s * 1.5) * 0.08, rs = 1 - diss, thr = 1.0 + diss * 3.2;
-      var R0 = base * 0.19 * pulse * rs, spin = s * 0.7, spin2 = s * 0.45;
-      var a1 = 0.42 + 0.10 * Math.sin(s * 1.2);
+      var cx = W / 2 + Math.sin(s * 0.45) * base * 0.03, cy = H / 2 + Math.cos(s * 0.5) * base * 0.03;
+      var pulse = 1 + Math.sin(s * 0.8) * 0.07, thr = 1.0;
+      var R0 = base * 0.19 * pulse, spin = s * 1.25, spin2 = s * 0.8;
+      var a1 = 0.42 + 0.08 * Math.sin(s * 0.7);
       var out = '';
       for (var j = 0; j < rows; j++) {
         var py = j * charH, dy = py - cy;
@@ -339,7 +339,6 @@
           var r = Math.sqrt(dx * dx + dy * dy) + 1;
           var th = Math.atan2(dy, dx);
           var Rb = R0 * (1 + a1 * Math.cos(6 * th + spin) + 0.16 * Math.cos(3 * th - spin2));
-          if (Rb <= 0) { out += ' '; continue; }
           var f = (Rb * Rb) / (r * r);
           if (f < thr) { out += ' '; }
           else { var idx = Math.floor((f - thr) * 17) + 8; out += RAMP[idx < L ? idx : L - 1]; }
@@ -348,10 +347,10 @@
       }
       pre.textContent = out;
     }
-    measure(); render(0, 0);
+    measure(); render(0);
     window.addEventListener('resize', function () { measure(); });
     var raf, start = null, running = true;
-    var REVEAL_AT = 1400, DISSOLVE = 360;
+    var REVEAL_AT = 1900, FADE = 650;
     var kill = function () { running = false; if (raf) cancelAnimationFrame(raf); if (splash && splash.parentNode) splash.remove(); };
     if (reduce) {
       splash.style.transition = 'opacity .5s ease';
@@ -362,14 +361,17 @@
     function loop(ts) {
       if (!running || !pre.isConnected) return;
       if (start === null) start = ts;
-      var el = ts - start, diss = Math.max(0, Math.min(1, (el - REVEAL_AT) / DISSOLVE));
-      render(el, diss);
-      if (diss > 0.35) splash.style.opacity = String(Math.max(0, 1 - (diss - 0.35) / 0.65));
-      if (diss >= 1) { kill(); return; }
+      var el = ts - start;
+      render(el);
+      if (el > REVEAL_AT) {
+        var fp = Math.min(1, (el - REVEAL_AT) / FADE);
+        splash.style.opacity = String(1 - fp);
+        if (fp >= 1) { kill(); return; }
+      }
       raf = requestAnimationFrame(loop);
     }
     raf = requestAnimationFrame(loop);
-    setTimeout(kill, REVEAL_AT + DISSOLVE + 700);
+    setTimeout(kill, REVEAL_AT + FADE + 700);
   })();
   // theme toggle
   (function () {
