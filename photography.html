@@ -30,6 +30,8 @@
   .top { position:fixed; top:0; left:0; right:0; z-index:10; display:flex; align-items:center; justify-content:space-between; padding:1.35rem 1.5rem; pointer-events:none; }
   .chip { pointer-events:auto; font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; color:var(--ink); text-decoration:none; background:var(--chip); -webkit-backdrop-filter:blur(9px); backdrop-filter:blur(9px); padding:.55rem .9rem; border-radius:999px; border:1px solid var(--chipbd); transition:border-color .25s ease; }
   a.chip:hover { border-color:var(--ink); }
+  .topr { display:flex; flex-direction:column; align-items:flex-end; gap:.5rem; }
+  .cam { font-size:.58rem; letter-spacing:.24em; text-transform:uppercase; color:var(--faint); padding-right:.15rem; }
   .hint { position:fixed; bottom:1.3rem; left:50%; transform:translateX(-50%); z-index:10; font-size:.64rem; letter-spacing:.32em; text-transform:uppercase; color:var(--faint); transition:opacity .7s ease; pointer-events:none; }
   .hint.gone { opacity:0; }
   #lightbox { position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; padding:4vmin; opacity:0; pointer-events:none; cursor:zoom-out; background:rgba(8,8,9,0); -webkit-backdrop-filter:blur(0); backdrop-filter:blur(0); transition:opacity .55s ease, background .55s ease, backdrop-filter .55s ease; }
@@ -42,7 +44,10 @@
 <body>
   <div class="top">
     <a class="chip" href="/">← Back</a>
-    <span class="chip">Photography</span>
+    <div class="topr">
+      <span class="chip">Photography</span>
+      <span class="cam">Olympus Stylus · 35mm</span>
+    </div>
   </div>
   <div class="hint" id="hint">drag to explore ↔</div>
   <div id="field"></div>
@@ -54,23 +59,30 @@
     function two(n) { return (n < 10 ? '0' : '') + n; }
     function mod(a, n) { return ((a % n) + n) % n; }
     function fr(x) { return x - Math.floor(x); }
-    var COLS = 10, ROWS = 8, CW = 400, CH = 500, TW = COLS * CW, TH = ROWS * CH, BUFX = 340, BUFY = 460;
+    var COLS = 10, ROWS = 8, CW = 295, CH = 420, TW = COLS * CW, TH = ROWS * CH, BUFX = 300, BUFY = 420;
     var photos = [];
     for (var i = 0; i < N; i++) {
       var el = document.createElement('div'); el.className = 'ph';
       var img = document.createElement('img'); img.decoding = 'async'; img.alt = '';
-      (function (el) { img.addEventListener('load', function () { el.classList.add('on'); }); })(el);
-      img.src = 'assets/photos/p' + two(i + 1) + '.jpg';
-      el.appendChild(img); field.appendChild(el);
       var depth = fr(i * PHI);
-      var w = Math.round(150 + depth * 140);         // 150..290
+      var w = Math.round(160 + depth * 90);          // 160..250, gentler variance
       el.style.width = w + 'px';
       var col = i % COLS, row = Math.floor(i / COLS);
-      var slackX = Math.max(0, CW - w - 28);
-      var slackY = Math.max(0, CH - w * 1.4 - 28);   // reserve for tallest (portrait) aspect
-      var bx = col * CW + 14 + fr(i * 0.7548776662) * slackX;
-      var by = row * CH + 14 + fr(i * 0.5698402909) * slackY;
-      photos.push({ el: el, bx: bx, by: by, depth: depth });
+      var jx = (fr(i * 0.7548776662) - 0.5) * 30;    // small jitter (±15) — even, not a rigid grid
+      var jy = (fr(i * 0.5698402909) - 0.5) * 30;
+      var bx = col * CW + (CW - w) / 2 + jx;          // centered horizontally in its cell
+      var by = row * CH + (CH - w * 1.15) / 2 + jy;   // estimate; recentered on load with true height
+      var p = { el: el, bx: bx, by: by, depth: depth, row: row, jy: jy };
+      (function (p, el, img) {
+        img.addEventListener('load', function () {
+          el.classList.add('on');
+          var h = el.offsetHeight || el.getBoundingClientRect().height;
+          if (h) p.by = p.row * CH + (CH - h) / 2 + p.jy;   // center on the cell using actual height
+        });
+      })(p, el, img);
+      img.src = 'assets/photos/p' + two(i + 1) + '.jpg';
+      el.appendChild(img); field.appendChild(el);
+      photos.push(p);
     }
     var vw = innerWidth, vh = innerHeight;
     addEventListener('resize', function () { vw = innerWidth; vh = innerHeight; });
