@@ -59,25 +59,27 @@
     function two(n) { return (n < 10 ? '0' : '') + n; }
     function mod(a, n) { return ((a % n) + n) % n; }
     function fr(x) { return x - Math.floor(x); }
-    var COLS = 10, ROWS = 8, CW = 295, CH = 420, TW = COLS * CW, TH = ROWS * CH, BUFX = 300, BUFY = 420;
+    var COLS = 10, ROWS = 8, CW = 335, CH = 455, TW = COLS * CW, TH = ROWS * CH, BUFX = 300, BUFY = 410;
     var photos = [];
     for (var i = 0; i < N; i++) {
       var el = document.createElement('div'); el.className = 'ph';
       var img = document.createElement('img'); img.decoding = 'async'; img.alt = '';
       var depth = fr(i * PHI);
-      var w = Math.round(160 + depth * 90);          // 160..250, gentler variance
+      var w = Math.round(150 + depth * 95);          // 150..245, varied sizes
       el.style.width = w + 'px';
       var col = i % COLS, row = Math.floor(i / COLS);
-      var jx = (fr(i * 0.7548776662) - 0.5) * 30;    // small jitter (±15) — even, not a rigid grid
-      var jy = (fr(i * 0.5698402909) - 0.5) * 30;
-      var bx = col * CW + (CW - w) / 2 + jx;          // centered horizontally in its cell
-      var by = row * CH + (CH - w * 1.15) / 2 + jy;   // estimate; recentered on load with true height
-      var p = { el: el, bx: bx, by: by, depth: depth, row: row, jy: jy };
+      var jx = (fr(i * 0.7548776662) - 0.5) * 76;    // scattered, not gridded (±38)
+      var jy = (fr(i * 0.5698402909) - 0.5) * 64;    // ±32
+      var cxp = col * CW + CW / 2 + (row % 2) * (CW / 2) + jx;  // half-cell brick offset breaks the columns
+      var cyp = row * CH + CH / 2 + jy;
+      var bx = cxp - w / 2;
+      var by = cyp - w * 1.15 / 2;                    // estimate; recentered on load with true height
+      var p = { el: el, bx: bx, by: by, depth: depth, cyp: cyp };
       (function (p, el, img) {
         img.addEventListener('load', function () {
           el.classList.add('on');
           var h = el.offsetHeight || el.getBoundingClientRect().height;
-          if (h) p.by = p.row * CH + (CH - h) / 2 + p.jy;   // center on the cell using actual height
+          if (h) p.by = p.cyp - h / 2;                // center on its point using actual height
         });
       })(p, el, img);
       img.src = 'assets/photos/p' + two(i + 1) + '.jpg';
