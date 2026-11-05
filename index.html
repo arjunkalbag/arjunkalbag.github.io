@@ -88,9 +88,16 @@
     --dur-arrow: 1000ms;   /* arrow boxes + arrow glides */
 
     --radius: 14px;
-    --pin: clamp(300px, 46vh, 460px); /* scroll spent folding the name into the bar */
+    /* the pill runs almost edge to edge (capped on very wide screens); inside it, the AK and
+       the menu line up with the page gutters */
     --bar-h: 60px;
-    --bar-top: calc(env(safe-area-inset-top, 0px) + 12px);
+    --bar-x: clamp(8px, 0.9vw, 14px);
+    --bar-top: calc(env(safe-area-inset-top, 0px) + var(--bar-x));
+    --bar-l: max(var(--bar-x), env(safe-area-inset-left, 0px), calc((100vw - 2000px) / 2));
+    --bar-r: max(var(--bar-x), env(safe-area-inset-right, 0px), calc((100vw - 2000px) / 2));
+    --bar-pad: max(14px, calc(var(--gl) - var(--bar-l)));
+    --ak: 36px;                          /* the docked monogram */
+    --mh: clamp(56px, 9.2vw, 184px);     /* the name, top left */
   }
   html.dark {
     --paper:   oklch(17.5% 0.009 70);
@@ -154,44 +161,41 @@
 
   /* ---------- pill bar ---------- */
   .bar {
-    position: fixed; z-index: 60; top: var(--bar-top); left: var(--gl); right: var(--gr); height: var(--bar-h);
-    pointer-events: none; --e: 0; --inset: 0px; --ak: 36px;
+    position: fixed; z-index: 60; top: var(--bar-top); left: var(--bar-l); right: var(--bar-r); height: var(--bar-h);
+    pointer-events: none; --e: 0;
   }
+  /* the pill surface settles in (fades, drops a few px) as the name arrives */
   .bar-bg {
-    position: absolute; top: 0; bottom: 0;
-    left: calc(var(--inset) * var(--e)); right: calc(var(--inset) * var(--e));
-    border-radius: var(--radius);
+    position: absolute; inset: 0; border-radius: var(--radius);
     background: color-mix(in oklch, var(--paper-2) 82%, transparent);
     -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2);
     box-shadow: var(--shadow);
-    opacity: clamp(0, calc((var(--e) - 0.3) * 1.7), 1);
+    opacity: clamp(0, calc((var(--e) - 0.2) * 1.6), 1);
+    transform: translateY(calc((1 - var(--e)) * -6px));
     transition: background-color .9s var(--ease-in-out);
   }
-  .bar.open .bar-bg { opacity: 1; }
   .bar-l, .bar-r { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; }
-  .bar-l { left: 0; padding-left: 8px; transform: translateX(calc(var(--inset) * var(--e))); z-index: 2; }
-  .bar-r { right: 0; padding-right: 8px; gap: 2px; transform: translateX(calc(var(--inset) * var(--e) * -1)); z-index: 3; pointer-events: auto; }
+  .bar-l { left: 0; padding-left: calc(var(--bar-pad) - 10px); z-index: 2; }
+  .bar-r { right: 0; padding-right: max(0px, calc(var(--bar-pad) - 12px)); gap: 2px; z-index: 3; pointer-events: auto; }
   .home {
     pointer-events: none; height: 44px; padding: 0 10px; display: flex; align-items: center; border-radius: 10px;
-    font-family: 'Inktera', sans-serif; font-size: var(--ak); line-height: 1; color: var(--ink);
+    font-family: 'Inktera', sans-serif; font-size: var(--ak); line-height: 1; letter-spacing: -0.01em; color: var(--ink);
   }
-  .home-ak { opacity: 0; transition: opacity .6s var(--ease-soft); }
+  /* JS nudges it (top) so the caps sit exactly centred in the pill */
+  .home-ak { position: relative; top: -0.08em; opacity: 0; }
   .bar.docked .home { pointer-events: auto; }
-  html.rm .bar.docked .home-ak { opacity: 1; }
+  .bar.docked .home-ak { opacity: 1; }
 
-  /* the morphing wordmark (fixed overlay; JS positions every letter) */
-  .mark { position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none; font-family: 'Inktera', sans-serif; color: var(--ink); visibility: hidden; transition: color .9s var(--ease-in-out); }
+  /* name ⇄ AK in flight: one fixed copy that moves and scales as a single piece (JS sets its
+     transform). At rest the real text shows instead: the name in the page, the AK in the bar. */
+  .mark {
+    position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none; transform-origin: 0 0;
+    font-family: 'Inktera', sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: -0.01em; line-height: 1.1;
+    color: var(--ink); visibility: hidden; transition: color .9s var(--ease-in-out);
+  }
   .mark.on { visibility: visible; }
   html.rm .mark { display: none; }
-  .ml { position: absolute; left: 0; top: 0; line-height: 1.1; white-space: pre; transform-origin: 0 0; will-change: transform, opacity; }
-  .ml.ini { z-index: 1; }
-  .mi { display: inline-block; }
-  html.js:not(.rm) .mi { opacity: 0; transform: translateY(0.32em); }
-  html.ready:not(.rm) .mi {
-    opacity: 1; transform: none;
-    transition: transform 1.7s var(--ease-out), opacity 1.3s var(--ease-soft);
-    transition-delay: calc(var(--i) * 60ms);
-  }
+  .mk { position: absolute; left: 0; top: 0; white-space: pre; }
 
   .btn {
     height: 40px; min-width: 40px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
@@ -253,20 +257,19 @@
   /* ---------- hero ---------- */
   .hero {
     min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column;
-    padding-top: calc(var(--bar-top) + var(--bar-h) + clamp(16px, 3.4vh, 44px));
+    /* the name's cap line sits level with the AK's in the bar, so docking is one clean shrink into the corner */
+    padding-top: max(0px, calc(var(--bar-top) + var(--bar-h) / 2 - var(--ak) * 0.322 - var(--mh) * 0.256));
     padding-bottom: clamp(16px, 2.6vh, 28px);
   }
-  /* the hero holds still for the first --pin of scroll while the name folds into the bar */
-  html.js:not(.rm) .hero-pin::after { content: ''; display: block; height: var(--pin); } /* sticky needs real content to travel through, not padding */
-  html.js:not(.rm) .hero { position: sticky; top: 0; }
   .mh-wrap { container-type: inline-size; }
   .masthead {
     font-family: 'Inktera', sans-serif; font-weight: 400; text-transform: uppercase;
-    font-size: calc(100cqi / 7.02); line-height: 0.8; letter-spacing: -0.01em; white-space: nowrap;
-    padding-top: 0.02em;
+    font-size: var(--mh); line-height: 1.1; letter-spacing: -0.01em; white-space: nowrap;
   }
-  .masthead .w { display: inline; }
-  html.js:not(.rm) .hl { visibility: hidden; }
+  .mh-t { display: block; }
+  html.js:not(.rm) .masthead.gone { visibility: hidden; }
+  html.js:not(.rm) .mh-t { opacity: 0; transform: translateY(0.14em); }
+  html.ready:not(.rm) .mh-t { opacity: 1; transform: none; transition: opacity 1.3s var(--ease-soft), transform 1.6s var(--ease-out); }
 
   .hero-body {
     margin-top: auto; padding-top: clamp(28px, 4.5vh, 80px);
@@ -492,8 +495,7 @@
     .wmeta { grid-column: 7 / span 5; }
   }
   @media (max-width: 819px) {
-    :root { --bar-h: 54px; }
-    .bar { --ak: 30px; }
+    :root { --bar-h: 54px; --ak: 30px; }
     .tagline { grid-column: 1 / -1; grid-row: 1; max-width: 20ch; }
     .now { grid-column: 1 / -1; grid-row: 2; justify-self: start; justify-items: start; text-align: left; gap: 6px; }
     .facts { grid-row: 3; grid-template-columns: 1fr; gap: var(--space-sm); }
@@ -513,10 +515,10 @@
     .foot-row { flex-direction: column; align-items: flex-start; }
     .foot-end { width: 100%; justify-content: space-between; }
   }
-  /* two-line name only when the screen is portrait (landscape phones keep one line) */
-  @media (max-width: 819px) and (max-aspect-ratio: 1/1) {
-    .masthead { font-size: calc(100cqi / 3.66); }
-    .masthead .w { display: block; }
+  /* phones: the bar's row is taken by the menu, so the name sits just under it, edge to edge */
+  @media (max-width: 639px) {
+    .hero { padding-top: calc(var(--bar-top) + var(--bar-h) + 12px); }
+    .masthead { font-size: calc(100cqi / 7.02); }
   }
   @media (max-width: 479px) {
     .cap-long { display: none; }
@@ -544,7 +546,7 @@
 
 <header class="bar" id="bar">
   <div class="bar-bg" aria-hidden="true"></div>
-  <div class="mark" id="mark" aria-hidden="true"></div>
+  <div class="mark" id="mark" aria-hidden="true"><span class="mk mk-full">Arjun Kalbag</span><span class="mk mk-ak">AK</span><span class="mk mk-a">A</span></div>
   <div class="bar-l">
     <a class="home" href="#top" aria-label="Arjun Kalbag, back to top" tabindex="-1"><span class="home-ak" aria-hidden="true">AK</span></a>
   </div>
@@ -577,10 +579,9 @@
 <main id="top">
 
   <!-- Hero -->
-  <div class="hero-pin" id="hero-pin">
   <section class="hero page" aria-label="Introduction">
     <div class="mh-wrap">
-      <h1 class="masthead" id="masthead"><span class="sr-only">Arjun Kalbag</span><span aria-hidden="true"><span class="w">Arjun</span> <span class="w">Kalbag</span></span></h1>
+      <h1 class="masthead" id="masthead"><span class="sr-only">Arjun Kalbag</span><span class="mh-t" aria-hidden="true">Arjun Kalbag</span></h1>
     </div>
 
     <div class="hero-body">
@@ -628,7 +629,6 @@
       </div>
     </div>
   </section>
-  </div>
 
   <!-- About -->
   <section class="sec page" id="about" aria-labelledby="about-h">
@@ -861,158 +861,119 @@
     });
   })();
 
-  // name ⇄ AK. The hero is pinned (sticky) for the first stretch of scroll. Inside
-  // that stretch your own scrolling drives the change: the page nudges up a few
-  // pixels, then the name folds into the AK monogram in the pill bar, and only once
-  // it's docked does the page move on. Stop half-way and the browser's own smooth
-  // scroll finishes it toward whichever end you were heading. Nothing is blocked or
-  // hijacked, so trackpads, wheels, keys and touch all stay native. The letters are a
-  // fixed overlay positioned from the in-flow masthead. Transform + opacity only.
+  // name ⇄ AK. The name sits big in the top left. The moment you scroll, it lets go of the
+  // page and shrinks, as one piece, into the AK in the pill bar; back at the very top it
+  // grows out again. The move runs on a critically damped spring (no overshoot, no bounce):
+  // it starts softly, lands softly, and can turn around mid-flight without a jolt. Scrolling
+  // itself is never touched. At rest the real text shows (the name in the page, the AK in the
+  // bar); the fixed copy only flies in between, so both ends stay pin-sharp.
   (function () {
     var mh = document.getElementById('masthead');
     var bar = document.getElementById('bar');
     var mark = document.getElementById('mark');
-    var hero = document.querySelector('.hero');
-    var pinEl = document.getElementById('hero-pin');
-    if (!mh || !bar || !mark || !hero || !pinEl) return;
-    var PILL_MAX = 600, HOME_X = 18, CAPC = 0.578;  // Inktera: cap centre sits .578em below the box top
-    var TAU = 150, MAXLAG = 0.25;                   // the fold eases softly after the scroll, never far behind
-    var IDLE = 180;                                 // rest before an unfinished fold settles
-
-    var letters = [], inits = [];
-    mh.querySelectorAll('.w').forEach(function (w) {
-      var text = w.textContent.toUpperCase(), n = text.length, g = null;
-      w.textContent = '';
-      Array.from(text).forEach(function (ch, j) {
-        var h = document.createElement('span'); h.className = 'hl'; h.textContent = ch; w.appendChild(h);
-        var o = document.createElement('span'); o.className = 'ml';
-        var mi = document.createElement('span'); mi.className = 'mi'; mi.textContent = ch; mi.style.setProperty('--i', letters.length);
-        o.appendChild(mi); mark.appendChild(o);
-        var l = { h: h, o: o, init: j === 0, st: 0.04 + 0.07 * (n - 1 - j) };
-        if (l.init) { g = l; o.classList.add('ini'); inits.push(l); }
-        l.g = g; letters.push(l);
-      });
-    });
-
-    var F = 0, s = 1, PIN = 0, NUDGE = 24, rmLine = 0;
-    var ready = false, raf = 0, last = 0, pr = 0, dir = 0, prevY = window.scrollY, touching = false, settleTimer = 0, glide = null;
+    var slot = bar && bar.querySelector('.home-ak');
+    if (!mh || !bar || !mark || !slot) return;
+    var full = mark.querySelector('.mk-full'), ak = mark.querySelector('.mk-ak'), solo = mark.querySelector('.mk-a');
+    var W = 5.4;                    // spring rate (1/s): half way in ~.3s, 90% by ~.7s, then a long soft landing
+    var DOCK_AT = 6, HOME_AT = 2;   // px of scroll that send the name into the bar / bring it back
+    var x0 = 0, y0 = 0, tx = 0, ty = 0, s = 1, rmLine = 0, capc = 0.58;
+    var p = 0, v = 0, goal = 0, raf = 0, last = 0, ready = false, state = -1, held = Infinity;
     var rm = root.classList.contains('rm');
-    function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
-    function lerp(a, b, t) { return a + (b - a) * t; }
-    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
-    function easeIO(t) { return (1 - Math.cos(Math.PI * t)) / 2; } // sine in-out: soft start, soft landing
-    function easeIOCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
-    function target(y) { return PIN ? clamp(y / PIN, 0, 1) : 0; }
+    function clamp(n, a, b) { return n < a ? a : n > b ? b : n; }
+    // where the middle of the capitals sits, in em below the top of the text box
+    function capCentre() {
+      try {
+        var c = document.createElement('canvas').getContext('2d'); c.font = '100px Inktera';
+        var m = c.measureText('H');
+        if (m.fontBoundingBoxAscent && m.actualBoundingBoxAscent) return (m.fontBoundingBoxAscent - m.actualBoundingBoxAscent / 2) / 100;
+      } catch (e) {}
+      return 0.58;
+    }
+    function sstep(a, b, t) { t = clamp((t - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+    function aim(y, cur) {
+      if (rm) return y > rmLine ? 1 : 0;
+      return y > DOCK_AT ? 1 : y < HOME_AT ? 0 : cur;
+    }
 
     function measure() {
-      PIN = rm ? 0 : parseFloat(getComputedStyle(pinEl, '::after').height) || 0;
-      NUDGE = window.innerWidth < 820 ? 16 : 24;
-      hero.style.transform = '';
-      F = parseFloat(getComputedStyle(mh).fontSize);
+      var F = parseFloat(getComputedStyle(mh).fontSize);
       mark.style.fontSize = F + 'px';
-      var sy = window.scrollY, past = Math.max(0, sy - PIN); // how far the hero has scrolled beyond its pin
-      letters.forEach(function (l) { var r = l.h.getBoundingClientRect(); l.x0 = r.left; l.y0 = r.top + past; l.w = r.width; });
-      var br = bar.getBoundingClientRect();
-      var inset = Math.max(0, (br.width - Math.min(br.width, PILL_MAX)) / 2);
-      bar.style.setProperty('--inset', inset + 'px');
-      var f = parseFloat(getComputedStyle(bar).getPropertyValue('--ak')) || 36;
+      var f = parseFloat(getComputedStyle(slot).fontSize), br = bar.getBoundingClientRect();
+      capc = capCentre();
+      slot.style.top = '0px';                // centre the AK's capitals in the pill, to the pixel
+      var sr = slot.getBoundingClientRect();
+      slot.style.top = (br.top + br.height / 2 - capc * f - sr.top).toFixed(2) + 'px';
+      sr = slot.getBoundingClientRect();
+      var sy = window.scrollY, r = mh.getBoundingClientRect();
+      x0 = r.left; y0 = r.top + sy;          // the name, in page coordinates
+      tx = sr.left; ty = sr.top;             // the AK slot in the bar (fixed)
       s = f / F;
-      var x = br.left + inset + HOME_X, ty = br.top + br.height / 2 - CAPC * f;
-      inits.forEach(function (g) { g.tx = x; g.ty = ty; x += g.w * s; });
-      rmLine = mh.getBoundingClientRect().bottom + sy - br.bottom;
-      pr = target(sy); prevY = sy;
-      if (!ready) { ready = true; mark.classList.add('on'); if (root.classList.contains('splash-skip')) requestAnimationFrame(reveal); }
-      render();
+      rmLine = Math.max(DOCK_AT, y0 + 0.9 * F - br.bottom); // reduced motion: swap once the name has slid under the bar
+      if (!ready) {
+        ready = true; goal = p = aim(sy, 0);
+        if (root.classList.contains('splash-skip')) requestAnimationFrame(reveal);
+      }
+      state = -1; render();
     }
 
     function render() {
-      if (rm) {
-        var on = window.scrollY > rmLine;
-        bar.style.setProperty('--e', on ? '1' : '0');
-        bar.classList.toggle('docked', on);
-        return;
+      var e = clamp(p, 0, 1);
+      var st = p === goal ? goal : 2;        // 0 = in the page, 1 = in the bar, 2 = in flight
+      if (st !== state) {
+        state = st;
+        if (st !== 2) held = Infinity;
+        mh.classList.toggle('gone', st !== 0);
+        bar.classList.toggle('docked', st === 1);
+        mark.classList.toggle('on', st === 2);
       }
-      // 1) the page nudges up a touch, 2) the name folds into the bar
-      var nud = NUDGE * easeOut(clamp(pr / 0.35, 0, 1));
-      hero.style.transform = nud > 0.01 ? 'translate3d(0,' + (-nud).toFixed(2) + 'px,0)' : '';
-      var e = easeIO(clamp((pr - 0.08) / 0.92, 0, 1));
       bar.style.setProperty('--e', e.toFixed(4));
-      bar.classList.toggle('docked', e > 0.985);
-      var lift = nud + Math.max(0, window.scrollY - PIN), sc = Math.exp(Math.log(s) * e);
-      for (var i = 0; i < letters.length; i++) {
-        var l = letters[i], g = l.g;
-        var ix = lerp(g.x0, g.tx, e), iy = lerp(g.y0 - lift, g.ty, e);
-        var x = ix, y = iy, op = 1, k = sc;
-        if (!l.init) { // the inner letters fold into their initial, the far ones first
-          var c = clamp((e - l.st) / 0.42, 0, 1); c = c * c * (3 - 2 * c);
-          var keep = 1 - c;
-          x = ix + (l.x0 - g.x0) * sc * keep;
-          y = iy + (l.y0 - g.y0) * sc * keep;
-          op = keep; k = sc * (1 - 0.3 * c);
-        }
-        l.o.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) scale(' + k.toFixed(4) + ')';
-        l.o.style.opacity = op.toFixed(3);
-      }
+      if (st !== 2) return;
+      // the page spot it left from: held where it let go, but it follows the page back down
+      var py = y0 - Math.min(held, window.scrollY);
+      var k = Math.exp(Math.log(s) * e);     // scale in log space, so the shrink reads evenly
+      var x = x0 + (tx - x0) * e, y = py + (ty - py) * e;
+      mark.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) scale(' + k.toFixed(4) + ')';
+      // the rest of the name dissolves while the K appears beside the A (the A never fades)
+      var of = 1 - sstep(0.02, 0.5, e), ok = sstep(0.36, 0.86, e);
+      full.style.opacity = of.toFixed(3);
+      ak.style.opacity = ok.toFixed(3);
+      solo.style.opacity = of > 0.999 || ok > 0.999 ? '0' : '1';
     }
 
     function tick(t) {
-      var dt = last ? Math.min(64, t - last) : 16; last = t;
-      var tp = target(window.scrollY);
-      pr += (tp - pr) * (1 - Math.exp(-dt / TAU));
-      if (pr < tp - MAXLAG) pr = tp - MAXLAG; else if (pr > tp + MAXLAG) pr = tp + MAXLAG;
-      if (Math.abs(tp - pr) < 0.0005) pr = tp;
+      var dt = last ? Math.min(0.064, (t - last) / 1000) : 1 / 60; last = t;
+      var y = p - goal, c = v + W * y, ex = Math.exp(-W * dt);
+      p = goal + (y + c * dt) * ex;          // exact critically damped step: frame-rate independent
+      v = (v - W * c * dt) * ex;
+      if (Math.abs(p - goal) < 0.0015 && Math.abs(v) < 0.02) { p = goal; v = 0; }
       render();
-      if (pr !== tp) raf = requestAnimationFrame(tick); else { raf = 0; last = 0; }
+      if (p !== goal) raf = requestAnimationFrame(tick); else { raf = 0; last = 0; }
     }
-    function queue() { if (ready && !raf) { last = 0; raf = requestAnimationFrame(tick); } }
 
-    // stopped part-way through the fold: glide the rest of the way, slowly, toward
-    // whichever end you were heading. Any input of yours cancels the glide at once.
-    function settle() {
-      if (rm || touching || !PIN || glide) return;
-      var y = window.scrollY;
-      if (y <= 1 || y >= PIN - 1) return;
-      var to = dir < 0 ? 0 : PIN;
-      glide = { from: y, to: to, t0: performance.now(), d: clamp(Math.abs(to - y) * 3.2, 600, 1100) };
-      requestAnimationFrame(glideStep);
-    }
-    function glideStep(t) {
-      if (!glide) return;
-      var k = clamp((t - glide.t0) / glide.d, 0, 1);
-      window.scrollTo({ top: lerp(glide.from, glide.to, easeIOCubic(k)), behavior: 'instant' });
-      if (k < 1) requestAnimationFrame(glideStep); else glide = null;
-    }
-    function cancelGlide() { glide = null; }
     function onScroll() {
-      var y = window.scrollY, d = y - prevY;
-      if (d) dir = d > 0 ? 1 : -1;
-      prevY = y;
-      if (rm) { render(); return; }
-      queue();
-      if (!glide) { clearTimeout(settleTimer); settleTimer = setTimeout(settle, IDLE); }
+      if (!ready) return;
+      var y = window.scrollY, g = aim(y, goal);
+      if (g === goal) return;
+      if (g === 1) held = y;                 // let go of the page exactly where it is now
+      goal = g;
+      if (rm) { p = g; v = 0; render(); return; }
+      render();
+      if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
     }
 
     var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    var onMq = function () { rm = mq.matches; root.classList.toggle('rm', rm); hero.style.transform = ''; measure(); };
+    var onMq = function () { rm = mq.matches; root.classList.toggle('rm', rm); ready = false; measure(); };
     if (mq.addEventListener) mq.addEventListener('change', onMq);
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('touchstart', function () { touching = true; cancelGlide(); }, { passive: true });
-    window.addEventListener('wheel', cancelGlide, { passive: true });
-    window.addEventListener('keydown', cancelGlide);
-    window.addEventListener('pointerdown', cancelGlide, { passive: true });
-    var lift = function () { touching = false; clearTimeout(settleTimer); settleTimer = setTimeout(settle, IDLE + 80); };
-    window.addEventListener('touchend', lift, { passive: true });
-    window.addEventListener('touchcancel', lift, { passive: true });
     window.addEventListener('resize', function () { requestAnimationFrame(measure); });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure); else measure();
     window.addEventListener('load', measure);
     if (rm && root.classList.contains('splash-skip')) reveal();
 
-    // the docked monogram goes back to the top (the name unfolds on the way)
+    // the AK goes back to the top (the name grows out of the bar on arrival)
     bar.querySelector('.home').addEventListener('click', function (e) {
       e.preventDefault();
-      cancelGlide();
       window.scrollTo({ top: 0, behavior: rm ? 'auto' : 'smooth' });
     });
   })();
