@@ -32,16 +32,16 @@
 <meta name="twitter:description" content="Engineering, projects, and music." />
 <meta name="twitter:image" content="https://arjunkalbag.xyz/og-card.jpg" />
 
-<link rel="preload" href="assets/InkteraDemo.otf" as="font" type="font/otf" crossorigin />
-<link rel="preload" href="assets/AlteHaasGroteskBold.ttf" as="font" type="font/ttf" crossorigin />
+<link rel="preload" href="assets/InkteraDemo.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="assets/AlteHaasGroteskBold.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..700;1,400..600&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet" />
 
 <style>
   /* Inktera: the name + AK monogram only. Alte Haas Grotesk Bold: every other display title. */
-  @font-face { font-family: 'Inktera'; src: url('assets/InkteraDemo.otf') format('opentype'); font-display: block; }
-  @font-face { font-family: 'Alte Haas Grotesk'; src: url('assets/AlteHaasGroteskBold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Inktera'; src: url('assets/InkteraDemo.woff2') format('woff2'), url('assets/InkteraDemo.otf') format('opentype'); font-display: block; }
+  @font-face { font-family: 'Alte Haas Grotesk'; src: url('assets/AlteHaasGroteskBold.woff2') format('woff2'), url('assets/AlteHaasGroteskBold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
 
   /* ---------- tokens ---------- */
   :root {
@@ -87,7 +87,7 @@
     --dur-reveal: 1500ms;  /* scroll reveals + entrances */
 
     --radius: 14px;
-    --bar-h: 56px;
+    --bar-h: 60px;
     --bar-top: calc(env(safe-area-inset-top, 0px) + 12px);
   }
   html.dark {
@@ -107,7 +107,7 @@
 
   /* ---------- base ---------- */
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; background: var(--paper); scroll-behavior: smooth; }
+  html { -webkit-text-size-adjust: 100%; background: var(--paper); scroll-behavior: smooth; scroll-padding-top: calc(var(--bar-top) + var(--bar-h) + 16px); }
   body {
     background: var(--paper); color: var(--ink);
     font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -154,7 +154,7 @@
   /* ---------- pill bar ---------- */
   .bar {
     position: fixed; z-index: 60; top: var(--bar-top); left: var(--gl); right: var(--gr); height: var(--bar-h);
-    pointer-events: none; --e: 0; --inset: 0px; --ak: 22px;
+    pointer-events: none; --e: 0; --inset: 0px; --ak: 36px;
   }
   .bar-bg {
     position: absolute; top: 0; bottom: 0;
@@ -171,7 +171,7 @@
   .bar-l { left: 0; padding-left: 8px; transform: translateX(calc(var(--inset) * var(--e))); z-index: 2; }
   .bar-r { right: 0; padding-right: 8px; gap: 2px; transform: translateX(calc(var(--inset) * var(--e) * -1)); z-index: 3; pointer-events: auto; }
   .home {
-    pointer-events: none; height: 40px; padding: 0 10px; display: flex; align-items: center; border-radius: 10px;
+    pointer-events: none; height: 44px; padding: 0 10px; display: flex; align-items: center; border-radius: 10px;
     font-family: 'Inktera', sans-serif; font-size: var(--ak); line-height: 1; color: var(--ink);
   }
   .home-ak { opacity: 0; transition: opacity .6s var(--ease-soft); }
@@ -295,6 +295,10 @@
     display: flex; justify-content: space-between; align-items: center; gap: var(--space-md);
     padding: 14px var(--gr) 0 var(--gl); font-size: var(--text-sm); color: var(--ink-3);
   }
+  .film-view { display: block; }
+  .film-ctl { display: inline-flex; align-items: center; gap: var(--space-lg); }
+  .film-pause { border: 0; background: none; padding: 0; font: inherit; color: var(--ink-3); cursor: pointer; transition: color var(--dur-hover) var(--ease-soft); }
+  html:not(.jsfilm) .film-pause { display: none; }
   .film-cap .go { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-weight: 500; }
   .film-cap .arr { width: 14px; height: 14px; }
 
@@ -436,6 +440,7 @@
     .prow:hover .pn { color: var(--accent); }
     .prow:hover .abox { background: var(--accent); color: var(--on-accent); }
 
+    .film-pause:hover { color: var(--ink); }
     .foot-social a:hover, .foot-end a:hover { color: var(--inv-fg); }
     .oldbtn:hover { background: var(--inv-fg); color: var(--inv-bg); }
   }
@@ -446,8 +451,8 @@
     .mlink:active { background: var(--paper-3); transition-duration: .3s; }
   }
   @media (pointer: coarse) {
-    .facts dd a, .foot-social a, .mfoot a, .it, .wdesc .ul, .statement a { position: relative; }
-    .facts dd a::before, .foot-social a::before, .mfoot a::before, .it::before, .wdesc .ul::before, .statement a::before { content: ''; position: absolute; inset: -12px -6px; }
+    .facts dd a, .foot-social a, .mfoot a, .it, .wdesc .ul, .statement a, .film-pause, .film-cap .go { position: relative; }
+    .facts dd a::before, .foot-social a::before, .mfoot a::before, .it::before, .wdesc .ul::before, .statement a::before, .film-pause::before, .film-cap .go::before { content: ''; position: absolute; inset: -12px -6px; }
     .btn { height: 44px; min-width: 44px; }
     .theme-btn { width: 44px; }
     .home { height: 44px; }
@@ -465,8 +470,8 @@
     .wmeta { grid-column: 9 / span 3; }
   }
   @media (max-width: 819px) {
-    :root { --bar-h: 52px; --ak: 20px; }
-    .bar { --ak: 20px; }
+    :root { --bar-h: 54px; }
+    .bar { --ak: 30px; }
     .facts { grid-template-columns: 1fr; gap: var(--space-sm); }
     .facts div { grid-template-columns: 6.5rem 1fr; gap: 12px; align-items: baseline; }
     .wrow { grid-template-columns: minmax(0, 1fr) auto; row-gap: 14px; }
@@ -518,7 +523,7 @@
     <a class="home" href="#top" aria-label="Arjun Kalbag, back to top" tabindex="-1"><span class="home-ak" aria-hidden="true">AK</span></a>
   </div>
   <div class="bar-r">
-    <button class="btn theme-btn" id="theme-btn" type="button" aria-label="Switch between light and dark mode">
+    <button class="btn theme-btn" id="theme-btn" type="button" aria-label="Dark mode" aria-pressed="false">
       <span class="ico" aria-hidden="true">
         <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 13.4A8.5 8.5 0 1 1 10.6 3.5a6.6 6.6 0 0 0 9.9 9.9z"/></svg>
         <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg>
@@ -552,16 +557,16 @@
     </div>
 
     <div class="hero-body">
-      <p class="tagline" data-px="0.14" data-px-m="0.08" data-px-hero>Building projects at the intersection of engineering and creativity.</p>
-      <dl class="facts" data-px="0.24" data-px-m="0.12" data-px-hero>
+      <p class="tagline" data-px="0.14" data-px-m="0.2" data-px-hero>Building projects at the intersection of engineering and creativity.</p>
+      <dl class="facts" data-px="0.24" data-px-m="0.26" data-px-hero>
         <div><dt>Based in</dt><dd>New York / St. Louis</dd></div>
         <div><dt>Studying</dt><dd>Computer Engineering &amp; Economics, WashU ’29</dd></div>
         <div><dt>Elsewhere</dt><dd><a class="ul" href="https://linkedin.com/in/arjun-kalbag/" target="_blank" rel="noopener">LinkedIn</a><a class="ul" href="https://github.com/arjunkalbag" target="_blank" rel="noopener">GitHub</a><a class="ul" href="mailto:arjunkalbag07@gmail.com">Email</a></dd></div>
       </dl>
     </div>
 
-    <a class="film" href="/photography.html" aria-label="Photography: shot on 35mm film">
-      <div class="film-view">
+    <div class="film">
+      <a class="film-view" href="/photography.html" tabindex="-1" aria-hidden="true">
         <div class="film-track">
           <div class="film-set">
             <span class="ph"><img src="assets/photos/p15.jpg" alt="" width="1100" height="729" decoding="async" /></span>
@@ -582,12 +587,15 @@
             <span class="ph"><img src="assets/photos/p48.jpg" alt="" width="1100" height="729" decoding="async" /></span>
           </div>
         </div>
-      </div>
+      </a>
       <div class="film-cap">
         <span>On film · Olympus Stylus 35mm</span>
-        <span class="go">Photographs <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span>
+        <span class="film-ctl">
+          <button class="film-pause" id="film-pause" type="button" aria-label="Pause the photo strip">Pause</button>
+          <a class="go" href="/photography.html">Photographs <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a>
+        </span>
       </div>
-    </a>
+    </div>
   </section>
 
   <!-- About -->
@@ -812,7 +820,7 @@
   // theme toggle (also keeps the mobile browser chrome in sync)
   (function () {
     var btn = document.getElementById('theme-btn'), meta = document.getElementById('theme-color');
-    function sync() { meta.setAttribute('content', root.classList.contains('dark') ? '#121110' : '#f3eee6'); }
+    function sync() { var d = root.classList.contains('dark'); meta.setAttribute('content', d ? '#121110' : '#f3eee6'); btn.setAttribute('aria-pressed', String(d)); }
     sync();
     btn.addEventListener('click', function () {
       root.classList.toggle('dark');
@@ -821,17 +829,24 @@
     });
   })();
 
-  // motion engine: one eased scroll value drives the name → AK morph, the pill
-  // bar and the parallax layers, so wheel steps glide instead of jumping. Every
-  // masthead letter is a fixed overlay positioned from the in-flow masthead, so
-  // once docked nothing moves with the scroll. Transform + opacity only.
+  // motion engine. The masthead letters are a fixed overlay positioned from the
+  // in-flow masthead. In the page they ride along at half scroll speed (their own
+  // parallax layer); scrolling folds them into the AK monogram in the pill bar.
+  // The fold trails the scroll lazily, and when scrolling rests mid-fold the
+  // letters glide the rest of the way into whichever home you were heading for:
+  // the bar (scrolling down) or the page (scrolling up). A clearance check keeps
+  // them off the hero text at every step. Transform + opacity only.
   (function () {
     var mh = document.getElementById('masthead');
     var bar = document.getElementById('bar');
     var mark = document.getElementById('mark');
     if (!mh || !bar || !mark) return;
-    var PILL_MAX = 600, HOME_X = 18, CAPC = 0.578; // Inktera: ascent .9em, cap height .644em
-    var TAU = 110, LAG = 70;                          // smoothing time constant (ms) + max lag (px)
+    var PILL_MAX = 600, HOME_X = 18, CAPC = 0.578, BASE = 0.9; // Inktera: cap centre .578em, baseline .9em below the box top
+    var TAU_S = 110, LAG = 70;    // scroll smoothing for the parallax layers (ms, max px behind)
+    var TAU_P = 280, PLAG = 0.2;  // the fold trails the scroll even more lazily
+    var K_PAGE = 0.5;             // in the page, the name scrolls at half speed
+    var IDLE = 170, GAP = 24;     // rest before it clicks into place; clearance above the hero text
+
     var letters = [], inits = [];
     mh.querySelectorAll('.w').forEach(function (w) {
       var text = w.textContent.toUpperCase(), n = text.length, g = null;
@@ -847,17 +862,60 @@
       });
     });
     var layers = [].map.call(document.querySelectorAll('[data-px]'), function (el) {
-      return { el: el, s: parseFloat(el.getAttribute('data-px')) || 0, sm: parseFloat(el.getAttribute('data-px-m')) || 0, hero: el.hasAttribute('data-px-hero'), c: 0, on: false };
+      return { el: el, s: parseFloat(el.getAttribute('data-px')) || 0, sm: parseFloat(el.getAttribute('data-px-m')) || 0, hero: el.hasAttribute('data-px-hero'), c: 0, top: 0, on: false };
     });
+    var heroText = layers.filter(function (q) { return q.el.classList.contains('tagline') || q.el.classList.contains('facts'); });
     var filmView = document.querySelector('.film-view'), filmC = 0;
 
-    var F = 0, s = 1, R = 400, vh = window.innerHeight, small = false;
-    var ready = false, raf = 0, last = 0, cur = window.scrollY;
+    var F = 0, s = 1, R = 400, vh = window.innerHeight, small = false, barBottom = 0;
+    var ready = false, raf = 0, last = 0;
+    var cur = window.scrollY, pc = 0, aS = 0, aP = 0, tween = null, lastScrollT = 0, dir = 0, prevY = window.scrollY;
     var rm = root.classList.contains('rm');
     var smallMq = window.matchMedia('(max-width: 819px), (pointer: coarse)');
+    var tmp = {};
     function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
     function lerp(a, b, t) { return a + (b - a) * t; }
-    function ease(t) { return Math.sin(t * Math.PI / 2); } // responds at once, lands softly
+    function ease(t) { return (1 - Math.cos(Math.PI * t)) / 2; }                         // sine in-out: soft start, soft landing
+    function easeIO(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; } // the click into place
+
+    // fold progress for a scroll position; after a click-into-place the curve is
+    // re-anchored there so scrolling on from it never jumps
+    function mapP(y) {
+      if (y <= 0) return 0;
+      if (y >= R) return 1;
+      if (aS > 0 && aS < R) return y <= aS ? aP * y / aS : aP + (1 - aP) * (y - aS) / (R - aS);
+      return y / R;
+    }
+    function place(l, p, ySm, out) {
+      var e = ease(p), sc = Math.exp(Math.log(s) * e), g = l.g;
+      var ix = lerp(g.x0, g.tx, e), iy = lerp(g.y0 - ySm * K_PAGE, g.ty, e);
+      out.x = ix; out.y = iy; out.k = sc; out.o = 1;
+      if (!l.init) {
+        var c = clamp((p - l.st) / 0.42, 0, 1); c = c * c * (3 - 2 * c);
+        var keep = 1 - c;
+        out.x = ix + (l.x0 - g.x0) * sc * keep;
+        out.y = iy + (l.y0 - g.y0) * sc * keep;
+        out.o = keep; out.k = sc * (1 - 0.3 * c);
+      }
+      return out;
+    }
+    function lettersBottom(p, ySm) {
+      var b = -1e9;
+      for (var i = 0; i < letters.length; i++) { place(letters[i], p, ySm, tmp); if (tmp.o > 0.05) b = Math.max(b, tmp.y + BASE * F * tmp.k); }
+      return b;
+    }
+    function textTop(y, ySm) { // the hero text moves with the real scroll, plus its own parallax on the smoothed one
+      var h = Math.min(ySm, vh * 1.2), t = 1e9;
+      heroText.forEach(function (q) { t = Math.min(t, q.top - y + h * (small ? q.sm : q.s)); });
+      return t;
+    }
+    // the letters must stay above the hero text, or be tucked inside the bar once the text slides under it
+    function clear(y, p, ySm) { return lettersBottom(p, ySm) < Math.max(textTop(y, ySm) - GAP, barBottom); }
+    function nudge(y, p, ySm) {
+      var lo = p, hi = 1;
+      for (var i = 0; i < 9; i++) { var mid = (lo + hi) / 2; if (clear(y, mid, ySm)) hi = mid; else lo = mid; }
+      return hi;
+    }
 
     function measure() {
       vh = window.innerHeight; small = smallMq.matches;
@@ -865,72 +923,101 @@
       mark.style.fontSize = F + 'px';
       var sy = window.scrollY;
       letters.forEach(function (l) { var r = l.h.getBoundingClientRect(); l.x0 = r.left; l.y0 = r.top + sy; l.w = r.width; });
-      layers.forEach(function (q) { q.el.style.transform = ''; q.on = false; var r = q.el.getBoundingClientRect(); q.c = r.top + sy + r.height / 2; });
+      var hb = document.querySelector('.hero-body'), hlift = 0;
+      try { hlift = new DOMMatrixReadOnly(getComputedStyle(hb).transform).m42 || 0; } catch (err) {} // ignore the entrance offset
+      layers.forEach(function (q) {
+        q.el.style.transform = ''; q.on = false;
+        var r = q.el.getBoundingClientRect();
+        q.c = r.top + sy + r.height / 2; q.top = r.top + sy - (hb.contains(q.el) ? hlift : 0);
+      });
       if (filmView) { var fr = filmView.getBoundingClientRect(); filmC = fr.top + sy + fr.height / 2; }
       var br = bar.getBoundingClientRect();
+      barBottom = br.bottom;
       var inset = Math.max(0, (br.width - Math.min(br.width, PILL_MAX)) / 2);
       bar.style.setProperty('--inset', inset + 'px');
-      var f = parseFloat(getComputedStyle(bar).getPropertyValue('--ak')) || 22;
+      var f = parseFloat(getComputedStyle(bar).getPropertyValue('--ak')) || 36;
       s = f / F;
       var x = br.left + inset + HOME_X, ty = br.top + br.height / 2 - CAPC * f;
       inits.forEach(function (g) { g.tx = x; g.ty = ty; x += g.w * s; });
-      // dock before the first line of hero text slides up under the bar
-      var hb = document.querySelector('.hero-body'), lift = 0;
-      try { lift = new DOMMatrixReadOnly(getComputedStyle(hb).transform).m42 || 0; } catch (err) {}
-      var below = Math.min(hb.querySelector('.tagline').getBoundingClientRect().top, hb.querySelector('.facts').getBoundingClientRect().top) + sy - lift;
-      R = clamp(below - (br.top + br.height) - 28 - LAG * 0.5, 140, vh * 0.6);
+      // the longest, slowest fold that stays clear of the hero text, even while it trails the scroll
+      aS = 0; aP = 0; tween = null;
+      var Rmax = Math.round(vh * (small ? 0.75 : 0.9)), Rmin = 180;
+      R = Rmin;
+      for (var cand = Rmax; cand >= Rmin; cand -= 20) {
+        R = cand; var ok = true;
+        // typical scrolling only; the runtime guard in tick() covers hard flicks
+        for (var y = 0; y <= cand && ok; y += 8) ok = clear(y, Math.max(0, y / cand - PLAG * 0.5), Math.max(0, y - LAG * 0.6));
+        if (ok) break;
+      }
       if (!ready) { ready = true; mark.classList.add('on'); if (root.classList.contains('splash-skip')) requestAnimationFrame(reveal); }
-      cur = sy;
-      render(cur);
+      cur = sy; prevY = sy; pc = mapP(sy);
+      render(); queue();
     }
 
-    function render(y) {
-      var p = clamp(y / R, 0, 1), e = ease(p);
+    function render() {
+      var e = ease(pc);
       bar.style.setProperty('--e', e.toFixed(4));
-      bar.classList.toggle('docked', p > 0.985);
+      bar.classList.toggle('docked', pc > 0.985);
       if (rm) return;
-      var sc = Math.exp(Math.log(s) * e);
       for (var i = 0; i < letters.length; i++) {
-        var l = letters[i], g = l.g;
-        // the name holds its place on screen and shrinks straight into the pill
-        var ix = lerp(g.x0, g.tx, e), iy = lerp(g.y0, g.ty, e);
-        var x = ix, yy = iy, op = 1, k = sc;
-        if (!l.init) {
-          var c = clamp((p - l.st) / 0.42, 0, 1); c = c * c * (3 - 2 * c);
-          var keep = 1 - c;
-          x = ix + (l.x0 - g.x0) * sc * keep;
-          yy = iy + (l.y0 - g.y0) * sc * keep;
-          op = keep; k = sc * (1 - 0.3 * c);
-        }
-        l.o.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + yy.toFixed(2) + 'px,0) scale(' + k.toFixed(4) + ')';
-        l.o.style.opacity = op.toFixed(3);
+        var l = letters[i]; place(l, pc, cur, tmp);
+        l.o.style.transform = 'translate3d(' + tmp.x.toFixed(2) + 'px,' + tmp.y.toFixed(2) + 'px,0) scale(' + tmp.k.toFixed(4) + ')';
+        l.o.style.opacity = tmp.o.toFixed(3);
       }
       // parallax: hero layers recede at their own pace; titles drift around the viewport centre
       for (var j = 0; j < layers.length; j++) {
         var q = layers[j], sp = small ? q.sm : q.s;
         if (!sp) { if (q.on) { q.el.style.transform = ''; q.on = false; } continue; }
-        var off = q.hero ? Math.min(y, vh * 1.2) * sp : -(q.c - y - vh / 2) * sp;
+        var off = q.hero ? Math.min(cur, vh * 1.2) * sp : -(q.c - cur - vh / 2) * sp;
         q.el.style.transform = 'translate3d(0,' + off.toFixed(2) + 'px,0)'; q.on = true;
       }
-      if (filmView) filmView.style.setProperty('--py', (-(filmC - y - vh / 2) * (small ? 0.035 : 0.06)).toFixed(2) + 'px');
+      if (filmView) filmView.style.setProperty('--py', (-(filmC - cur - vh / 2) * (small ? 0.035 : 0.06)).toFixed(2) + 'px');
+    }
+
+    // scrolling rested mid-fold: glide into the bar or back into the page
+    function settle(y, t) {
+      var P = dir > 0 ? 1 : dir < 0 ? 0 : (pc >= 0.5 ? 1 : 0);
+      if (P === 0 && !clear(y, 0, y)) P = 1; // too far down to fit back in the page
+      tween = { from: pc, to: P, t0: t, d: 650 + 950 * Math.abs(P - pc) };
     }
 
     function tick(t) {
       var dt = last ? Math.min(64, t - last) : 16; last = t;
-      var target = window.scrollY;
-      cur += (target - cur) * (1 - Math.exp(-dt / TAU));
-      if (cur < target - LAG) cur = target - LAG; else if (cur > target + LAG) cur = target + LAG;
-      if (Math.abs(target - cur) < 0.1) cur = target;
-      render(cur);
-      if (cur !== target) raf = requestAnimationFrame(tick); else { raf = 0; last = 0; }
+      var y = window.scrollY;
+      cur += (y - cur) * (1 - Math.exp(-dt / TAU_S));
+      if (cur < y - LAG) cur = y - LAG; else if (cur > y + LAG) cur = y + LAG;
+      if (Math.abs(y - cur) < 0.1) cur = y;
+      if (y <= 0 || y >= R) { aS = 0; aP = 0; }
+      if (tween) {
+        var k = clamp((t - tween.t0) / tween.d, 0, 1);
+        pc = lerp(tween.from, tween.to, easeIO(k));
+        if (k >= 1) { pc = tween.to; tween = null; if (y > 0 && y < R) { aS = y; aP = pc; } }
+      } else {
+        var tp = mapP(y);
+        pc += (tp - pc) * (1 - Math.exp(-dt / TAU_P));
+        if (pc < tp - PLAG) pc = tp - PLAG; else if (pc > tp + PLAG) pc = tp + PLAG;
+        if (Math.abs(tp - pc) < 0.0008) pc = tp;
+        if (!rm && !clear(y, pc, cur)) { pc = nudge(y, pc, cur); if (y > 0 && y < R) { aS = y; aP = pc; } }
+        if (!rm && Math.abs(pc - mapP(y)) < 0.03 && pc > 0.0015 && pc < 0.9985 && t - lastScrollT > IDLE) settle(y, t);
+      }
+      render();
+      var mid = !rm && pc > 0.0015 && pc < 0.9985;
+      if (tween || mid || cur !== y || pc !== mapP(y)) raf = requestAnimationFrame(tick); else { raf = 0; last = 0; }
     }
     function queue() { if (ready && !raf) { last = 0; raf = requestAnimationFrame(tick); } }
+    function onScroll() {
+      var y = window.scrollY, d = y - prevY;
+      if (d) dir = d > 0 ? 1 : -1;
+      prevY = y; lastScrollT = performance.now();
+      if (tween) { tween = null; if (y > 0 && y < R) { aS = y; aP = pc; } } // you took over mid-glide: carry on from here
+      queue();
+    }
 
     var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     var onMq = function () { rm = mq.matches; root.classList.toggle('rm', rm); measure(); };
     if (mq.addEventListener) mq.addEventListener('change', onMq);
 
-    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', function () { requestAnimationFrame(measure); });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure); else measure();
     window.addEventListener('load', measure);
@@ -949,19 +1036,29 @@
     var set = track && track.querySelector('.film-set');
     if (!film || !track || !set || root.classList.contains('rm')) return;
     root.classList.add('jsfilm');
-    var x = 0, w = 0, base = 0, v = 0, target = 0, raf = 0, last = 0, visible = true, hovering = false;
-    function size() { w = set.getBoundingClientRect().width; base = w / 80000; target = hovering ? base * 0.1 : base; if (!v) v = base; }
+    var x = 0, w = 0, base = 0, v = 0, target = 0, raf = 0, last = 0, visible = true, hovering = false, paused = false;
+    var pauseBtn = document.getElementById('film-pause');
+    function aim() { target = paused ? 0 : hovering ? base * 0.1 : base; }
+    function size() { w = set.getBoundingClientRect().width; base = w / 80000; aim(); if (!v && !paused) v = base; }
     function step(t) {
       var dt = last ? Math.min(64, t - last) : 16; last = t;
       v += (target - v) * (1 - Math.exp(-dt / 650));
       x -= v * dt; if (w && x <= -w) x += w;
       track.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+      if (paused && v < 1e-4) { v = 0; raf = 0; last = 0; return; } // fully stopped: let the loop rest
       if (visible) raf = requestAnimationFrame(step); else { raf = 0; last = 0; }
     }
     function start() { if (!raf) { last = 0; raf = requestAnimationFrame(step); } }
     if (window.matchMedia('(hover: hover)').matches) {
-      film.addEventListener('mouseenter', function () { hovering = true; target = base * 0.1; });
-      film.addEventListener('mouseleave', function () { hovering = false; target = base; });
+      film.addEventListener('mouseenter', function () { hovering = true; aim(); });
+      film.addEventListener('mouseleave', function () { hovering = false; aim(); });
+    }
+    if (pauseBtn) {
+      pauseBtn.addEventListener('click', function () {
+        paused = !paused; aim(); start();
+        pauseBtn.textContent = paused ? 'Play' : 'Pause';
+        pauseBtn.setAttribute('aria-label', paused ? 'Play the photo strip' : 'Pause the photo strip');
+      });
     }
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (en) { visible = en[0].isIntersecting; if (visible) start(); }).observe(film);
