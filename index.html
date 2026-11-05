@@ -33,12 +33,15 @@
 <meta name="twitter:image" content="https://arjunkalbag.xyz/og-card.jpg" />
 
 <link rel="preload" href="assets/InkteraDemo.otf" as="font" type="font/otf" crossorigin />
+<link rel="preload" href="assets/AlteHaasGroteskBold.ttf" as="font" type="font/ttf" crossorigin />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..700;1,400..600&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet" />
 
 <style>
+  /* Inktera: the name + AK monogram only. Alte Haas Grotesk Bold: every other display title. */
   @font-face { font-family: 'Inktera'; src: url('assets/InkteraDemo.otf') format('opentype'); font-display: block; }
+  @font-face { font-family: 'Alte Haas Grotesk'; src: url('assets/AlteHaasGroteskBold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
 
   /* ---------- tokens ---------- */
   :root {
@@ -56,6 +59,8 @@
     --inv-mut: oklch(72% 0.014 78);
     --shadow: 0 1px 1px oklch(25% 0.02 60 / 0.05), 0 12px 32px -10px oklch(25% 0.03 60 / 0.18);
 
+    --font-display: 'Alte Haas Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
     --gutter: clamp(16px, 3.6vw, 56px);
     /* gutters respect the notch and cap the layout at 1920px on very wide screens */
     --gl: max(var(--gutter), env(safe-area-inset-left, 0px), calc((100vw - 1920px) / 2));
@@ -70,11 +75,16 @@
     --text-base: 1.0625rem;
     --text-lg: clamp(1.1875rem, 1.05rem + 0.45vw, 1.375rem);
     --text-xl: clamp(1.5rem, 1.08rem + 1.65vw, 2.5rem);
-    --text-2xl: clamp(2.25rem, 1.15rem + 4.3vw, 5rem);
+    --text-2xl: clamp(2.375rem, 1.2rem + 4.4vw, 5.25rem);
 
-    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-    --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
-    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    /* motion: long, soft decelerations — they start right away and settle gently */
+    --ease-out: cubic-bezier(0.25, 1, 0.5, 1);       /* quart: glides, reveals */
+    --ease-soft: cubic-bezier(0.33, 1, 0.68, 1);     /* cubic: fades, colour */
+    --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);   /* gentle toggles */
+    --dur-quick: 500ms;    /* button tints */
+    --dur-hover: 850ms;    /* hover glides + colour */
+    --dur-draw: 1100ms;    /* underline draws */
+    --dur-reveal: 1500ms;  /* scroll reveals + entrances */
 
     --radius: 14px;
     --bar-h: 56px;
@@ -104,7 +114,7 @@
     font-size: var(--text-base); line-height: 1.55; font-kerning: normal;
     -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
     overflow-x: clip;
-    transition: background-color .5s var(--ease-in-out), color .5s var(--ease-in-out);
+    transition: background-color .9s var(--ease-in-out), color .9s var(--ease-in-out);
   }
   ::selection { background: var(--accent); color: var(--on-accent); }
   a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
@@ -117,28 +127,20 @@
     font-size: var(--text-xs); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--ink-3); line-height: 1.4;
   }
+  [data-px] { will-change: transform; }
 
-  /* underline that wipes out and back in on hover */
-  .ul {
-    background-image: linear-gradient(currentColor, currentColor);
-    background-size: 100% 1px; background-position: 0 100%; background-repeat: no-repeat;
+  /* underline: a faint rule at rest; on hover a solid line draws across it, and retracts on leave */
+  .ul, .itt {
+    background-image: linear-gradient(currentColor, currentColor), linear-gradient(color-mix(in oklch, currentColor 32%, transparent), color-mix(in oklch, currentColor 32%, transparent));
+    background-size: 0% 1px, 100% 1px; background-position: 0 100%, 0 100%; background-repeat: no-repeat;
     padding-bottom: 1px;
+    transition: background-size var(--dur-draw) var(--ease-out), color var(--dur-hover) var(--ease-soft);
   }
-  @keyframes ulswap {
-    0%   { background-size: 100% 1px; background-position: 100% 100%; }
-    45%  { background-size: 0% 1px;   background-position: 100% 100%; }
-    46%  { background-size: 0% 1px;   background-position: 0 100%; }
-    100% { background-size: 100% 1px; background-position: 0 100%; }
-  }
+  .itt { background-size: 0% 1px, 0% 1px; }
 
-  /* diagonal arrow that rolls out and back in */
-  .arr { position: relative; display: inline-block; width: 1em; height: 1em; overflow: hidden; flex-shrink: 0; }
-  .arr svg { position: absolute; inset: 0; width: 100%; height: 100%; transition: transform .55s var(--ease-out); }
-  .arr svg + svg { transform: translate(-110%, 110%); }
-
-  /* per-letter text roll (built by JS from [data-roll]) */
-  .rc { display: inline-block; overflow: hidden; vertical-align: top; line-height: 1; height: 1em; }
-  .rc > span { display: block; height: 1em; transition: transform .55s var(--ease-out); transition-delay: calc(var(--i) * 16ms); }
+  /* arrows glide a couple of pixels toward where they point */
+  .arr { display: inline-block; width: 1em; height: 1em; flex-shrink: 0; }
+  .arr svg { display: block; width: 100%; height: 100%; transition: transform var(--dur-hover) var(--ease-out); }
 
   /* ---------- splash: ASCII blob, once per session ---------- */
   #splash { position: fixed; inset: 0; z-index: 9999; background: var(--paper); overflow: hidden; will-change: opacity; }
@@ -162,7 +164,7 @@
     -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2);
     box-shadow: var(--shadow);
     opacity: clamp(0, calc((var(--e) - 0.3) * 1.7), 1);
-    transition: background-color .5s var(--ease-in-out);
+    transition: background-color .9s var(--ease-in-out);
   }
   .bar.open .bar-bg { opacity: 1; }
   .bar-l, .bar-r { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; }
@@ -172,45 +174,51 @@
     pointer-events: none; height: 40px; padding: 0 10px; display: flex; align-items: center; border-radius: 10px;
     font-family: 'Inktera', sans-serif; font-size: var(--ak); line-height: 1; color: var(--ink);
   }
-  .home-ak { opacity: 0; transition: opacity .3s var(--ease-out); }
+  .home-ak { opacity: 0; transition: opacity .6s var(--ease-soft); }
   .bar.docked .home { pointer-events: auto; }
   html.rm .bar.docked .home-ak { opacity: 1; }
 
   /* the morphing wordmark (fixed overlay; JS positions every letter) */
-  .mark { position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none; font-family: 'Inktera', sans-serif; color: var(--ink); visibility: hidden; transition: color .5s var(--ease-in-out); }
+  .mark { position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none; font-family: 'Inktera', sans-serif; color: var(--ink); visibility: hidden; transition: color .9s var(--ease-in-out); }
   .mark.on { visibility: visible; }
   html.rm .mark { display: none; }
   .ml { position: absolute; left: 0; top: 0; line-height: 1.1; white-space: pre; transform-origin: 0 0; will-change: transform, opacity; }
   .ml.ini { z-index: 1; }
   .mi { display: inline-block; }
-  html.js:not(.rm) .mi { opacity: 0; transform: translateY(0.3em); }
+  html.js:not(.rm) .mi { opacity: 0; transform: translateY(0.32em); }
   html.ready:not(.rm) .mi {
     opacity: 1; transform: none;
-    transition: transform 1.2s var(--ease-expo), opacity .9s var(--ease-out);
-    transition-delay: calc(var(--i) * 42ms);
+    transition: transform 1.7s var(--ease-out), opacity 1.3s var(--ease-soft);
+    transition-delay: calc(var(--i) * 60ms);
   }
 
   .btn {
     height: 40px; min-width: 40px; padding: 0 12px; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
     border: 0; border-radius: 10px; background: transparent; color: var(--ink); cursor: pointer;
     font-size: var(--text-sm); font-weight: 500; letter-spacing: 0.01em;
-    transition: background-color .25s var(--ease-out);
+    transition: background-color var(--dur-quick) var(--ease-soft);
   }
   .btn svg { width: 18px; height: 18px; }
   .theme-btn { padding: 0; width: 40px; }
   .theme-btn .ico { position: relative; width: 18px; height: 18px; }
-  .theme-btn svg { position: absolute; inset: 0; transition: transform .6s var(--ease-expo), opacity .3s var(--ease-out); }
-  .theme-btn .sun { opacity: 0; transform: rotate(-90deg) scale(.6); }
-  html.dark .theme-btn .moon { opacity: 0; transform: rotate(90deg) scale(.6); }
+  /* sun and moon crossfade; no spinning */
+  .theme-btn svg { position: absolute; inset: 0; transition: opacity .7s var(--ease-soft), transform .9s var(--ease-out); }
+  .theme-btn .sun { opacity: 0; transform: scale(.72); }
+  html.dark .theme-btn .moon { opacity: 0; transform: scale(.72); }
   html.dark .theme-btn .sun { opacity: 1; transform: none; }
 
-  .menu-btn .lbl { display: inline-block; height: 1.2em; line-height: 1.2em; overflow: hidden; }
-  .menu-btn .lbl > span { display: block; transition: transform .45s var(--ease-out); }
-  .bar.open .menu-btn .lbl > span { transform: translateY(-100%); }
+  /* "Menu" ⇄ "Close" crossfade */
+  .menu-btn .lbl { display: inline-grid; line-height: 1.2; }
+  .menu-btn .lbl > span { grid-area: 1 / 1; transition: opacity .55s var(--ease-soft), transform .8s var(--ease-out); }
+  .menu-btn .lbl > span + span { opacity: 0; transform: translateY(5px); }
+  .bar.open .menu-btn .lbl > span:first-child { opacity: 0; transform: translateY(-5px); }
+  .bar.open .menu-btn .lbl > span + span { opacity: 1; transform: none; }
+  /* burger: lines meet in the middle, then cross (and undo in reverse) */
   .burger { position: relative; width: 18px; height: 12px; }
-  .burger i { position: absolute; left: 0; right: 0; height: 1.5px; border-radius: 2px; background: currentColor; transition: transform .45s var(--ease-out), top .45s var(--ease-out); }
+  .burger i { position: absolute; left: 0; right: 0; height: 1.5px; border-radius: 2px; background: currentColor; transition: top .42s var(--ease-in-out) .26s, transform .42s var(--ease-in-out) 0s; }
   .burger i:nth-child(1) { top: 2px; }
   .burger i:nth-child(2) { top: 8.5px; }
+  .bar.open .burger i { transition: top .42s var(--ease-in-out) 0s, transform .42s var(--ease-in-out) .26s; }
   .bar.open .burger i:nth-child(1) { top: 5.25px; transform: rotate(45deg); }
   .bar.open .burger i:nth-child(2) { top: 5.25px; transform: rotate(-45deg); }
 
@@ -223,23 +231,23 @@
     -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2);
     box-shadow: var(--shadow);
     transform-origin: 100% 0;
-    opacity: 0; transform: translateY(-8px) scale(.97); visibility: hidden;
-    transition: opacity .18s var(--ease-out), transform .24s var(--ease-out), visibility 0s linear .24s;
+    opacity: 0; transform: translateY(-10px) scale(.98); visibility: hidden;
+    transition: opacity .38s var(--ease-soft), transform .5s var(--ease-out), visibility 0s linear .5s;
   }
-  .bar.open .menu { opacity: 1; transform: none; visibility: visible; transition: opacity .3s var(--ease-out), transform .55s var(--ease-expo), visibility 0s; }
+  .bar.open .menu { opacity: 1; transform: none; visibility: visible; transition: opacity .6s var(--ease-soft), transform .95s var(--ease-out), visibility 0s; }
   .mlist { list-style: none; display: grid; gap: 2px; }
-  .bar.open .mlist li { animation: menuIn .6s var(--ease-expo) both; animation-delay: calc(70ms + var(--i) * 55ms); }
-  @keyframes menuIn { from { opacity: 0; transform: translateY(10px); } }
+  .bar.open .mlist li { animation: menuIn 1s var(--ease-out) both; animation-delay: calc(110ms + var(--i) * 90ms); }
+  @keyframes menuIn { from { opacity: 0; transform: translateY(12px); } }
   .mlink {
     display: grid; grid-template-columns: 2rem 1fr auto; grid-template-rows: auto auto; align-items: center; column-gap: 12px;
-    padding: 16px 14px 15px; border-radius: 10px; transition: background-color .3s var(--ease-out);
+    padding: 16px 14px 15px; border-radius: 10px; transition: background-color var(--dur-hover) var(--ease-soft);
   }
-  .mn { font-size: var(--text-xs); color: var(--ink-3); font-variant-numeric: tabular-nums; transition: color .3s var(--ease-out); }
-  .mt { font-family: 'Inktera', sans-serif; font-size: 1.625rem; line-height: 1; text-transform: uppercase; }
-  .md { grid-column: 2; font-size: var(--text-sm); color: var(--ink-3); margin-top: 6px; }
-  .mlink .arr { grid-column: 3; grid-row: 1 / span 2; width: 18px; height: 18px; color: var(--ink-3); transition: color .3s var(--ease-out); }
+  .mn { font-size: var(--text-xs); color: var(--ink-3); font-variant-numeric: tabular-nums; transition: color var(--dur-hover) var(--ease-soft); }
+  .mt { font-family: var(--font-display); font-weight: 700; font-size: 1.75rem; line-height: 1; letter-spacing: -0.03em; transition: translate var(--dur-hover) var(--ease-out); }
+  .md { grid-column: 2; font-size: var(--text-sm); color: var(--ink-3); margin-top: 6px; transition: translate var(--dur-hover) var(--ease-out) 40ms; }
+  .mlink .arr { grid-column: 3; grid-row: 1 / span 2; width: 18px; height: 18px; color: var(--ink-3); transition: color var(--dur-hover) var(--ease-soft); }
   .mfoot { display: flex; flex-wrap: wrap; gap: 6px 20px; padding: 14px 14px 10px; font-size: var(--text-sm); color: var(--ink-3); }
-  .mfoot a:hover { color: var(--ink); }
+  .mfoot a { transition: color var(--dur-hover) var(--ease-soft); }
 
   /* ---------- hero ---------- */
   .hero {
@@ -271,13 +279,17 @@
   .facts dd a + a { margin-left: 14px; }
 
   .film { display: block; margin: clamp(24px, 4vh, 48px) calc(-1 * var(--gr)) 0 calc(-1 * var(--gl)); color: var(--ink); }
-  .film-view { overflow: hidden; }
-  .film-track { display: flex; width: max-content; animation: drift 70s linear infinite; }
+  .film-view { overflow: hidden; --py: 0px; }
+  .film-track { display: flex; width: max-content; will-change: transform; }
+  html:not(.jsfilm) .film-track { animation: drift 75s linear infinite; }
+  html:not(.jsfilm) .film:hover .film-track { animation-play-state: paused; }
   .film-set { display: flex; gap: 12px; padding-right: 12px; }
-  .film img {
-    height: clamp(140px, 21vh, 280px); width: auto; aspect-ratio: 1100 / 729; object-fit: cover;
-    border-radius: 6px; background: var(--paper-2);
+  .ph {
+    display: block; overflow: hidden; border-radius: 6px; background: var(--paper-2);
+    height: clamp(140px, 21vh, 280px); aspect-ratio: 1100 / 729;
   }
+  /* each frame drifts a little inside its window as the strip scrolls past (parallax) */
+  .ph img { width: 100%; height: 100%; object-fit: cover; transform: translate3d(0, var(--py), 0) scale(1.14); }
   @keyframes drift { to { transform: translateX(-50%); } }
   .film-cap {
     display: flex; justify-content: space-between; align-items: center; gap: var(--space-md);
@@ -287,13 +299,13 @@
   .film-cap .arr { width: 14px; height: 14px; }
 
   /* entrance for the rest of the hero */
-  html.js:not(.rm) .hero-body, html.js:not(.rm) .film { opacity: 0; transform: translateY(18px); }
+  html.js:not(.rm) .hero-body, html.js:not(.rm) .film { opacity: 0; transform: translateY(24px); }
   html.ready:not(.rm) .hero-body, html.ready:not(.rm) .film {
     opacity: 1; transform: none;
-    transition: opacity 1s var(--ease-out), transform 1.2s var(--ease-expo);
+    transition: opacity 1.3s var(--ease-soft), transform var(--dur-reveal) var(--ease-out);
   }
-  html.ready:not(.rm) .hero-body { transition-delay: .35s; }
-  html.ready:not(.rm) .film { transition-delay: .5s; }
+  html.ready:not(.rm) .hero-body { transition-delay: .55s; }
+  html.ready:not(.rm) .film { transition-delay: .8s; }
 
   /* ---------- sections ---------- */
   .sec {
@@ -315,14 +327,11 @@
   .wrow {
     position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--col-gap);
     align-items: start; padding-block: clamp(22px, 3.4vh, 38px);
-    transition: opacity .5s var(--ease-out);
+    transition: opacity var(--dur-hover) var(--ease-soft);
   }
-  .wn { grid-column: 1; padding-top: 0.6em; font-size: var(--text-sm); color: var(--ink-3); font-variant-numeric: tabular-nums; transition: color .3s var(--ease-out); }
-  .wt {
-    grid-column: 2 / span 6; font-family: 'Inktera', sans-serif; font-weight: 400; text-transform: uppercase;
-    font-size: var(--text-2xl); line-height: 0.92; letter-spacing: -0.005em;
-  }
-  .wtt { display: inline-block; transition: transform .7s var(--ease-expo); }
+  .wn { grid-column: 1; padding-top: 0.7em; font-size: var(--text-sm); color: var(--ink-3); font-variant-numeric: tabular-nums; transition: color var(--dur-hover) var(--ease-soft); }
+  .wt { grid-column: 2 / span 6; font-family: var(--font-display); font-weight: 700; font-size: var(--text-2xl); line-height: 0.95; letter-spacing: -0.04em; }
+  .wtt { display: inline-block; transition: translate var(--dur-hover) var(--ease-out); }
   .stretch::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: var(--radius); }
   .wmeta { grid-column: 8 / span 4; padding-top: 0.35em; }
   .wtag { font-size: var(--text-xs); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
@@ -336,18 +345,18 @@
   .abox {
     grid-column: 12; justify-self: end; width: 52px; height: 52px; border-radius: var(--radius);
     display: grid; place-items: center; background: var(--paper-2); color: var(--ink);
-    transition: background-color .35s var(--ease-out), color .35s var(--ease-out);
+    transition: background-color var(--dur-hover) var(--ease-soft), color var(--dur-hover) var(--ease-soft);
   }
   .abox .arr { width: 18px; height: 18px; }
 
   /* more */
   .groups { grid-column: 4 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: var(--space-2xl) var(--col-gap); }
   .group { display: grid; align-content: start; gap: var(--space-lg); }
-  .gl { font-family: 'Inktera', sans-serif; font-weight: 400; font-size: var(--text-lg); text-transform: uppercase; letter-spacing: 0.01em; }
+  .gl { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem, 1.15rem + 1vw, 2rem); letter-spacing: -0.035em; line-height: 1; }
   .items { list-style: none; display: grid; gap: var(--space-lg); }
-  .item { transition: opacity .5s var(--ease-out); }
+  .item { transition: opacity var(--dur-hover) var(--ease-soft); }
   .it { display: inline-flex; align-items: center; gap: 8px; font-size: var(--text-lg); font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; }
-  .it .arr { width: 14px; height: 14px; color: var(--ink-3); transition: color .3s var(--ease-out); }
+  .it .arr { width: 14px; height: 14px; color: var(--ink-3); transition: color var(--dur-hover) var(--ease-soft); }
   .itag { margin-top: 4px; font-size: var(--text-xs); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
   .idesc { margin-top: 8px; font-size: 0.9375rem; color: var(--ink-2); line-height: 1.55; max-width: 46ch; text-wrap: pretty; }
 
@@ -356,17 +365,18 @@
   .prow {
     position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--col-gap);
     align-items: center; padding-block: clamp(16px, 2.6vh, 28px);
-    transition: opacity .5s var(--ease-out);
+    transition: opacity var(--dur-hover) var(--ease-soft);
   }
-  .pn { grid-column: 1; font-size: var(--text-sm); color: var(--ink-3); font-variant-numeric: tabular-nums; transition: color .3s var(--ease-out); }
-  .pt { grid-column: 2 / span 6; font-family: 'Inktera', sans-serif; font-size: clamp(2rem, 1.1rem + 3.6vw, 4.25rem); text-transform: uppercase; line-height: 1; }
-  .pd { grid-column: 8 / span 4; color: var(--ink-2); }
+  .pn { grid-column: 1; font-size: var(--text-sm); color: var(--ink-3); font-variant-numeric: tabular-nums; transition: color var(--dur-hover) var(--ease-soft); }
+  .pt { grid-column: 2 / span 6; font-family: var(--font-display); font-weight: 700; font-size: clamp(2.125rem, 1.15rem + 3.7vw, 4.5rem); line-height: 1; letter-spacing: -0.04em; }
+  .ptt { display: inline-block; transition: translate var(--dur-hover) var(--ease-out); }
+  .pd { grid-column: 8 / span 4; color: var(--ink-2); transition: translate var(--dur-hover) var(--ease-out) 50ms; }
 
   /* ---------- footer panel ---------- */
   .foot {
     margin: var(--section-y) var(--gr) max(var(--gr), env(safe-area-inset-bottom, 0px)) var(--gl);
     background: var(--inv-bg); color: var(--inv-fg); border-radius: 20px;
-    transition: background-color .5s var(--ease-in-out), color .5s var(--ease-in-out);
+    transition: background-color .9s var(--ease-in-out), color .9s var(--ease-in-out);
   }
   .foot-in { padding: clamp(40px, 8vh, 104px) clamp(20px, 4vw, 56px) clamp(22px, 3.4vh, 36px); display: grid; gap: clamp(40px, 9vh, 112px); }
   .foot .label { color: var(--inv-mut); }
@@ -379,54 +389,61 @@
   .mail .arr { width: 0.62em; height: 0.62em; }
   .foot-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-md) var(--space-xl); font-size: var(--text-sm); }
   .foot-social { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+  .foot-social a, .foot-end a { transition: color var(--dur-hover) var(--ease-soft), background-color var(--dur-hover) var(--ease-soft); }
   .foot-end { display: flex; align-items: center; gap: var(--space-lg); color: var(--inv-mut); }
   .oldbtn {
     display: inline-flex; align-items: center; height: 40px; padding: 0 16px; border-radius: 10px;
     background: color-mix(in oklch, var(--inv-fg) 10%, transparent); color: var(--inv-fg); font-weight: 500;
-    transition: background-color .3s var(--ease-out), color .3s var(--ease-out);
   }
 
   /* ---------- reveal on scroll ---------- */
-  html.js:not(.rm) .r { opacity: 0; transform: translateY(22px); }
-  html.js .r.in { opacity: 1; transform: none; transition: opacity 1s var(--ease-out), transform 1.1s var(--ease-expo); transition-delay: calc(var(--i, 0) * 70ms); }
-  html.js .wrow.r.in, html.js .prow.r.in, html.js .item.r.in { transition: opacity 1s var(--ease-out), transform 1.1s var(--ease-expo); transition-delay: calc(var(--i, 0) * 70ms); }
+  html.js:not(.rm) .r { opacity: 0; transform: translateY(34px); }
+  html.js .r.in {
+    opacity: 1; transform: none;
+    transition: opacity 1.2s var(--ease-soft), transform var(--dur-reveal) var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 90ms);
+  }
+  /* once revealed, rows hand their opacity back to the hover dimming */
+  html.js .r.in.settled {
+    transition: opacity var(--dur-hover) var(--ease-soft), transform var(--dur-reveal) var(--ease-out);
+    transition-delay: 0s;
+  }
 
   /* ---------- hover (real pointers only) ---------- */
   @media (hover: hover) and (pointer: fine) {
     .btn:hover { background: color-mix(in oklch, var(--ink) 7%, transparent); }
-    a.ul:hover, .mail:hover .ul { animation: ulswap .75s var(--ease-out); }
-    a:hover > .arr svg, a:hover .arr svg { transform: translate(110%, -110%); }
-    a:hover > .arr svg + svg, a:hover .arr svg + svg { transform: none; }
-    [data-roll-host]:hover .rc > span { transform: translateY(-100%); }
+    a.ul:hover, .mail:hover .ul, .it:hover .itt { background-size: 100% 1px, 100% 1px; }
+    a:hover .arr svg { transform: translate(2px, -2px); }
 
     .mlink:hover { background: var(--paper-3); }
+    .mlink:hover .mt { translate: 8px 0; }
+    .mlink:hover .md { translate: 8px 0; }
     .mlink:hover .mn, .mlink:hover .arr { color: var(--accent); }
+    .mfoot a:hover { color: var(--ink); }
 
     .work-list:has(.wrow:hover) .wrow:not(:hover) { opacity: 0.3; }
-    .wrow:hover .wtt { transform: translateX(10px); }
+    .wrow:hover .wtt { translate: 14px 0; }
     .wrow:hover .wn { color: var(--accent); }
-    .wrow:has(.stretch:hover) .abox, .wrow:hover .abox { background: var(--accent); color: var(--on-accent); }
-    .wrow:hover .abox .arr svg { transform: translate(110%, -110%); }
-    .wrow:hover .abox .arr svg + svg { transform: none; }
+    .wrow:hover .abox { background: var(--accent); color: var(--on-accent); }
+    .wrow:hover .abox .arr svg { transform: translate(2px, -2px); }
 
     .items:has(.item:hover) .item:not(:hover) { opacity: 0.4; }
     .it:hover .arr { color: var(--accent); }
 
     .plist:has(.prow:hover) .prow:not(:hover) { opacity: 0.3; }
+    .prow:hover .ptt { translate: 14px 0; }
+    .prow:hover .pd { translate: 6px 0; }
     .prow:hover .pn { color: var(--accent); }
     .prow:hover .abox { background: var(--accent); color: var(--on-accent); }
 
-    .film:hover .film-track { animation-play-state: paused; }
     .foot-social a:hover, .foot-end a:hover { color: var(--inv-fg); }
     .oldbtn:hover { background: var(--inv-fg); color: var(--inv-bg); }
   }
-  .itt { background-image: linear-gradient(currentColor, currentColor); background-size: 0% 1px; background-position: 0 100%; background-repeat: no-repeat; padding-bottom: 1px; transition: background-size .5s var(--ease-out); }
-  .it:hover .itt { background-size: 100% 1px; }
 
   /* touch: pressed states instead of hover */
   @media (hover: none) {
-    .wrow:active .abox, .prow:active .abox { background: var(--accent); color: var(--on-accent); }
-    .mlink:active { background: var(--paper-3); }
+    .wrow:active .abox, .prow:active .abox { background: var(--accent); color: var(--on-accent); transition-duration: .3s; }
+    .mlink:active { background: var(--paper-3); transition-duration: .3s; }
   }
   @media (pointer: coarse) {
     .facts dd a, .foot-social a, .mfoot a, .it, .wdesc .ul, .statement a { position: relative; }
@@ -462,15 +479,14 @@
     .pt { grid-column: 2; grid-row: 1; }
     .pd { grid-column: 2; grid-row: 2; font-size: var(--text-sm); }
     .prow .abox { grid-column: 3; grid-row: 1 / span 2; width: 44px; height: 44px; }
+    .idesc { font-size: 1rem; }
     .foot-row { flex-direction: column; align-items: flex-start; }
     .foot-end { width: 100%; justify-content: space-between; }
   }
+  /* two-line name only when the screen is portrait (landscape phones keep one line) */
   @media (max-width: 819px) and (max-aspect-ratio: 1/1) {
     .masthead { font-size: calc(100cqi / 3.66); }
     .masthead .w { display: block; }
-  }
-  @media (max-width: 819px) {
-    .idesc { font-size: 1rem; }
   }
   @media (max-width: 479px) {
     .menu-btn .lbl { display: none; }
@@ -484,8 +500,9 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .film-view { overflow-x: auto; scrollbar-width: none; }
-    .film-track { animation: none; }
+    .film-track { animation: none !important; }
     .film-set + .film-set { display: none; }
+    .ph img { transform: none; }
     *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-delay: 0s !important; transition-delay: 0s !important; }
   }
 </style>
@@ -508,14 +525,14 @@
       </span>
     </button>
     <button class="btn menu-btn" id="menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu">
-      <span class="lbl"><span>Menu</span><span aria-hidden="true">Close</span></span>
+      <span class="lbl" aria-hidden="true"><span>Menu</span><span>Close</span></span>
       <span class="burger" aria-hidden="true"><i></i><i></i></span>
     </button>
     <nav class="menu" id="menu" aria-label="Pages" inert>
       <ul class="mlist">
-        <li style="--i:0"><a class="mlink" href="/music/" data-roll-host><span class="mn">01</span><span class="mt" data-roll>Music</span><span class="md">Original productions</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a></li>
-        <li style="--i:1"><a class="mlink" href="/projects/" data-roll-host><span class="mn">02</span><span class="mt" data-roll>Projects</span><span class="md">Everything I’ve built, as a gallery</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a></li>
-        <li style="--i:2"><a class="mlink" href="/photography.html" data-roll-host><span class="mn">03</span><span class="mt" data-roll>Photography</span><span class="md">Shot on 35mm film</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a></li>
+        <li style="--i:0"><a class="mlink" href="/music/"><span class="mn">01</span><span class="mt">Music</span><span class="md">Original productions</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a></li>
+        <li style="--i:1"><a class="mlink" href="/projects/"><span class="mn">02</span><span class="mt">Projects</span><span class="md">Everything I’ve built, as a gallery</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a></li>
+        <li style="--i:2"><a class="mlink" href="/photography.html"><span class="mn">03</span><span class="mt">Photography</span><span class="md">Shot on 35mm film</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a></li>
       </ul>
       <div class="mfoot">
         <a href="https://linkedin.com/in/arjun-kalbag/" target="_blank" rel="noopener">LinkedIn</a>
@@ -535,8 +552,8 @@
     </div>
 
     <div class="hero-body">
-      <p class="tagline">Building projects at the intersection of engineering and creativity.</p>
-      <dl class="facts">
+      <p class="tagline" data-px="0.14" data-px-m="0.08" data-px-hero>Building projects at the intersection of engineering and creativity.</p>
+      <dl class="facts" data-px="0.24" data-px-m="0.12" data-px-hero>
         <div><dt>Based in</dt><dd>New York / St. Louis</dd></div>
         <div><dt>Studying</dt><dd>Computer Engineering &amp; Economics, WashU ’29</dd></div>
         <div><dt>Elsewhere</dt><dd><a class="ul" href="https://linkedin.com/in/arjun-kalbag/" target="_blank" rel="noopener">LinkedIn</a><a class="ul" href="https://github.com/arjunkalbag" target="_blank" rel="noopener">GitHub</a><a class="ul" href="mailto:arjunkalbag07@gmail.com">Email</a></dd></div>
@@ -547,28 +564,28 @@
       <div class="film-view">
         <div class="film-track">
           <div class="film-set">
-            <img src="assets/photos/p15.jpg" alt="" width="1100" height="729" decoding="async" />
-            <img src="assets/photos/p27.jpg" alt="" width="1100" height="729" decoding="async" />
-            <img src="assets/photos/p44.jpg" alt="" width="1100" height="729" decoding="async" />
-            <img src="assets/photos/p61.jpg" alt="" width="1100" height="729" decoding="async" />
-            <img src="assets/photos/p62.jpg" alt="" width="1100" height="729" decoding="async" />
-            <img src="assets/photos/p20.jpg" alt="" width="1100" height="729" decoding="async" />
-            <img src="assets/photos/p48.jpg" alt="" width="1100" height="729" decoding="async" />
+            <span class="ph"><img src="assets/photos/p15.jpg" alt="" width="1100" height="729" decoding="async" /></span>
+            <span class="ph"><img src="assets/photos/p27.jpg" alt="" width="1100" height="729" decoding="async" /></span>
+            <span class="ph"><img src="assets/photos/p44.jpg" alt="" width="1100" height="729" decoding="async" /></span>
+            <span class="ph"><img src="assets/photos/p61.jpg" alt="" width="1100" height="729" decoding="async" /></span>
+            <span class="ph"><img src="assets/photos/p62.jpg" alt="" width="1100" height="729" decoding="async" /></span>
+            <span class="ph"><img src="assets/photos/p20.jpg" alt="" width="1100" height="729" decoding="async" /></span>
+            <span class="ph"><img src="assets/photos/p48.jpg" alt="" width="1100" height="729" decoding="async" /></span>
           </div>
           <div class="film-set" aria-hidden="true">
-            <img src="assets/photos/p15.jpg" alt="" width="1100" height="729" decoding="async" />
-            <img src="assets/photos/p27.jpg" alt="" width="1100" height="729" decoding="async" />
-            <img src="assets/photos/p44.jpg" alt="" width="1100" height="729" decoding="async" />
-            <img src="assets/photos/p61.jpg" alt="" width="1100" height="729" decoding="async" />
-            <img src="assets/photos/p62.jpg" alt="" width="1100" height="729" decoding="async" />
-            <img src="assets/photos/p20.jpg" alt="" width="1100" height="729" decoding="async" />
-            <img src="assets/photos/p48.jpg" alt="" width="1100" height="729" decoding="async" />
+            <span class="ph"><img src="assets/photos/p15.jpg" alt="" width="1100" height="729" decoding="async" /></span>
+            <span class="ph"><img src="assets/photos/p27.jpg" alt="" width="1100" height="729" decoding="async" /></span>
+            <span class="ph"><img src="assets/photos/p44.jpg" alt="" width="1100" height="729" decoding="async" /></span>
+            <span class="ph"><img src="assets/photos/p61.jpg" alt="" width="1100" height="729" decoding="async" /></span>
+            <span class="ph"><img src="assets/photos/p62.jpg" alt="" width="1100" height="729" decoding="async" /></span>
+            <span class="ph"><img src="assets/photos/p20.jpg" alt="" width="1100" height="729" decoding="async" /></span>
+            <span class="ph"><img src="assets/photos/p48.jpg" alt="" width="1100" height="729" decoding="async" /></span>
           </div>
         </div>
       </div>
       <div class="film-cap">
         <span>On film · Olympus Stylus 35mm</span>
-        <span class="go">Photographs <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span>
+        <span class="go">Photographs <span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span>
       </div>
     </a>
   </section>
@@ -585,25 +602,25 @@
     <ol class="work-list">
       <li class="wrow r" style="--i:0">
         <span class="wn">01</span>
-        <h3 class="wt"><a class="stretch" href="https://pairyx.co/" target="_blank" rel="noopener"><span class="wtt">Pairyx</span></a></h3>
+        <h3 class="wt"><a class="stretch" href="https://pairyx.co/" target="_blank" rel="noopener"><span class="wtt" data-px="0.06">Pairyx</span></a></h3>
         <div class="wmeta">
           <p class="wtag">AI · Creator Economy</p>
           <p class="wdesc">Building an AI-integrated company connecting creators with early-stage brands through strategic partnerships. Responsible for technical strategy, platform architecture, and product roadmap.</p>
         </div>
-        <span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span>
+        <span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span>
       </li>
       <li class="wrow r" style="--i:1">
         <span class="wn">02</span>
-        <h3 class="wt"><a class="stretch" href="https://genre-space.netlify.app/" target="_blank" rel="noopener"><span class="wtt">genre-space</span></a></h3>
+        <h3 class="wt"><a class="stretch" href="https://genre-space.netlify.app/" target="_blank" rel="noopener"><span class="wtt" data-px="0.06">genre-space</span></a></h3>
         <div class="wmeta">
           <p class="wtag">Research · Data Viz</p>
           <p class="wdesc">Computational research on music-genre similarity, visualized as an interactive 2D map of genre clusters and influence over time. <a class="ul" href="assets/genre-explosion-paper.pdf" target="_blank" rel="noopener">Read the paper</a></p>
         </div>
-        <span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span>
+        <span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span>
       </li>
       <li class="wrow r" style="--i:2">
         <span class="wn">03</span>
-        <h3 class="wt"><a class="stretch" href="https://aklaboratories.github.io" target="_blank" rel="noopener"><span class="wtt">AK Labs</span></a></h3>
+        <h3 class="wt"><a class="stretch" href="https://akalbag.github.io" target="_blank" rel="noopener"><span class="wtt" data-px="0.06">AK Labs</span></a></h3>
         <div class="wmeta">
           <p class="wtag">Swift · macOS</p>
           <p class="wdesc">An independent studio building native macOS apps for music discovery, organization, and creative workflows.</p>
@@ -613,25 +630,25 @@
             <li><b>Needlebox</b><span>Key/BPM library sorter and harmonic set builder.</span></li>
           </ul>
         </div>
-        <span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span>
+        <span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span>
       </li>
       <li class="wrow r" style="--i:3">
         <span class="wn">04</span>
-        <h3 class="wt"><a class="stretch" href="https://tryplayback.xyz" target="_blank" rel="noopener"><span class="wtt">Playback</span></a></h3>
+        <h3 class="wt"><a class="stretch" href="https://tryplayback.xyz" target="_blank" rel="noopener"><span class="wtt" data-px="0.06">Playback</span></a></h3>
         <div class="wmeta">
           <p class="wtag">Product Design · Hardware</p>
           <p class="wdesc">Music hardware, in progress.</p>
         </div>
-        <span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span>
+        <span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span>
       </li>
       <li class="wrow r" style="--i:4">
         <span class="wn">05</span>
-        <h3 class="wt"><a class="stretch" href="https://vantageprep.netlify.app/" target="_blank" rel="noopener"><span class="wtt">Vantage Prep</span></a></h3>
+        <h3 class="wt"><a class="stretch" href="https://vantageprep.netlify.app/" target="_blank" rel="noopener"><span class="wtt" data-px="0.06">Vantage Prep</span></a></h3>
         <div class="wmeta">
           <p class="wtag">Founder · EdTech</p>
           <p class="wdesc">A premium tutoring service pairing students with elite tutors from top universities.</p>
         </div>
-        <span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span>
+        <span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span>
       </li>
     </ol>
   </section>
@@ -644,17 +661,17 @@
         <h3 class="gl r">Sites</h3>
         <ul class="items">
           <li class="item r" style="--i:1">
-            <a class="it" href="https://usepitstop.netlify.app/" target="_blank" rel="noopener"><span class="itt">Pitstop</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a>
+            <a class="it" href="https://usepitstop.netlify.app/" target="_blank" rel="noopener"><span class="itt">Pitstop</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a>
             <p class="itag">Geospatial · Routing</p>
             <p class="idesc">Maps the best places to stop along a travel route using dynamic geospatial routing and real-time telemetry.</p>
           </li>
           <li class="item r" style="--i:2">
-            <a class="it" href="https://createwellness.github.io" target="_blank" rel="noopener"><span class="itt">Create Report Engine</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a>
+            <a class="it" href="https://createwellness.github.io" target="_blank" rel="noopener"><span class="itt">Create Report Engine</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a>
             <p class="itag">Data Tooling · Automation</p>
             <p class="idesc">A data-aggregation and automated reporting platform that turns raw retail analytics into presentation-ready executive reports.</p>
           </li>
           <li class="item r" style="--i:3">
-            <a class="it" href="https://useneedl.netlify.app/" target="_blank" rel="noopener"><span class="itt">Needl</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a>
+            <a class="it" href="https://useneedl.netlify.app/" target="_blank" rel="noopener"><span class="itt">Needl</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a>
             <p class="itag">JavaScript · Three.js</p>
             <p class="idesc">A browser music player with real-time 3D vinyl visualization, local file management, and playback controls.</p>
           </li>
@@ -669,7 +686,7 @@
             <p class="idesc">A two-year independent study building a 16-bit CPU from scratch. Under active development.</p>
           </li>
           <li class="item r" style="--i:2">
-            <a class="it" href="https://github.com/arjunkalbag/DIRECT" target="_blank" rel="noopener"><span class="itt">IoT Digital Record Player</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a>
+            <a class="it" href="https://github.com/arjunkalbag/DIRECT" target="_blank" rel="noopener"><span class="itt">IoT Digital Record Player</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a>
             <p class="itag">IoT · NFC</p>
             <p class="idesc">A digital record player built from scratch, using NFC to bridge physical media with digital streaming.</p>
           </li>
@@ -682,9 +699,9 @@
   <section class="sec page" id="pages" aria-labelledby="pages-h">
     <div class="sec-head r"><h2 class="label" id="pages-h">Pages</h2><span class="count">03</span></div>
     <ul class="plist">
-      <li class="r" style="--i:0"><a class="prow" href="/music/" data-roll-host><span class="pn">01</span><span class="pt" data-roll>Music</span><span class="pd">Original productions</span><span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span></a></li>
-      <li class="r" style="--i:1"><a class="prow" href="/projects/" data-roll-host><span class="pn">02</span><span class="pt" data-roll>Projects</span><span class="pd">Everything I’ve built, as a gallery</span><span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span></a></li>
-      <li class="r" style="--i:2"><a class="prow" href="/photography.html" data-roll-host><span class="pn">03</span><span class="pt" data-roll>Photography</span><span class="pd">Shot on 35mm film</span><span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span></a></li>
+      <li class="r" style="--i:0"><a class="prow" href="/music/"><span class="pn">01</span><span class="pt"><span class="ptt" data-px="0.05">Music</span></span><span class="pd">Original productions</span><span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span></a></li>
+      <li class="r" style="--i:1"><a class="prow" href="/projects/"><span class="pn">02</span><span class="pt"><span class="ptt" data-px="0.05">Projects</span></span><span class="pd">Everything I’ve built, as a gallery</span><span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span></a></li>
+      <li class="r" style="--i:2"><a class="prow" href="/photography.html"><span class="pn">03</span><span class="pt"><span class="ptt" data-px="0.05">Photography</span></span><span class="pd">Shot on 35mm film</span><span class="abox" aria-hidden="true"><span class="arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></span></a></li>
     </ul>
   </section>
 
@@ -693,9 +710,9 @@
 <!-- Contact -->
 <footer class="foot" id="contact">
   <div class="foot-in">
-    <div class="mail-wrap">
+    <div class="mail-wrap r">
       <p class="label">Get in touch</p>
-      <a class="mail" href="mailto:arjunkalbag07@gmail.com"><span class="ul">arjunkalbag07@gmail.com</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a>
+      <a class="mail" href="mailto:arjunkalbag07@gmail.com"><span class="ul">arjunkalbag07@gmail.com</span><span class="arr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8.5 7H17v8.5"/></svg></span></a>
     </div>
     <div class="foot-row">
       <nav class="foot-social" aria-label="Social">
@@ -766,7 +783,7 @@
     measure(); render(0);
     window.addEventListener('resize', function () { measure(); });
     var raf, start = null, running = true, revealed = false;
-    var REVEAL_AT = 1900, FADE = 650;
+    var REVEAL_AT = 1900, FADE = 1000;
     var kill = function () { running = false; if (raf) cancelAnimationFrame(raf); if (splash && splash.parentNode) splash.remove(); if (!revealed) { revealed = true; reveal(); } };
     if (reduce) {
       splash.style.transition = 'opacity .5s ease';
@@ -782,6 +799,7 @@
       if (el > REVEAL_AT) {
         if (!revealed) { revealed = true; reveal(); }
         var fp = Math.min(1, (el - REVEAL_AT) / FADE);
+        fp = fp * fp * (3 - 2 * fp); // smoothstep: soft in, soft out
         splash.style.opacity = String(1 - fp);
         if (fp >= 1) { kill(); return; }
       }
@@ -803,33 +821,17 @@
     });
   })();
 
-  // per-letter roll: duplicate each glyph so hover can slide a fresh copy up
-  (function () {
-    document.querySelectorAll('[data-roll]').forEach(function (el) {
-      var text = el.textContent;
-      var vis = document.createElement('span'); vis.setAttribute('aria-hidden', 'true');
-      Array.from(text).forEach(function (ch, i) {
-        var c = ch === ' ' ? ' ' : ch;
-        var rc = document.createElement('span'); rc.className = 'rc'; rc.style.setProperty('--i', i);
-        var a = document.createElement('span'); a.textContent = c;
-        var b = document.createElement('span'); b.textContent = c;
-        rc.appendChild(a); rc.appendChild(b); vis.appendChild(rc);
-      });
-      var sr = document.createElement('span'); sr.className = 'sr-only'; sr.textContent = text;
-      el.textContent = ''; el.appendChild(sr); el.appendChild(vis);
-    });
-  })();
-
-  // masthead → AK: the full-width name folds into the monogram, which docks in
-  // the pill bar as you scroll (and unfolds on the way back). Every letter is a
-  // fixed overlay positioned from the in-flow masthead, so once docked nothing
-  // moves with the scroll and there's no jitter. Transform + opacity only.
+  // motion engine: one eased scroll value drives the name → AK morph, the pill
+  // bar and the parallax layers, so wheel steps glide instead of jumping. Every
+  // masthead letter is a fixed overlay positioned from the in-flow masthead, so
+  // once docked nothing moves with the scroll. Transform + opacity only.
   (function () {
     var mh = document.getElementById('masthead');
     var bar = document.getElementById('bar');
     var mark = document.getElementById('mark');
     if (!mh || !bar || !mark) return;
     var PILL_MAX = 600, HOME_X = 18, CAPC = 0.578; // Inktera: ascent .9em, cap height .644em
+    var TAU = 110, LAG = 70;                          // smoothing time constant (ms) + max lag (px)
     var letters = [], inits = [];
     mh.querySelectorAll('.w').forEach(function (w) {
       var text = w.textContent.toUpperCase(), n = text.length, g = null;
@@ -844,17 +846,27 @@
         l.g = g; letters.push(l);
       });
     });
+    var layers = [].map.call(document.querySelectorAll('[data-px]'), function (el) {
+      return { el: el, s: parseFloat(el.getAttribute('data-px')) || 0, sm: parseFloat(el.getAttribute('data-px-m')) || 0, hero: el.hasAttribute('data-px-hero'), c: 0, on: false };
+    });
+    var filmView = document.querySelector('.film-view'), filmC = 0;
 
-    var F = 0, s = 1, R = 400, ready = false, raf = 0, rm = root.classList.contains('rm');
+    var F = 0, s = 1, R = 400, vh = window.innerHeight, small = false;
+    var ready = false, raf = 0, last = 0, cur = window.scrollY;
+    var rm = root.classList.contains('rm');
+    var smallMq = window.matchMedia('(max-width: 819px), (pointer: coarse)');
     function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
     function lerp(a, b, t) { return a + (b - a) * t; }
-    function ease(t) { return Math.sin(t * Math.PI / 2); } // ease-out: responds at once, lands softly
+    function ease(t) { return Math.sin(t * Math.PI / 2); } // responds at once, lands softly
 
     function measure() {
+      vh = window.innerHeight; small = smallMq.matches;
       F = parseFloat(getComputedStyle(mh).fontSize);
       mark.style.fontSize = F + 'px';
       var sy = window.scrollY;
       letters.forEach(function (l) { var r = l.h.getBoundingClientRect(); l.x0 = r.left; l.y0 = r.top + sy; l.w = r.width; });
+      layers.forEach(function (q) { q.el.style.transform = ''; q.on = false; var r = q.el.getBoundingClientRect(); q.c = r.top + sy + r.height / 2; });
+      if (filmView) { var fr = filmView.getBoundingClientRect(); filmC = fr.top + sy + fr.height / 2; }
       var br = bar.getBoundingClientRect();
       var inset = Math.max(0, (br.width - Math.min(br.width, PILL_MAX)) / 2);
       bar.style.setProperty('--inset', inset + 'px');
@@ -862,19 +874,18 @@
       s = f / F;
       var x = br.left + inset + HOME_X, ty = br.top + br.height / 2 - CAPC * f;
       inits.forEach(function (g) { g.tx = x; g.ty = ty; x += g.w * s; });
-      // finish docking before the first line of hero text slides up under the bar
+      // dock before the first line of hero text slides up under the bar
       var hb = document.querySelector('.hero-body'), lift = 0;
-      try { lift = new DOMMatrixReadOnly(getComputedStyle(hb).transform).m42 || 0; } catch (err) {} // ignore the entrance offset
+      try { lift = new DOMMatrixReadOnly(getComputedStyle(hb).transform).m42 || 0; } catch (err) {}
       var below = Math.min(hb.querySelector('.tagline').getBoundingClientRect().top, hb.querySelector('.facts').getBoundingClientRect().top) + sy - lift;
-      R = clamp(below - (br.top + br.height) - 28, 160, window.innerHeight * 0.6);
+      R = clamp(below - (br.top + br.height) - 28 - LAG * 0.5, 140, vh * 0.6);
       if (!ready) { ready = true; mark.classList.add('on'); if (root.classList.contains('splash-skip')) requestAnimationFrame(reveal); }
-      update();
+      cur = sy;
+      render(cur);
     }
 
-    function update() {
-      raf = 0;
-      if (!ready) return;
-      var y = window.scrollY, p = clamp(y / R, 0, 1), e = ease(p);
+    function render(y) {
+      var p = clamp(y / R, 0, 1), e = ease(p);
       bar.style.setProperty('--e', e.toFixed(4));
       bar.classList.toggle('docked', p > 0.985);
       if (rm) return;
@@ -894,10 +905,29 @@
         l.o.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + yy.toFixed(2) + 'px,0) scale(' + k.toFixed(4) + ')';
         l.o.style.opacity = op.toFixed(3);
       }
+      // parallax: hero layers recede at their own pace; titles drift around the viewport centre
+      for (var j = 0; j < layers.length; j++) {
+        var q = layers[j], sp = small ? q.sm : q.s;
+        if (!sp) { if (q.on) { q.el.style.transform = ''; q.on = false; } continue; }
+        var off = q.hero ? Math.min(y, vh * 1.2) * sp : -(q.c - y - vh / 2) * sp;
+        q.el.style.transform = 'translate3d(0,' + off.toFixed(2) + 'px,0)'; q.on = true;
+      }
+      if (filmView) filmView.style.setProperty('--py', (-(filmC - y - vh / 2) * (small ? 0.035 : 0.06)).toFixed(2) + 'px');
     }
-    function queue() { if (!raf) raf = requestAnimationFrame(update); }
+
+    function tick(t) {
+      var dt = last ? Math.min(64, t - last) : 16; last = t;
+      var target = window.scrollY;
+      cur += (target - cur) * (1 - Math.exp(-dt / TAU));
+      if (cur < target - LAG) cur = target - LAG; else if (cur > target + LAG) cur = target + LAG;
+      if (Math.abs(target - cur) < 0.1) cur = target;
+      render(cur);
+      if (cur !== target) raf = requestAnimationFrame(tick); else { raf = 0; last = 0; }
+    }
+    function queue() { if (ready && !raf) { last = 0; raf = requestAnimationFrame(tick); } }
+
     var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    var onMq = function () { rm = mq.matches; root.classList.toggle('rm', rm); update(); };
+    var onMq = function () { rm = mq.matches; root.classList.toggle('rm', rm); measure(); };
     if (mq.addEventListener) mq.addEventListener('change', onMq);
 
     window.addEventListener('scroll', queue, { passive: true });
@@ -913,6 +943,33 @@
     });
   })();
 
+  // film strip: a slow drift that eases almost to a stop under the cursor
+  (function () {
+    var film = document.querySelector('.film'), track = document.querySelector('.film-track');
+    var set = track && track.querySelector('.film-set');
+    if (!film || !track || !set || root.classList.contains('rm')) return;
+    root.classList.add('jsfilm');
+    var x = 0, w = 0, base = 0, v = 0, target = 0, raf = 0, last = 0, visible = true, hovering = false;
+    function size() { w = set.getBoundingClientRect().width; base = w / 80000; target = hovering ? base * 0.1 : base; if (!v) v = base; }
+    function step(t) {
+      var dt = last ? Math.min(64, t - last) : 16; last = t;
+      v += (target - v) * (1 - Math.exp(-dt / 650));
+      x -= v * dt; if (w && x <= -w) x += w;
+      track.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+      if (visible) raf = requestAnimationFrame(step); else { raf = 0; last = 0; }
+    }
+    function start() { if (!raf) { last = 0; raf = requestAnimationFrame(step); } }
+    if (window.matchMedia('(hover: hover)').matches) {
+      film.addEventListener('mouseenter', function () { hovering = true; target = base * 0.1; });
+      film.addEventListener('mouseleave', function () { hovering = false; target = base; });
+    }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (en) { visible = en[0].isIntersecting; if (visible) start(); }).observe(film);
+    }
+    window.addEventListener('resize', size);
+    size(); start();
+  })();
+
   // pill menu
   (function () {
     var bar = document.getElementById('bar');
@@ -923,11 +980,12 @@
       open = o;
       bar.classList.toggle('open', o);
       btn.setAttribute('aria-expanded', String(o));
+      btn.setAttribute('aria-label', o ? 'Close menu' : 'Menu');
       if (o) { menu.removeAttribute('inert'); } else { menu.setAttribute('inert', ''); if (focusBtn) btn.focus(); }
     }
     btn.addEventListener('click', function () {
       set(!open);
-      if (open && btn.matches(':focus-visible')) { var a = menu.querySelector('a'); if (a) setTimeout(function () { a.focus(); }, 60); }
+      if (open && btn.matches(':focus-visible')) { var a = menu.querySelector('a'); if (a) setTimeout(function () { a.focus(); }, 80); }
     });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && open) set(false, true); });
     document.addEventListener('pointerdown', function (e) { if (open && !e.target.closest('.bar-r')) set(false); });
@@ -935,12 +993,16 @@
     window.addEventListener('pageshow', function () { set(false); });
   })();
 
-  // gentle reveal on scroll
+  // reveal on scroll; once a row has settled, hand its opacity back to the hover dimming
   (function () {
     var els = document.querySelectorAll('.r');
-    if (!('IntersectionObserver' in window) || root.classList.contains('rm')) { els.forEach(function (e) { e.classList.add('in'); }); return; }
+    if (!('IntersectionObserver' in window) || root.classList.contains('rm')) { els.forEach(function (e) { e.classList.add('in', 'settled'); }); return; }
     var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var el = en.target; el.classList.add('in'); io.unobserve(el);
+        setTimeout(function () { el.classList.add('settled'); }, 1700);
+      });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
     els.forEach(function (e) { io.observe(e); });
   })();
