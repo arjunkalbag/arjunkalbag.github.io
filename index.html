@@ -97,7 +97,7 @@
     --bar-r: max(var(--bar-x), env(safe-area-inset-right, 0px), calc((100vw - 2000px) / 2));
     --bar-pad: max(14px, calc(var(--gl) - var(--bar-l)));
     --ak: 52px;                          /* the docked monogram: big enough to fill the pill */
-    --mh: clamp(52px, 8.2vw, 164px);     /* the name, top left */
+    --mh: clamp(48px, 7.4vw, 148px);     /* the name, top left */
   }
   html.dark {
     --paper:   oklch(17.5% 0.009 70);
@@ -531,7 +531,7 @@
   /* phones: the bar's row is taken by the menu, so the name sits just under it, edge to edge */
   @media (max-width: 639px) {
     .hero { padding-top: calc(var(--bar-top) + var(--bar-h) + 12px); }
-    .masthead { font-size: calc(100cqi / 7.8); }
+    .masthead { font-size: calc(100cqi / 8.6); }
     .logo { height: clamp(76px, 13vh, 120px); }
   }
   @media (max-width: 479px) {
@@ -882,9 +882,9 @@
 
   // name ⇄ AK. The name sits big in the top left. The moment you scroll, it lets go of the
   // page and shrinks, as one piece, into the AK in the pill bar; back at the very top it
-  // grows out again. The move runs on a critically damped spring (no overshoot, no bounce):
-  // it starts softly, lands softly, and can turn around mid-flight without a jolt. Scrolling
-  // itself is never touched. At rest the real text shows (the name in the page, the AK in the
+  // grows out again. The flight is a fixed-length eased move (soft start, long deceleration
+  // that ends cleanly, no spring tail), and the AK scales around the middle of its capitals,
+  // so it arrives centred in the bar and simply stops. Scrolling itself is never touched. At rest the real text shows (the name in the page, the AK in the
   // bar); the fixed copy only flies in between, so both ends stay pin-sharp.
   (function () {
     var mh = document.getElementById('masthead');
@@ -894,15 +894,15 @@
     if (!mh || !bar || !mark || !slot) return;
     var full = mark.querySelector('.mk-full'), ak = mark.querySelector('.mk-ak'), solo = mark.querySelector('.mk-a');
     var tag = document.querySelector('.tagline'), solidAt = 0, solid = false;
-    var W = 5.4;                    // spring rate (1/s): half way in ~.3s, 90% by ~.7s, then a long soft landing
+    var DUR = 950;                  // a full flight, ms: half way by ~.33s, 94% by ~.67s, done at .95s
     var DOCK_AT = 6, HOME_AT = 2;   // px of scroll that send the name into the bar / bring it back
-    var x0 = 0, y0 = 0, tx = 0, ty = 0, s = 1, rmLine = 0, capc = 0.58;
+    var x0 = 0, y0 = 0, tx = 0, ty = 0, s = 1, rmLine = 0, capc = 0.58, FN = 1, FA = 1;
     // the pill surface only appears once the tagline ("Building projects…") reaches the top
     function pill(y) {
       var on = solid ? y > solidAt - 8 : y > solidAt;  // a few px of give so it never flickers
       if (on !== solid) { solid = on; bar.classList.toggle('solid', on); }
     }
-    var p = 0, v = 0, goal = 0, raf = 0, last = 0, ready = false, state = -1, held = Infinity;
+    var p = 0, goal = 0, tw = null, raf = 0, ready = false, state = -1, held = Infinity;
     var rm = root.classList.contains('rm');
     function clamp(n, a, b) { return n < a ? a : n > b ? b : n; }
     // where the middle of the capitals sits, in em below the top of the text box
@@ -915,6 +915,18 @@
       return 0.58;
     }
     function sstep(a, b, t) { t = clamp((t - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+    // cubic-bezier(.45, 0, .2, 1): a gentle departure and a long, soft deceleration that ends on time
+    var ease = (function (x1, y1, x2, y2) {
+      function A(a, b) { return 1 - 3 * b + 3 * a; } function B(a, b) { return 3 * b - 6 * a; }
+      function at(t, a, b) { return ((A(a, b) * t + B(a, b)) * t + 3 * a) * t; }
+      function slope(t, a, b) { return 3 * A(a, b) * t * t + 2 * B(a, b) * t + 3 * a; }
+      return function (x) {
+        if (x <= 0) return 0; if (x >= 1) return 1;
+        var t = x;
+        for (var i = 0; i < 8; i++) { var d = slope(t, x1, x2); if (Math.abs(d) < 1e-6) break; t -= (at(t, x1, x2) - x) / d; }
+        return at(clamp(t, 0, 1), y1, y2);
+      };
+    })(0.45, 0, 0.2, 1);
     function aim(y, cur) {
       if (rm) return y > rmLine ? 1 : 0;
       return y > DOCK_AT ? 1 : y < HOME_AT ? 0 : cur;
@@ -932,7 +944,7 @@
       var sy = window.scrollY, r = mh.getBoundingClientRect();
       x0 = r.left; y0 = r.top + sy;          // the name, in page coordinates
       tx = sr.left; ty = sr.top;             // the AK slot in the bar (fixed)
-      s = f / F;
+      FN = F; FA = f; s = f / F;
       rmLine = Math.max(DOCK_AT, y0 + 0.9 * F - br.bottom); // reduced motion: swap once the name has slid under the bar
       // the pill arrives just before the tagline slides under the bar (layout offsets ignore the hero's entrance transform)
       for (var el = tag, top = 0; el; el = el.offsetParent) top += el.offsetTop;
@@ -959,7 +971,10 @@
       // the page spot it left from: held where it let go, but it follows the page back down
       var py = y0 - Math.min(held, window.scrollY);
       var k = Math.exp(Math.log(s) * e);     // scale in log space, so the shrink reads evenly
-      var x = x0 + (tx - x0) * e, y = py + (ty - py) * e;
+      // the middle of the capitals (at the A's left edge) travels in a straight line and the
+      // letters scale around it, so the AK settles centred instead of drifting into place
+      var a0 = py + capc * FN, a1 = ty + capc * FA;
+      var x = x0 + (tx - x0) * e, y = a0 + (a1 - a0) * e - capc * FN * k;
       mark.style.transform = 'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) scale(' + k.toFixed(4) + ')';
       // the rest of the name dissolves while the K appears beside the A (the A never fades)
       var of = 1 - sstep(0.02, 0.5, e), ok = sstep(0.36, 0.86, e);
@@ -969,13 +984,11 @@
     }
 
     function tick(t) {
-      var dt = last ? Math.min(0.064, (t - last) / 1000) : 1 / 60; last = t;
-      var y = p - goal, c = v + W * y, ex = Math.exp(-W * dt);
-      p = goal + (y + c * dt) * ex;          // exact critically damped step: frame-rate independent
-      v = (v - W * c * dt) * ex;
-      if (Math.abs(p - goal) < 0.0015 && Math.abs(v) < 0.02) { p = goal; v = 0; }
+      var k = tw ? clamp((t - tw.t0) / tw.d, 0, 1) : 1;
+      if (tw) p = tw.from + (tw.to - tw.from) * ease(k);
+      if (k >= 1) { p = goal; tw = null; }
       render();
-      if (p !== goal) raf = requestAnimationFrame(tick); else { raf = 0; last = 0; }
+      raf = tw ? requestAnimationFrame(tick) : 0;
     }
 
     function onScroll() {
@@ -985,9 +998,11 @@
       if (g === goal) return;
       if (g === 1) held = y;                 // let go of the page exactly where it is now
       goal = g;
-      if (rm) { p = g; v = 0; render(); return; }
+      if (rm) { p = g; tw = null; render(); return; }
+      // a part-way flight that turns around takes proportionally less time
+      tw = { from: p, to: g, t0: performance.now(), d: Math.max(420, DUR * Math.pow(Math.abs(g - p), 0.6)) };
       render();
-      if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
+      if (!raf) raf = requestAnimationFrame(tick);
     }
 
     var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
