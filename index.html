@@ -97,7 +97,7 @@
     --bar-r: max(var(--bar-x), env(safe-area-inset-right, 0px), calc((100vw - 2000px) / 2));
     --bar-pad: max(14px, calc(var(--gl) - var(--bar-l)));
     --ak: 52px;                          /* the docked monogram: big enough to fill the pill */
-    --mh: clamp(44px, 6.8vw, 136px);     /* the name, top left */
+    --mh: clamp(36px, 4.8vw, 96px);      /* the name, top left */
   }
   html.dark {
     --paper:   oklch(17.5% 0.009 70);
@@ -532,7 +532,7 @@
   /* phones: the bar's row is taken by the menu, so the name sits just under it, edge to edge */
   @media (max-width: 639px) {
     .hero { padding-top: calc(var(--bar-top) + var(--bar-h) + 12px); }
-    .masthead { font-size: calc(100cqi / 9.4); }
+    .masthead { font-size: calc(100cqi / 10.4); }
     .logo { height: clamp(76px, 13vh, 120px); }
   }
   @media (max-width: 479px) {
