@@ -88,7 +88,7 @@
     --dur-arrow: 1000ms;   /* arrow boxes + arrow glides */
 
     --radius: 14px;
-    --pin: clamp(200px, 30vh, 300px); /* scroll spent folding the name into the bar */
+    --pin: clamp(300px, 46vh, 460px); /* scroll spent folding the name into the bar */
     --bar-h: 60px;
     --bar-top: calc(env(safe-area-inset-top, 0px) + 12px);
   }
@@ -876,8 +876,8 @@
     var pinEl = document.getElementById('hero-pin');
     if (!mh || !bar || !mark || !hero || !pinEl) return;
     var PILL_MAX = 600, HOME_X = 18, CAPC = 0.578;  // Inktera: cap centre sits .578em below the box top
-    var TAU = 85, MAXLAG = 0.22;                    // the fold eases after the scroll, never far behind
-    var IDLE = 150;                                 // rest before an unfinished fold settles
+    var TAU = 150, MAXLAG = 0.25;                   // the fold eases softly after the scroll, never far behind
+    var IDLE = 180;                                 // rest before an unfinished fold settles
 
     var letters = [], inits = [];
     mh.querySelectorAll('.w').forEach(function (w) {
@@ -895,12 +895,13 @@
     });
 
     var F = 0, s = 1, PIN = 0, NUDGE = 24, rmLine = 0;
-    var ready = false, raf = 0, last = 0, pr = 0, dir = 0, prevY = window.scrollY, touching = false, settleTimer = 0;
+    var ready = false, raf = 0, last = 0, pr = 0, dir = 0, prevY = window.scrollY, touching = false, settleTimer = 0, glide = null;
     var rm = root.classList.contains('rm');
     function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
     function lerp(a, b, t) { return a + (b - a) * t; }
     function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
     function easeIO(t) { return (1 - Math.cos(Math.PI * t)) / 2; } // sine in-out: soft start, soft landing
+    function easeIOCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
     function target(y) { return PIN ? clamp(y / PIN, 0, 1) : 0; }
 
     function measure() {
@@ -932,9 +933,9 @@
         return;
       }
       // 1) the page nudges up a touch, 2) the name folds into the bar
-      var nud = NUDGE * easeOut(clamp(pr / 0.3, 0, 1));
+      var nud = NUDGE * easeOut(clamp(pr / 0.35, 0, 1));
       hero.style.transform = nud > 0.01 ? 'translate3d(0,' + (-nud).toFixed(2) + 'px,0)' : '';
-      var e = easeIO(clamp((pr - 0.1) / 0.9, 0, 1));
+      var e = easeIO(clamp((pr - 0.08) / 0.92, 0, 1));
       bar.style.setProperty('--e', e.toFixed(4));
       bar.classList.toggle('docked', e > 0.985);
       var lift = nud + Math.max(0, window.scrollY - PIN), sc = Math.exp(Math.log(s) * e);
@@ -965,19 +966,30 @@
     }
     function queue() { if (ready && !raf) { last = 0; raf = requestAnimationFrame(tick); } }
 
-    // stopped part-way through the fold: let the browser's smooth scroll finish it
+    // stopped part-way through the fold: glide the rest of the way, slowly, toward
+    // whichever end you were heading. Any input of yours cancels the glide at once.
     function settle() {
-      if (rm || touching || !PIN) return;
+      if (rm || touching || !PIN || glide) return;
       var y = window.scrollY;
-      if (y > 1 && y < PIN - 1) window.scrollTo({ top: dir < 0 ? 0 : PIN, behavior: 'smooth' });
+      if (y <= 1 || y >= PIN - 1) return;
+      var to = dir < 0 ? 0 : PIN;
+      glide = { from: y, to: to, t0: performance.now(), d: clamp(Math.abs(to - y) * 3.2, 600, 1100) };
+      requestAnimationFrame(glideStep);
     }
+    function glideStep(t) {
+      if (!glide) return;
+      var k = clamp((t - glide.t0) / glide.d, 0, 1);
+      window.scrollTo({ top: lerp(glide.from, glide.to, easeIOCubic(k)), behavior: 'instant' });
+      if (k < 1) requestAnimationFrame(glideStep); else glide = null;
+    }
+    function cancelGlide() { glide = null; }
     function onScroll() {
       var y = window.scrollY, d = y - prevY;
       if (d) dir = d > 0 ? 1 : -1;
       prevY = y;
       if (rm) { render(); return; }
       queue();
-      clearTimeout(settleTimer); settleTimer = setTimeout(settle, IDLE);
+      if (!glide) { clearTimeout(settleTimer); settleTimer = setTimeout(settle, IDLE); }
     }
 
     var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -985,7 +997,10 @@
     if (mq.addEventListener) mq.addEventListener('change', onMq);
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('touchstart', function () { touching = true; }, { passive: true });
+    window.addEventListener('touchstart', function () { touching = true; cancelGlide(); }, { passive: true });
+    window.addEventListener('wheel', cancelGlide, { passive: true });
+    window.addEventListener('keydown', cancelGlide);
+    window.addEventListener('pointerdown', cancelGlide, { passive: true });
     var lift = function () { touching = false; clearTimeout(settleTimer); settleTimer = setTimeout(settle, IDLE + 80); };
     window.addEventListener('touchend', lift, { passive: true });
     window.addEventListener('touchcancel', lift, { passive: true });
@@ -997,6 +1012,7 @@
     // the docked monogram goes back to the top (the name unfolds on the way)
     bar.querySelector('.home').addEventListener('click', function (e) {
       e.preventDefault();
+      cancelGlide();
       window.scrollTo({ top: 0, behavior: rm ? 'auto' : 'smooth' });
     });
   })();
