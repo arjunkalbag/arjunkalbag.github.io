@@ -88,6 +88,7 @@
     --dur-arrow: 1000ms;   /* arrow boxes + arrow glides */
 
     --radius: 14px;
+    --pin: clamp(200px, 30vh, 300px); /* scroll spent folding the name into the bar */
     --bar-h: 60px;
     --bar-top: calc(env(safe-area-inset-top, 0px) + 12px);
   }
@@ -255,6 +256,9 @@
     padding-top: calc(var(--bar-top) + var(--bar-h) + clamp(16px, 3.4vh, 44px));
     padding-bottom: clamp(16px, 2.6vh, 28px);
   }
+  /* the hero holds still for the first --pin of scroll while the name folds into the bar */
+  html.js:not(.rm) .hero-pin::after { content: ''; display: block; height: var(--pin); } /* sticky needs real content to travel through, not padding */
+  html.js:not(.rm) .hero { position: sticky; top: 0; }
   .mh-wrap { container-type: inline-size; }
   .masthead {
     font-family: 'Inktera', sans-serif; font-weight: 400; text-transform: uppercase;
@@ -573,6 +577,7 @@
 <main id="top">
 
   <!-- Hero -->
+  <div class="hero-pin" id="hero-pin">
   <section class="hero page" aria-label="Introduction">
     <div class="mh-wrap">
       <h1 class="masthead" id="masthead"><span class="sr-only">Arjun Kalbag</span><span aria-hidden="true"><span class="w">Arjun</span> <span class="w">Kalbag</span></span></h1>
@@ -623,6 +628,7 @@
       </div>
     </div>
   </section>
+  </div>
 
   <!-- About -->
   <section class="sec page" id="about" aria-labelledby="about-h">
@@ -855,20 +861,23 @@
     });
   })();
 
-  // name ⇄ AK. At the top of the page the first scroll doesn't scroll the page:
-  // it nudges it a few pixels, then the name folds into the AK monogram in the
-  // pill bar (~0.7s). The page is held still until the bar is complete, then
-  // scrolls normally. Coming back to the top unfolds it again. The letters are a
+  // name ⇄ AK. The hero is pinned (sticky) for the first stretch of scroll. Inside
+  // that stretch your own scrolling drives the change: the page nudges up a few
+  // pixels, then the name folds into the AK monogram in the pill bar, and only once
+  // it's docked does the page move on. Stop half-way and the browser's own smooth
+  // scroll finishes it toward whichever end you were heading. Nothing is blocked or
+  // hijacked, so trackpads, wheels, keys and touch all stay native. The letters are a
   // fixed overlay positioned from the in-flow masthead. Transform + opacity only.
   (function () {
     var mh = document.getElementById('masthead');
     var bar = document.getElementById('bar');
     var mark = document.getElementById('mark');
-    if (!mh || !bar || !mark) return;
-    var PILL_MAX = 600, HOME_X = 18, CAPC = 0.578;    // Inktera: cap centre sits .578em below the box top
-    var NUDGE = 24, NUDGE_MS = 320;                   // the small first movement of the page
-    var DUR = 720, FOLD_DELAY = 60;                   // the fold itself
-    var ZONE = NUDGE + 2;                             // "at the top" for gestures that reverse it
+    var hero = document.querySelector('.hero');
+    var pinEl = document.getElementById('hero-pin');
+    if (!mh || !bar || !mark || !hero || !pinEl) return;
+    var PILL_MAX = 600, HOME_X = 18, CAPC = 0.578;  // Inktera: cap centre sits .578em below the box top
+    var TAU = 85, MAXLAG = 0.22;                    // the fold eases after the scroll, never far behind
+    var IDLE = 150;                                 // rest before an unfinished fold settles
 
     var letters = [], inits = [];
     mh.querySelectorAll('.w').forEach(function (w) {
@@ -885,18 +894,23 @@
       });
     });
 
-    var F = 0, s = 1, ready = false, raf = 0, pc = 0, docked = false, anim = null, armed = false, touchY = null, rmLine = 0;
+    var F = 0, s = 1, PIN = 0, NUDGE = 24, rmLine = 0;
+    var ready = false, raf = 0, last = 0, pr = 0, dir = 0, prevY = window.scrollY, touching = false, settleTimer = 0;
     var rm = root.classList.contains('rm');
     function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
     function lerp(a, b, t) { return a + (b - a) * t; }
     function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
-    function easeIO(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function easeIO(t) { return (1 - Math.cos(Math.PI * t)) / 2; } // sine in-out: soft start, soft landing
+    function target(y) { return PIN ? clamp(y / PIN, 0, 1) : 0; }
 
     function measure() {
+      PIN = rm ? 0 : parseFloat(getComputedStyle(pinEl, '::after').height) || 0;
+      NUDGE = window.innerWidth < 820 ? 16 : 24;
+      hero.style.transform = '';
       F = parseFloat(getComputedStyle(mh).fontSize);
       mark.style.fontSize = F + 'px';
-      var sy = window.scrollY;
-      letters.forEach(function (l) { var r = l.h.getBoundingClientRect(); l.x0 = r.left; l.y0 = r.top + sy; l.w = r.width; });
+      var sy = window.scrollY, past = Math.max(0, sy - PIN); // how far the hero has scrolled beyond its pin
+      letters.forEach(function (l) { var r = l.h.getBoundingClientRect(); l.x0 = r.left; l.y0 = r.top + past; l.w = r.width; });
       var br = bar.getBoundingClientRect();
       var inset = Math.max(0, (br.width - Math.min(br.width, PILL_MAX)) / 2);
       bar.style.setProperty('--inset', inset + 'px');
@@ -905,9 +919,9 @@
       var x = br.left + inset + HOME_X, ty = br.top + br.height / 2 - CAPC * f;
       inits.forEach(function (g) { g.tx = x; g.ty = ty; x += g.w * s; });
       rmLine = mh.getBoundingClientRect().bottom + sy - br.bottom;
-      if (!anim) { docked = sy > ZONE + 2; pc = docked ? 1 : 0; }
+      pr = target(sy); prevY = sy;
       if (!ready) { ready = true; mark.classList.add('on'); if (root.classList.contains('splash-skip')) requestAnimationFrame(reveal); }
-      render(); arm();
+      render();
     }
 
     function render() {
@@ -917,11 +931,13 @@
         bar.classList.toggle('docked', on);
         return;
       }
-      var e = pc;
+      // 1) the page nudges up a touch, 2) the name folds into the bar
+      var nud = NUDGE * easeOut(clamp(pr / 0.3, 0, 1));
+      hero.style.transform = nud > 0.01 ? 'translate3d(0,' + (-nud).toFixed(2) + 'px,0)' : '';
+      var e = easeIO(clamp((pr - 0.1) / 0.9, 0, 1));
       bar.style.setProperty('--e', e.toFixed(4));
       bar.classList.toggle('docked', e > 0.985);
-      // in the page the name moves with the page; far down (a jump) it starts from just above the fold
-      var lift = Math.min(window.scrollY, 90), sc = Math.exp(Math.log(s) * e);
+      var lift = nud + Math.max(0, window.scrollY - PIN), sc = Math.exp(Math.log(s) * e);
       for (var i = 0; i < letters.length; i++) {
         var l = letters[i], g = l.g;
         var ix = lerp(g.x0, g.tx, e), iy = lerp(g.y0 - lift, g.ty, e);
@@ -938,87 +954,47 @@
       }
     }
 
-    // to: 1 = docked in the bar, 0 = back in the page. scrollTo: where to ease the page (null = leave it)
-    function animate(to, scrollTo) {
-      anim = { from: pc, to: to, ys: window.scrollY, ye: scrollTo, t0: performance.now(), fd: to === 1 ? FOLD_DELAY : 0 };
-      docked = to === 1;
-      arm();
-      if (!raf) raf = requestAnimationFrame(step);
-    }
-    function step(t) {
-      raf = 0;
-      if (!anim) return;
-      var el = Math.max(0, t - anim.t0);
-      if (anim.ye !== null) window.scrollTo({ top: lerp(anim.ys, anim.ye, easeOut(clamp(el / NUDGE_MS, 0, 1))), behavior: 'instant' });
-      pc = lerp(anim.from, anim.to, easeIO(clamp((el - anim.fd) / (DUR - anim.fd), 0, 1)));
+    function tick(t) {
+      var dt = last ? Math.min(64, t - last) : 16; last = t;
+      var tp = target(window.scrollY);
+      pr += (tp - pr) * (1 - Math.exp(-dt / TAU));
+      if (pr < tp - MAXLAG) pr = tp - MAXLAG; else if (pr > tp + MAXLAG) pr = tp + MAXLAG;
+      if (Math.abs(tp - pr) < 0.0005) pr = tp;
       render();
-      if (el >= DUR && (anim.ye === null || el >= NUDGE_MS)) { pc = anim.to; anim = null; render(); arm(); return; }
-      raf = requestAnimationFrame(step);
+      if (pr !== tp) raf = requestAnimationFrame(tick); else { raf = 0; last = 0; }
     }
-    function dock(hold) { animate(1, hold ? Math.max(window.scrollY, NUDGE) : null); }
-    function undock() { animate(0, 0); }
+    function queue() { if (ready && !raf) { last = 0; raf = requestAnimationFrame(tick); } }
 
-    // gestures near the top drive the transformation; while it plays the page holds still
-    function onWheel(e) {
-      if (rm || e.ctrlKey) return;
-      if (anim) { e.preventDefault(); return; }
-      if (!docked && e.deltaY > 0) { e.preventDefault(); dock(true); }
-      else if (docked && e.deltaY < 0 && window.scrollY <= ZONE) { e.preventDefault(); undock(); }
-    }
-    function onTouchStart(e) { touchY = e.touches.length === 1 ? e.touches[0].clientY : null; }
-    function onTouchMove(e) {
-      if (rm || touchY === null || e.touches.length !== 1) return;
-      if (anim) { if (e.cancelable) e.preventDefault(); return; }
-      var dy = e.touches[0].clientY - touchY;
-      if (!docked && dy < -6) { if (e.cancelable) e.preventDefault(); dock(true); }
-      else if (docked && dy > 6 && window.scrollY <= ZONE) { if (e.cancelable) e.preventDefault(); undock(); }
-    }
-    var DOWN_KEYS = { ArrowDown: 1, PageDown: 1, End: 1, ' ': 1 }, UP_KEYS = { ArrowUp: 1, PageUp: 1, Home: 1 };
-    function onKey(e) {
-      if (rm || e.altKey || e.ctrlKey || e.metaKey) return;
-      var tg = e.target, tag = tg && tg.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (tg && tg.isContentEditable)) return;
-      if (e.key === ' ' && tg && tg.closest && tg.closest('a, button')) return; // space activates the focused control
-      var down = DOWN_KEYS[e.key] && !(e.key === ' ' && e.shiftKey), up = UP_KEYS[e.key] || (e.key === ' ' && e.shiftKey);
-      if (!down && !up) return;
-      if (anim) { e.preventDefault(); return; }
-      if (!docked && down) { e.preventDefault(); dock(true); }
-      else if (docked && up && window.scrollY <= ZONE) { e.preventDefault(); undock(); }
-    }
-    // anything else that moves the page (scrollbar, links, find-in-page, a restored position) just follows along
-    function onScroll() {
-      if (rm) { render(); return; }
+    // stopped part-way through the fold: let the browser's smooth scroll finish it
+    function settle() {
+      if (rm || touching || !PIN) return;
       var y = window.scrollY;
-      if (!anim) {
-        if (!docked && y > ZONE + 2) dock(false);
-        else if (docked && y <= NUDGE / 2) undock();
-        else if (!docked) render();
-      }
-      arm();
+      if (y > 1 && y < PIN - 1) window.scrollTo({ top: dir < 0 ? 0 : PIN, behavior: 'smooth' });
     }
-    // the blocking listeners are only attached near the top, so the rest of the page scrolls untouched
-    function arm() {
-      var need = !rm && (anim !== null || !docked || window.scrollY <= ZONE + 240);
-      if (need === armed) return;
-      armed = need;
-      var m = need ? 'addEventListener' : 'removeEventListener';
-      window[m]('wheel', onWheel, { passive: false });
-      window[m]('touchmove', onTouchMove, { passive: false });
+    function onScroll() {
+      var y = window.scrollY, d = y - prevY;
+      if (d) dir = d > 0 ? 1 : -1;
+      prevY = y;
+      if (rm) { render(); return; }
+      queue();
+      clearTimeout(settleTimer); settleTimer = setTimeout(settle, IDLE);
     }
 
     var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    var onMq = function () { rm = mq.matches; root.classList.toggle('rm', rm); anim = null; measure(); };
+    var onMq = function () { rm = mq.matches; root.classList.toggle('rm', rm); hero.style.transform = ''; measure(); };
     if (mq.addEventListener) mq.addEventListener('change', onMq);
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('keydown', onKey);
+    window.addEventListener('touchstart', function () { touching = true; }, { passive: true });
+    var lift = function () { touching = false; clearTimeout(settleTimer); settleTimer = setTimeout(settle, IDLE + 80); };
+    window.addEventListener('touchend', lift, { passive: true });
+    window.addEventListener('touchcancel', lift, { passive: true });
     window.addEventListener('resize', function () { requestAnimationFrame(measure); });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure); else measure();
     window.addEventListener('load', measure);
     if (rm && root.classList.contains('splash-skip')) reveal();
 
-    // the docked monogram goes back to the top (the name unfolds when it gets there)
+    // the docked monogram goes back to the top (the name unfolds on the way)
     bar.querySelector('.home').addEventListener('click', function (e) {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: rm ? 'auto' : 'smooth' });
