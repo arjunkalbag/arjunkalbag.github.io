@@ -162,18 +162,19 @@
   /* ---------- pill bar ---------- */
   .bar {
     position: fixed; z-index: 60; top: var(--bar-top); left: var(--bar-l); right: var(--bar-r); height: var(--bar-h);
-    pointer-events: none; --e: 0;
+    pointer-events: none;
   }
-  /* the pill surface settles in (fades, drops a few px) as the name arrives */
+  /* until the tagline reaches the top, the AK and the menu just float; then the pill
+     surface settles in behind them (fades, drops a few px) and hovers from there on */
   .bar-bg {
     position: absolute; inset: 0; border-radius: var(--radius);
     background: color-mix(in oklch, var(--paper-2) 82%, transparent);
     -webkit-backdrop-filter: blur(18px) saturate(1.2); backdrop-filter: blur(18px) saturate(1.2);
     box-shadow: var(--shadow);
-    opacity: clamp(0, calc((var(--e) - 0.2) * 1.6), 1);
-    transform: translateY(calc((1 - var(--e)) * -6px));
-    transition: background-color .9s var(--ease-in-out);
+    opacity: 0; transform: translateY(-8px);
+    transition: opacity .8s var(--ease-soft), transform 1.1s var(--ease-out), background-color .9s var(--ease-in-out);
   }
+  .bar.solid .bar-bg { opacity: 1; transform: none; }
   .bar-l, .bar-r { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; }
   .bar-l { left: 0; padding-left: calc(var(--bar-pad) - 10px); z-index: 2; }
   .bar-r { right: 0; padding-right: max(0px, calc(var(--bar-pad) - 12px)); gap: 2px; z-index: 3; pointer-events: auto; }
@@ -271,8 +272,19 @@
   html.js:not(.rm) .mh-t { opacity: 0; transform: translateY(0.14em); }
   html.ready:not(.rm) .mh-t { opacity: 1; transform: none; transition: opacity 1.3s var(--ease-soft), transform 1.6s var(--ease-out); }
 
+  /* the mark sits centred in the open space between the name and the tagline */
+  .hero-mark { flex: 1 0 auto; display: grid; place-items: center; padding-block: clamp(20px, 3.6vh, 52px); }
+  .logo { display: block; height: clamp(84px, 16vh, 210px); width: auto; aspect-ratio: 122 / 100; overflow: visible; color: var(--ink); transition: color .9s var(--ease-in-out); }
+  .lh { fill: currentColor; transition: transform 1.4s var(--ease-out); }
+  .lh-t { transform: translateX(-11px); }
+  .lh-b { transform: translateX(11px); }
+  /* entrance: it arrives as one whole disc, then splits */
+  html.js:not(.rm) .logo { opacity: 0; }
+  html.ready:not(.rm) .logo { opacity: 1; transition: opacity 1.2s var(--ease-soft) .3s, color .9s var(--ease-in-out); }
+  html.ready:not(.rm) .lh { animation: lhSplit 1.9s var(--ease-out) .5s backwards; }
+  @keyframes lhSplit { from { transform: none; } }
   .hero-body {
-    margin-top: auto; padding-top: clamp(28px, 4.5vh, 80px);
+    padding-top: 0;
     display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--col-gap); row-gap: clamp(20px, 3.2vh, 36px); align-items: end;
   }
   .tagline {
@@ -464,6 +476,7 @@
     .now:hover .now-t::after { transform: scaleX(1); }
     .now:hover .now-k { color: var(--ink); }
     .now:hover .arr { opacity: 1; transform: none; }
+    .logo:hover .lh { transform: none; }
 
     .film-pause:hover { color: var(--ink); }
     .foot-social a:hover, .foot-end a:hover { color: var(--inv-fg); }
@@ -519,6 +532,7 @@
   @media (max-width: 639px) {
     .hero { padding-top: calc(var(--bar-top) + var(--bar-h) + 12px); }
     .masthead { font-size: calc(100cqi / 7.02); }
+    .logo { height: clamp(76px, 13vh, 120px); }
   }
   @media (max-width: 479px) {
     .cap-long { display: none; }
@@ -582,6 +596,11 @@
   <section class="hero page" aria-label="Introduction">
     <div class="mh-wrap">
       <h1 class="masthead" id="masthead"><span class="sr-only">Arjun Kalbag</span><span class="mh-t" aria-hidden="true">Arjun Kalbag</span></h1>
+    </div>
+
+    <!-- the mark: a disc split in two, the halves slid apart (they meet again on hover) -->
+    <div class="hero-mark" aria-hidden="true">
+      <svg class="logo" viewBox="-11 0 122 100" focusable="false"><path class="lh lh-t" d="M0.09 47A50 50 0 0 1 99.91 47Z"/><path class="lh lh-b" d="M0.09 53A50 50 0 0 0 99.91 53Z"/></svg>
     </div>
 
     <div class="hero-body">
@@ -874,9 +893,15 @@
     var slot = bar && bar.querySelector('.home-ak');
     if (!mh || !bar || !mark || !slot) return;
     var full = mark.querySelector('.mk-full'), ak = mark.querySelector('.mk-ak'), solo = mark.querySelector('.mk-a');
+    var tag = document.querySelector('.tagline'), solidAt = 0, solid = false;
     var W = 5.4;                    // spring rate (1/s): half way in ~.3s, 90% by ~.7s, then a long soft landing
     var DOCK_AT = 6, HOME_AT = 2;   // px of scroll that send the name into the bar / bring it back
     var x0 = 0, y0 = 0, tx = 0, ty = 0, s = 1, rmLine = 0, capc = 0.58;
+    // the pill surface only appears once the tagline ("Building projects…") reaches the top
+    function pill(y) {
+      var on = solid ? y > solidAt - 8 : y > solidAt;  // a few px of give so it never flickers
+      if (on !== solid) { solid = on; bar.classList.toggle('solid', on); }
+    }
     var p = 0, v = 0, goal = 0, raf = 0, last = 0, ready = false, state = -1, held = Infinity;
     var rm = root.classList.contains('rm');
     function clamp(n, a, b) { return n < a ? a : n > b ? b : n; }
@@ -909,6 +934,10 @@
       tx = sr.left; ty = sr.top;             // the AK slot in the bar (fixed)
       s = f / F;
       rmLine = Math.max(DOCK_AT, y0 + 0.9 * F - br.bottom); // reduced motion: swap once the name has slid under the bar
+      // the pill arrives just before the tagline slides under the bar (layout offsets ignore the hero's entrance transform)
+      for (var el = tag, top = 0; el; el = el.offsetParent) top += el.offsetTop;
+      solidAt = tag ? Math.max(DOCK_AT, top - br.bottom - 28) : DOCK_AT;
+      pill(sy);
       if (!ready) {
         ready = true; goal = p = aim(sy, 0);
         if (root.classList.contains('splash-skip')) requestAnimationFrame(reveal);
@@ -926,7 +955,6 @@
         bar.classList.toggle('docked', st === 1);
         mark.classList.toggle('on', st === 2);
       }
-      bar.style.setProperty('--e', e.toFixed(4));
       if (st !== 2) return;
       // the page spot it left from: held where it let go, but it follows the page back down
       var py = y0 - Math.min(held, window.scrollY);
@@ -953,6 +981,7 @@
     function onScroll() {
       if (!ready) return;
       var y = window.scrollY, g = aim(y, goal);
+      pill(y);
       if (g === goal) return;
       if (g === 1) held = y;                 // let go of the page exactly where it is now
       goal = g;
