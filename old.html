@@ -471,6 +471,12 @@
             .tile-desc { grid-template-rows: 1fr !important; opacity: 1 !important; transition: none !important; }
             .bento-tile, .bento-tile:hover, .tile-arrow { transition: none !important; transform: none !important; }
         }
+
+        /* touch: every link and button gets at least a 44px hit area (the archived design was built for a mouse) */
+        @media (pointer: coarse) {
+            a, button, summary { position: relative; }
+            a::before, button::before, summary::before { content: ''; position: absolute; left: -6px; right: -6px; top: 50%; height: max(100%, 44px); transform: translateY(-50%); }
+        }
     </style>
 </head>
 <body class="antialiased">

@@ -522,19 +522,35 @@
     .foot-row { flex-direction: column; align-items: flex-start; }
     .foot-end { width: 100%; justify-content: space-between; }
   }
-  /* phones: the bar's row is taken by the menu, so the name sits just under it, edge to edge */
+  /* phones: the name sits in the bar's row, level with the AK and the menu (as on larger screens),
+     the hero is allowed to run past one screen so nothing is squeezed, and everything gets more air */
   @media (max-width: 639px) {
-    .hero { padding-top: calc(var(--bar-top) + var(--bar-h) + 12px); }
-    .masthead { font-size: calc(100cqi / 10.4); }
+    :root { --gutter: 22px; --mh: calc((100vw - var(--gl) - var(--gr)) / 10.4); }
+    .hero { min-height: 0; padding-bottom: 0; }
+    .hero-mark { flex: none; height: clamp(230px, 32svh, 300px); margin-block: 18px 30px; }
+    .hero-body { row-gap: 32px; }
+    .now { margin-top: -4px; }
+    .film { margin-top: 56px; }
+    .film-cap { padding-top: 18px; padding-bottom: 6px; }
+    .sec { row-gap: 28px; }
+    .wrow { padding-block: 24px; row-gap: 10px; }
+    .wdesc { margin-top: 8px; line-height: 1.55; }
+    .wmeta .apps { margin-top: 16px; }
+    .prow { padding-block: 20px; }
+    .mail { padding-block: 12px; margin-block: -12px; }
+    .foot-in { padding-block: 44px 28px; }
+    .facts dd { display: flex; flex-wrap: wrap; gap: 2px 18px; }   /* the link row wraps instead of overflowing */
+    .facts dd a + a { margin-left: 0; }
   }
   @media (max-width: 479px) {
     .cap-long { display: none; }
-    .ph { height: clamp(130px, 17vh, 170px); }
+    .ph { height: clamp(150px, 22vh, 200px); }
     .menu-btn .lbl { display: none; }
     .menu-btn { padding: 0; width: 44px; }
   }
   @media (max-width: 380px) {
     .apps li { grid-template-columns: 1fr; gap: 0; }
+    .facts div { grid-template-columns: 5.6rem 1fr; gap: 10px; }
   }
 
   /* ---------- reduced motion ---------- */
