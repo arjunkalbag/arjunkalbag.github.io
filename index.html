@@ -1023,8 +1023,8 @@
     var cv = document.getElementById('horse');
     if (!cv || !cv.getContext) return;
     var ctx = cv.getContext('2d');
-    var COLS = 80, ROWS = 58, CELL = 9.2, OXP = 20, OYP = 10, N = COLS * ROWS;   // a cell is 9.2 px of the silhouette's own space
-    var CX = 46.7, CY = 26.1;                  // where the build starts (the middle of the body)
+    var COLS = 87, ROWS = 59, CELL = 9.2, OXP = 48, OYP = 18, N = COLS * ROWS;   // a cell is 9.2 px of the silhouette's own space
+    var CX = 49.8, CY = 27;                  // where the build starts (the middle of the body)
     var REACH = 10, KS = 190, KD = 2 * 0.9 * Math.sqrt(190);      // cursor reach (cells), spring stiffness + damping (quick, no wobble)
 
     var Horse = (function () {
@@ -1082,7 +1082,7 @@
     hF:     [14, 20, 22, 22], hB: [-24, -30, -38, -46],    // hind leg swing
     liftF:  [0.16, 0.26, 0.32, 0.38], liftH: [0.14, 0.24, 0.30, 0.34],
     rock1:  [0.3, 0.4, 2.2, 2.8], rock2: [0.6, 1.0, 0.0, 0.0],   // whole-body rock, 1x and 2x per stride (deg)
-    neck:   [14, 8, 2, -3], nod: [7, 2, 3, 2.6],              // neck carriage and head nod (deg)
+    neck:   [10, 6, 1, -3], nod: [5, 2, 3, 2.6],              // neck carriage and head nod (deg)
     tail:   [0.69, 0.75, 0.80, 0.86], tailWave: [0.07, 0.08, 0.10, 0.12],
     mane:   [3, 4, 6, 7]                                       // mane ripple (model px)
   };
@@ -1218,7 +1218,7 @@
     var W = 0, H = 0, pitch = 6, gx0 = 0, gy0 = 0, dpr = 1;
     var ph = 0.3, last = 0, raf = 0, ready = false, tStart = 0, tm = -1;
     var paused = false, visible = true, boostUntil = 0, lastCol = '';
-    var spd = 0.85, spdT = 0.85;     // pace: 0 = walk ... 1 = gallop
+    var spd = 0, spdT = 0;     // pace: 0 = walk ... 1 = gallop (it starts at a walk)
     var pHas = false, pcx = 0, pcy = 0, px = 0, py = 0, pAct = 0;      // pointer (client px) and its smoothed cell position
     var rm = root.classList.contains('rm');
 
@@ -1252,7 +1252,7 @@
       if (!rm && tm < 1.5) {
         building = true;
         var q = Math.max(0, tm);
-        ax = 0.5 + 44 * easeIO((q - 0.26) / 0.38);
+        ax = 0.5 + 47 * easeIO((q - 0.26) / 0.38);
         ay = 0.7 + 34 * ease3((q - 0.5) / 0.62);
       }
       // the pointer, smoothed, as a position in grid cells
