@@ -277,6 +277,8 @@
 
   /* the horse fills the open space between the name and the tagline (its dots can drift anywhere inside it) */
   .hero-mark { flex: 1 1 auto; position: relative; min-height: clamp(120px, 19svh, 320px); }
+  .horse-hint { position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); white-space: nowrap; pointer-events: none; opacity: 0; font-size: var(--text-xs); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); transition: opacity .6s var(--ease-soft); }
+  @media (hover: hover) and (pointer: fine) { .hero-mark.hov .horse-hint { opacity: 1; } }
   .horse { position: absolute; inset: 0; width: 100%; height: 100%; display: block; color: var(--ink); pointer-events: none; transition: color .9s var(--ease-in-out); }
   .hero-body {
     padding-top: 0;
@@ -592,7 +594,7 @@
     </div>
 
     <!-- the mark: a dot-matrix horse that gallops in place, builds itself on load and parts around the cursor -->
-    <div class="hero-mark" aria-hidden="true"><canvas class="horse" id="horse"></canvas></div>
+    <div class="hero-mark" aria-hidden="true"><canvas class="horse" id="horse"></canvas><span class="horse-hint"></span></div>
 
     <div class="hero-body">
       <p class="tagline">Building projects at the intersection of engineering and creativity.</p>
@@ -1013,143 +1015,202 @@
     });
   })();
 
-  // dot-matrix horse. It gallops in place (the torso never moves), builds itself the way the
+  // dot-matrix horse. It runs in place (the torso never travels), builds itself the way the
   // reference does (one dot, a line, then the horse), and its dots part around the cursor on
-  // springs and settle back. A skeleton drives the pose; each grid cell is a dot whose size
-  // eases toward "on" or "off", so legs sweep through the grid without any flicker.
+  // springs and settle back. Torso, neck, head and mane are a traced silhouette; legs and tail
+  // are a skeleton that walks, trots, canters or gallops. Scrolling over the horse sets its pace
+  // (up = faster, down = slower), always between a walk and a gallop. Each grid cell is a dot
+  // whose size eases toward "on" or "off", so legs sweep through the grid without flicker.
   (function () {
     var cv = document.getElementById('horse');
     if (!cv || !cv.getContext) return;
     var ctx = cv.getContext('2d');
-    var COLS = 70, ROWS = 50, OX = 7.5, OY = 2.5, SC = 1.3, N = COLS * ROWS;   // SC: model units -> cells
-    var CX = 36, CY = 21;                      // where the build starts (the middle of the body)
-    var CYCLE = 0.74;                            // seconds per stride
+    var COLS = 80, ROWS = 58, CELL = 9.2, OXP = 20, OYP = 10, N = COLS * ROWS;   // a cell is 9.2 px of the silhouette's own space
+    var CX = 46.7, CY = 26.1;                  // where the build starts (the middle of the body)
+    var hint = cv.parentNode.querySelector('.horse-hint');
     var REACH = 10, KS = 190, KD = 2 * 0.9 * Math.sqrt(190);      // cursor reach (cells), spring stiffness + damping (quick, no wobble)
 
     var Horse = (function () {
-  var TAU = Math.PI * 2, DEG = Math.PI / 180;
+      var root = {};
+  var DEG = Math.PI / 180, TAU = Math.PI * 2;
+  function sstep(a, b, x) { x = clamp((x - a) / (b - a), 0, 1); return x * x * (3 - 2 * x); }
 
-  // pose(phase) -> flat array of capsules [ax, ay, bx, by, ra, rb, ...] (+ .eye)
-  function pose(ph) {
-    var S = [];
-    function cap(ax, ay, bx, by, ra, rb) { S.push(ax, ay, bx, by, Math.max(0.7, ra), Math.max(0.7, rb)); }
-    var c = Math.cos, s = Math.sin, w = TAU * ph;
-
-    // ---- torso (anchored): shallow barrel, tucked flank, rounded croup, deep chest ----
-    cap(13.0, 14.8, 18.5, 15.6, 4.2, 3.5);        // hindquarter -> flank
-    cap(18.5, 15.6, 25.5, 16.0, 3.5, 4.4);        // flank -> girth
-    cap(25.5, 16.0, 30.6, 14.8, 4.4, 4.0);        // girth -> chest
-    cap(12.6, 12.4, 15.8, 12.0, 2.6, 2.3);        // croup
-    cap(29.6, 11.6, 31.6, 11.4, 2.2, 2.2);        // withers
-
-    // ---- neck (long, arched) and head, with a gentle nod ----
-    var nod = 2.6 * s(w - 0.6) * DEG;
-    var bx0 = 31.4, by0 = 12.4;
-    var px1 = 38.2 + 0.25 * s(w - 0.6), py1 = 4.6 + 0.25 * c(w - 0.6);
-    var mxn = (bx0 + px1) / 2 - 0.9, myn = (by0 + py1) / 2 - 0.7;
-    cap(bx0, by0, mxn, myn, 3.5, 2.8);
-    cap(mxn, myn, px1, py1, 2.8, 1.95);
-    var ha = 40 * DEG + nod, ac = c(ha), as = s(ha), pc = -as, ps = ac;      // axis + the "underneath" direction
-    cap(px1, py1 + 0.1, px1 + 3.0 * ac, py1 + 3.0 * as, 2.1, 1.75);          // forehead / skull
-    cap(px1 + 3.0 * ac, py1 + 3.0 * as, px1 + 7.4 * ac, py1 + 7.4 * as, 1.5, 1.05);   // nasal bone -> muzzle
-    cap(px1 + 7.0 * ac, py1 + 7.0 * as, px1 + 8.2 * ac, py1 + 8.2 * as, 1.25, 1.15);  // nose
-    cap(px1 + 1.5 * ac + 1.3 * pc, py1 + 1.5 * as + 1.3 * ps, px1 + 6.0 * ac + 0.55 * pc, py1 + 6.0 * as + 0.55 * ps, 1.35, 0.95); // jaw
-    cap(px1 - 0.6, py1 - 1.2, px1 - 1.1, py1 - 3.5, 0.9, 0.7);              // ears, pricked and slightly back
-    cap(px1 + 0.5, py1 - 1.2, px1 + 0.5, py1 - 3.3, 0.85, 0.7);
-
-    // ---- mane: short wisps along the crest, barely flicking ----
-    for (var j = 0; j < 6; j++) {
-      var t = j / 5;
-      var rx = px1 - 0.9 - (px1 - bx0 - 0.2) * t * 0.97;
-      var ry = py1 - 1.2 + (by0 - py1 - 3.2) * t * 0.97 - 0.4 * Math.sin(Math.PI * t);
-      var ang = Math.PI * (1.2 + 0.045 * j) + 0.13 * s(w - 0.5 * j + 0.4);
-      cap(rx, ry, rx + 2.9 * c(ang), ry + 2.9 * s(ang), 1.0, 0.7);
-    }
-
-    // ---- tail: streams back in a calm, long S ----
-    var tails = [[10.2, 11.6, 7, 2.5, 0.0, [1.7, 1.6, 1.45, 1.25, 1.05, 0.9, 0.75]],
-                 [10.0, 12.6, 4, 2.3, 0.05, [1.15, 1.05, 0.95, 0.8]]];
-    for (var sd = 0; sd < 2; sd++) {
-      var T = tails[sd], tx = T[0], ty = T[1], ta = Math.PI * 1.055 + T[4] + 0.035 * s(w + 1.0), rad = T[5];
-      for (var k = 0; k < T[2]; k++) {
-        var ang2 = ta + 0.10 * s(w - 0.45 * k) * (0.5 + 0.10 * k) + 0.025 * k;
-        var ex = tx + T[3] * c(ang2), ey = ty + T[3] * s(ang2);
-        cap(tx, ty, ex, ey, rad[k], k < T[2] - 1 ? rad[k + 1] : 0.7);
-        tx = ex; ty = ey; ta = ang2;
+  // ---- the silhouette: scanline-filled once, then softened so thin mane strands read as partial dots ----
+  var POLY = [670,12,664,18,650,20,647,17,648,8,647,6,639,13,633,13,627,16,618,16,615,18,609,19,594,18,592,20,582,21,571,20,569,22,562,23,557,22,550,17,539,12,542,15,542,18,539,21,531,22,514,19,514,20,522,24,534,26,549,31,551,33,551,38,548,40,545,39,531,42,518,43,506,38,486,35,504,44,508,48,509,52,529,59,534,59,537,62,537,65,533,68,525,69,501,69,480,65,466,66,481,67,503,72,505,75,505,78,501,81,483,81,474,83,487,83,489,85,489,89,465,104,470,105,473,108,473,110,484,109,489,113,489,116,486,119,483,119,481,123,474,129,474,134,472,136,473,140,467,146,458,152,436,163,425,167,405,168,404,169,378,168,374,166,362,164,336,153,311,148,294,148,282,151,265,158,262,161,252,162,239,156,221,151,211,151,201,154,201,195,212,190,221,190,224,193,220,205,210,220,201,243,201,280,248,291,258,289,262,293,295,296,330,301,339,290,349,289,359,292,374,301,383,303,405,312,423,316,469,315,518,300,527,300,532,308,537,310,556,305,581,295,611,280,611,254,612,253,614,210,605,198,605,173,604,172,605,135,607,131,607,123,610,115,614,112,617,113,623,112,629,116,638,118,656,119,667,131,672,135,680,138,683,141,684,149,686,151,706,152,710,148,715,137,714,132,706,121,686,83,684,77,684,60,673,51,667,42,666,33,668,28,664,25,664,23,668,19];
+  var MW = 727, MH = 489, MS = 0.5, BW = 364, BH = 245;           // mask size, half-res buffer
+  var mask = (function () {
+    var m = new Float32Array(BW * BH), n = POLY.length / 2;
+    for (var y = 0; y < BH; y++) {
+      var py = (y + 0.5) / MS, xs = [];
+      for (var i = 0; i < n; i++) {
+        var j = (i + 1) % n, ax = POLY[i * 2], ay = POLY[i * 2 + 1], bx = POLY[j * 2], by = POLY[j * 2 + 1];
+        if ((ay <= py && by > py) || (by <= py && ay > py)) xs.push(ax + (py - ay) / (by - ay) * (bx - ax));
+      }
+      xs.sort(function (a, b) { return a - b; });
+      for (var k = 0; k + 1 < xs.length; k += 2) {
+        var x0 = Math.max(0, Math.ceil(xs[k] * MS - 0.5)), x1 = Math.min(BW - 1, Math.floor(xs[k + 1] * MS - 0.5));
+        for (var x = x0; x <= x1; x++) m[y * BW + x] = 1;
       }
     }
+    // two box-blur passes (radius 3 half-res px ~ 6 px of model space) in each direction
+    var t = new Float32Array(BW * BH);
+    function blur(src, dst, horiz) {
+      var R = 3, L = 2 * R + 1;
+      for (var a = 0; a < (horiz ? BH : BW); a++) {
+        var acc = 0, b;
+        for (b = -R; b <= R; b++) acc += src[horiz ? a * BW + clamp(b, 0, BW - 1) : clamp(b, 0, BH - 1) * BW + a];
+        for (b = 0; b < (horiz ? BW : BH); b++) {
+          dst[horiz ? a * BW + b : b * BW + a] = acc / L;
+          var o = clamp(b - R, 0, (horiz ? BW : BH) - 1), nn = clamp(b + R + 1, 0, (horiz ? BW : BH) - 1);
+          acc += src[horiz ? a * BW + nn : nn * BW + a] - src[horiz ? a * BW + o : o * BW + a];
+        }
+      }
+    }
+    blur(m, t, true); blur(t, m, false);
+    return m;
+  })();
+  function sample(x, y) {                                          // softened coverage at a model-space point
+    var fx = x * MS - 0.5, fy = y * MS - 0.5, ix = Math.floor(fx), iy = Math.floor(fy);
+    if (ix < 0 || iy < 0 || ix >= BW - 1 || iy >= BH - 1) return 0;
+    var tx = fx - ix, ty = fy - iy, o = iy * BW + ix;
+    return (mask[o] * (1 - tx) + mask[o + 1] * tx) * (1 - ty) + (mask[o + BW] * (1 - tx) + mask[o + BW + 1] * tx) * ty;
+  }
 
-    // ---- legs: the foot swings on an arc about the root, then two-bone IK; joints and hooves are kept ----
+  // ---- gaits: 0 walk, 1 trot, 2 canter, 3 gallop. Everything is blended continuously between neighbours ----
+  var G = {
+    T:      [1.25, 0.80, 0.66, 0.58],                  // seconds per stride
+    off:    [[0.00, 0.25, 0.50, 0.75], [0.00, 0.50, 0.50, 1.00], [0.00, 0.32, 0.30, 0.62], [0.00, 0.42, 0.15, 0.55]],   // near hind, near fore, far hind, far fore
+    st:     [0.62, 0.48, 0.42, 0.34],                  // share of the stride the foot reaches back
+    fF:     [22, 28, 34, 40], fB: [-22, -26, -28, -26],    // front leg swing, forward / back (deg)
+    hF:     [14, 20, 22, 22], hB: [-24, -30, -38, -46],    // hind leg swing
+    liftF:  [0.16, 0.26, 0.32, 0.38], liftH: [0.14, 0.24, 0.30, 0.34],
+    rock1:  [0.3, 0.4, 2.2, 2.8], rock2: [0.6, 1.0, 0.0, 0.0],   // whole-body rock, 1x and 2x per stride (deg)
+    neck:   [14, 8, 2, -3], nod: [7, 2, 3, 2.6],              // neck carriage and head nod (deg)
+    tail:   [0.69, 0.75, 0.80, 0.86], tailWave: [0.07, 0.08, 0.10, 0.12],
+    mane:   [3, 4, 6, 7]                                       // mane ripple (model px)
+  };
+  function at(arr, g) { var i = Math.min(2, Math.floor(g)), f = g - i; return arr[i] + (arr[i + 1] - arr[i]) * f; }
+  function atOff(k, g) {
+    var i = Math.min(2, Math.floor(g)), f = g - i, a = G.off[i][k], b = G.off[i + 1][k];
+    var d = ((b - a + 0.5) % 1 + 1) % 1 - 0.5;                    // shortest way round the cycle
+    return a + d * f;
+  }
+  function gaitT(g) { return at(G.T, g); }
+
+  // pose(ph, g) -> capsules [ax, ay, bx, by, ra, rb]... for legs and tail, plus rock + neck warp parameters
+  function pose(ph, g, cell) {
+    var S = [], minr = 0.72 * cell, c = Math.cos, s = Math.sin, w = TAU * ph;
+    function cap(ax, ay, bx, by, ra, rb) { S.push(ax, ay, bx, by, Math.max(minr, ra), Math.max(minr, rb)); }
+
+    // tail: hangs in a walk, streams back in a gallop; ripples along its length
+    var tl = at(G.tail, g) * Math.PI, tw = at(G.tailWave, g);
+    var rad = [22, 20, 17, 14, 11, 8], tx = 204, ty = 172, ta = tl + 0.5 * tw * s(w + 1.0), wx = 0, wy = 0, wa = 0;
+    for (var k = 0; k < 6; k++) {
+      var an = ta + tw * s(w - 0.5 * k) * (0.6 + 0.16 * k) + 0.02 * k;
+      var ex = tx + 36 * c(an), ey = ty + 36 * s(an);
+      cap(tx, ty, ex, ey, rad[k], k < 5 ? rad[k + 1] : 8);
+      if (k === 3) { wx = ex; wy = ey; wa = an; }
+      tx = ex; ty = ey; ta = an;
+    }
+    // feathered tip: two short wisps fan off the lower part of the tail
+    cap(wx, wy, wx + 46 * c(wa + 0.30 + 0.05 * s(w)), wy + 46 * s(wa + 0.30 + 0.05 * s(w)), 8, 6);
+    cap(wx, wy, wx + 40 * c(wa - 0.26 - 0.05 * s(w + 1)), wy + 40 * s(wa - 0.26 - 0.05 * s(w + 1)), 8, 6);
+    // rounded buttock (the traced outline is cut flat here)
+    cap(224, 218, 224, 218, 44, 44);
+
+    // legs: foot swings on an arc about the root, two-bone IK, with knee/hock, fetlock and hoof kept
+    var st = at(G.st, g);
     function leg(rx, ry, a, b, front, off) {
       var u = ph - off; u -= Math.floor(u);
-      var st = 0.34, th, rho;
-      var thF = (front ? 40 : 22) * DEG, thB = (front ? -26 : -46) * DEG;
+      var thF = (front ? at(G.fF, g) : at(G.hF, g)) * DEG, thB = (front ? at(G.fB, g) : at(G.hB, g)) * DEG;
+      var lift = front ? at(G.liftF, g) : at(G.liftH, g), th, rho;
       if (u < st) { var p = u / st; th = thF + (thB - thF) * p; rho = 0.975 - 0.02 * Math.sin(Math.PI * p); }
       else {
         var v = (u - st) / (1 - st), e = v * v * (3 - 2 * v);
-        th = thB + (thF - thB) * e;
-        rho = 0.975 - (front ? 0.38 : 0.34) * Math.pow(Math.sin(Math.PI * v), 0.9);
+        th = thB + (thF - thB) * e; rho = 0.975 - lift * Math.pow(Math.sin(Math.PI * v), 0.9);
       }
       var L = (a + b) * rho, fx = L * Math.sin(th), fy = L * Math.cos(th);
-      var d = clamp(L, Math.abs(a - b) + 0.05, a + b - 0.05);
+      var d = clamp(L, Math.abs(a - b) + 1, a + b - 1);
       var base = Math.atan2(fy, fx), ang = Math.acos(clamp((a * a + d * d - b * b) / (2 * a * d), -1, 1));
-      var k1 = { x: rx + a * Math.cos(base + ang), y: ry + a * Math.sin(base + ang) };
-      var k2 = { x: rx + a * Math.cos(base - ang), y: ry + a * Math.sin(base - ang) };
-      var kn = front ? (k1.x > k2.x ? k1 : k2) : (k1.x < k2.x ? k1 : k2);
-      var fxw = rx + d * Math.cos(base), fyw = ry + d * Math.sin(base);
-      var ldx = fxw - kn.x, ldy = fyw - kn.y, ll = Math.sqrt(ldx * ldx + ldy * ldy) || 1;
-      ldx /= ll; ldy /= ll;
-      var fet = { x: fxw - ldx * 2.0, y: fyw - ldy * 2.0 };                 // fetlock
-      if (front) cap(rx, ry, kn.x, kn.y, 2.2, 1.2);                          // forearm tapering to the knee
-      else cap(rx, ry, kn.x, kn.y, 3.1, 1.35);                               // gaskin
-      cap(kn.x, kn.y, kn.x, kn.y, front ? 1.3 : 1.55, front ? 1.3 : 1.55);   // knee / hock
-      cap(kn.x, kn.y, fet.x, fet.y, 0.95, 0.8);                              // cannon (slender)
-      cap(fet.x, fet.y, fet.x, fet.y, 1.0, 1.0);                             // fetlock
-      cap(fet.x, fet.y, fxw, fyw, 0.85, 1.15);                               // pastern -> hoof
+      var k1x = rx + a * c(base + ang), k1y = ry + a * s(base + ang), k2x = rx + a * c(base - ang), k2y = ry + a * s(base - ang);
+      var kx, ky;
+      if (front ? k1x > k2x : k1x < k2x) { kx = k1x; ky = k1y; } else { kx = k2x; ky = k2y; }
+      var fxw = rx + d * c(base), fyw = ry + d * s(base);
+      var ldx = fxw - kx, ldy = fyw - ky, ll = Math.sqrt(ldx * ldx + ldy * ldy) || 1; ldx /= ll; ldy /= ll;
+      var fex = fxw - ldx * 26, fey = fyw - ldy * 26;                          // fetlock
+      if (front) { cap(rx, ry, kx, ky, 34, 16); cap(kx, ky, kx, ky, 17, 17); cap(kx, ky, fex, fey, 11, 9); }
+      else { cap(rx, ry, kx, ky, 50, 19); cap(kx, ky, kx, ky, 19, 19); cap(kx, ky, fex, fey, 12, 10); }
+      cap(fex, fey, fex, fey, 10.5, 10.5);
+      cap(fex, fey, fxw, fyw, 8, 14);                                         // pastern -> hoof
     }
-    leg(13.2, 18.6, 8.0, 8.2, false, 0.15);
-    leg(28.4, 19.2, 7.2, 8.0, true, 0.55);
-    leg(14.4, 18.6, 8.0, 8.2, false, 0.00);
-    leg(29.6, 19.2, 7.2, 8.0, true, 0.42);
+    leg(226, 262, 128, 120, false, atOff(2, g));       // far hind
+    leg(572, 292, 96, 106, true, atOff(3, g));          // far fore
+    leg(262, 262, 128, 120, false, atOff(0, g));       // near hind
+    leg(596, 292, 96, 106, true, atOff(1, g));          // near fore
 
-    // ---- eye: follows the head ----
-    var eyx = px1 + 2.3 * ac + 0.95 * -pc, eyy = py1 + 2.3 * as + 0.95 * -ps;
-
-    // ---- the whole body rocks a couple of degrees about its middle (no travel) ----
-    var rot = 2.0 * DEG * s(w + 1.2), cr = c(rot), sr = s(rot), pxv = 21.5, pyv = 13.5;
-    function rot2(x, y) { var X = x - pxv, Y = y - pyv; return [pxv + X * cr - Y * sr, pyv + X * sr + Y * cr]; }
-    for (var i = 0; i < S.length; i += 6) {
-      var p0 = rot2(S[i], S[i + 1]), p1 = rot2(S[i + 2], S[i + 3]);
-      S[i] = p0[0]; S[i + 1] = p0[1]; S[i + 2] = p1[0]; S[i + 3] = p1[1];
-    }
-    S.eye = rot2(eyx, eyy);
-    return S;
+    return { S: S, rock: (at(G.rock1, g) * s(w + 1.2) + at(G.rock2, g) * s(2 * w + 0.6)) * DEG,
+             neck: (at(G.neck, g) + at(G.nod, g) * s(w - 0.6)) * DEG, mane: at(G.mane, g), w: w };
   }
 
-  // rasterise to cols x rows. Cell centres are at +0.5; model coordinates are scaled by SC.
-  function raster(ph, cols, rows, ox, oy, out, SC) {
-    var S0 = pose(ph), n = S0.length / 6, i;
-    var S = S0, eye = S0.eye;
-    var inv = 1 / SC;
+  // rasterise to cols x rows. A cell is CELL model-px wide; (oxp, oyp) is the model-space offset of the grid.
+  var PV = { x: 500, y: 150 }, NAX = { x: 0.884, y: -0.467 }, NNN = { x: 0.467, y: 0.884 }, NLEN = 203.5, RP = { x: 410, y: 230 };
+  function neckWeight(x, y) {                                       // 0 on the body, 1 on the head, eased along the neck
+    var dx = x - PV.x, dy = y - PV.y, t = (dx * NAX.x + dy * NAX.y) / NLEN, sdist = dx * NNN.x + dy * NNN.y;
+    var a = sstep(0.12, 0.6, t), low = sstep(60, 100, sdist) * (1 - sstep(0.7, 0.95, t));
+    return a * (1 - low);
+  }
+  function raster(ph, g, cols, rows, cell, oxp, oyp, out) {
+    var P = pose(ph, g, cell), S = P.S, n = S.length / 6, i;
+    var cr = Math.cos(P.rock), sr = Math.sin(P.rock);
+    // rock the capsules about the middle of the body
+    var R = new Float32Array(S.length);
+    for (i = 0; i < S.length; i += 6) {
+      var X0 = S[i] - RP.x, Y0 = S[i + 1] - RP.y, X1 = S[i + 2] - RP.x, Y1 = S[i + 3] - RP.y;
+      R[i] = RP.x + X0 * cr - Y0 * sr; R[i + 1] = RP.y + X0 * sr + Y0 * cr;
+      R[i + 2] = RP.x + X1 * cr - Y1 * sr; R[i + 3] = RP.y + X1 * sr + Y1 * cr; R[i + 4] = S[i + 4]; R[i + 5] = S[i + 5];
+    }
+    var neck = P.neck, mane = P.mane, w = P.w;
     for (var gy = 0; gy < rows; gy++) {
-      var py = (gy + 0.5) * inv - oy;
+      var qy = (gy + 0.5) * cell - oyp;
       for (var gx = 0; gx < cols; gx++) {
-        var px = (gx + 0.5) * inv - ox, on = 0;
+        var qx = (gx + 0.5) * cell - oxp, on = 0;
+        // capsules (legs, tail)
         for (i = 0; i < n; i++) {
-          var o = i * 6, ax = S[o], ay = S[o + 1], bx = S[o + 2], by = S[o + 3], ra = S[o + 4], rb = S[o + 5];
+          var o = i * 6, ax = R[o], ay = R[o + 1], bx = R[o + 2], by = R[o + 3], ra = R[o + 4], rb = R[o + 5], rm = ra > rb ? ra : rb;
+          var lo = ax < bx ? ax : bx, hi = ax < bx ? bx : ax;
+          if (qx < lo - rm || qx > hi + rm) continue;
+          lo = ay < by ? ay : by; hi = ay < by ? by : ay;
+          if (qy < lo - rm || qy > hi + rm) continue;
           var dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
-          var t = l2 ? clamp(((px - ax) * dx + (py - ay) * dy) / l2, 0, 1) : 0;
-          var qx = ax + t * dx - px, qy = ay + t * dy - py, r = ra + (rb - ra) * t;
-          if (qx * qx + qy * qy <= r * r) { on = 1; break; }
+          var t = l2 ? clamp(((qx - ax) * dx + (qy - ay) * dy) / l2, 0, 1) : 0;
+          var ex = ax + t * dx - qx, ey = ay + t * dy - qy, r = ra + (rb - ra) * t;
+          if (ex * ex + ey * ey <= r * r) { on = 1; break; }
+        }
+        if (!on) {
+          // silhouette: undo the rock, then undo the neck swing (iterating, since the weight depends on where the point started)
+          var ux = qx - RP.x, uy = qy - RP.y, px = RP.x + ux * cr + uy * sr, py = RP.y - ux * sr + uy * cr;
+          var sx = px, sy = py;
+          for (var it = 0; it < 3; it++) {
+            var wt = neckWeight(sx, sy), a = -neck * wt, ca = Math.cos(a), sa = Math.sin(a), rx = px - PV.x, ry = py - PV.y;
+            sx = PV.x + rx * ca - ry * sa; sy = PV.y + rx * sa + ry * ca;
+          }
+          // mane ripple: the loose strands above the crest drift a little
+          if (sy < 135 && sx < 610) { var f = sstep(0, 1, (160 - sy) / 120) * sstep(560, 440, sx); sy += mane * f * Math.sin(w * 1.0 - sx * 0.035); }
+          if (sample(sx, sy) > 0.33) on = 1;
         }
         out[gy * cols + gx] = on;
       }
     }
-    var ex = Math.floor((eye[0] + ox) * SC), ey = Math.floor((eye[1] + oy) * SC);
-    if (ex >= 0 && ex < cols && ey >= 0 && ey < rows) out[ey * cols + ex] = 0;
+    // the eye follows the head: a single dot left dark
+    var ex0 = 652 - PV.x, ey0 = 64 - PV.y, wt2 = neckWeight(652, 64), a2 = neck * wt2, c2 = Math.cos(a2), s2 = Math.sin(a2);
+    var exw = PV.x + ex0 * c2 - ey0 * s2, eyw = PV.y + ex0 * s2 + ey0 * c2;
+    var rx2 = exw - RP.x, ry2 = eyw - RP.y, exr = RP.x + rx2 * cr - ry2 * sr, eyr = RP.y + rx2 * sr + ry2 * cr;
+    var cx = Math.floor((exr + oxp) / cell), cy = Math.floor((eyr + oyp) / cell);
+    if (cx >= 0 && cx < cols && cy >= 0 && cy < rows) out[cy * cols + cx] = 0;
     return out;
   }
-      return { pose: pose, raster: raster };
+      root.Horse = { raster: raster, gaitT: gaitT };
+      return root.Horse;
     })();
 
 
@@ -1160,6 +1221,7 @@
     var W = 0, H = 0, pitch = 6, gx0 = 0, gy0 = 0, dpr = 1;
     var ph = 0.3, last = 0, raf = 0, ready = false, tStart = 0, tm = -1;
     var paused = false, visible = true, boostUntil = 0, lastCol = '';
+    var spd = 0.85, spdT = 0.85, lastGait = '', hovering = false;     // pace: 0 = walk ... 1 = gallop
     var pHas = false, pcx = 0, pcy = 0, px = 0, py = 0, pAct = 0;      // pointer (client px) and its smoothed cell position
     var rm = root.classList.contains('rm');
 
@@ -1183,16 +1245,18 @@
 
     // ---- one step: pose -> targets -> dot sizes and springs ----
     function step(dt) {
-      if (!paused) ph = (ph + dt / CYCLE) % 1;
-      Horse.raster(ph, COLS, ROWS, OX, OY, on, SC);
+      spd += (spdT - spd) * (1 - Math.exp(-dt / 0.3));
+      var gg = 3 * spd;
+      if (!paused) ph = (ph + dt / Horse.gaitT(gg)) % 1;
+      Horse.raster(ph, gg, COLS, ROWS, CELL, OXP, OYP, on);
 
       // load-in: a dot becomes a line, the line fills out into the horse (edges speckle in)
       var ax = 1e3, ay = 1e3, building = false;
       if (!rm && tm < 1.5) {
         building = true;
         var q = Math.max(0, tm);
-        ax = 0.5 + 38 * easeIO((q - 0.26) / 0.38);
-        ay = 0.7 + 31 * ease3((q - 0.5) / 0.62);
+        ax = 0.5 + 44 * easeIO((q - 0.26) / 0.38);
+        ay = 0.7 + 34 * ease3((q - 0.5) / 0.62);
       }
       // the pointer, smoothed, as a position in grid cells
       var rc = cv.getBoundingClientRect();
@@ -1203,7 +1267,7 @@
       px += (tx - px) * kp; py += (ty - py) * kp;
       pAct += ((near ? 1 : 0) - pAct) * (1 - Math.exp(-dt / 0.07));
 
-      var up = 1 - Math.exp(-dt / 0.045), dn = 1 - Math.exp(-dt / 0.06), moving = false;
+      var up = 1 - Math.exp(-dt / 0.045), dn = 1 - Math.exp(-dt / 0.06), moving = Math.abs(spdT - spd) > 0.002;
       var sub = 2, h = dt / sub;
       for (var gy = 0; gy < ROWS; gy++) {
         for (var gx = 0; gx < COLS; gx++) {
@@ -1272,24 +1336,53 @@
       tm = ready ? (ts - tStart) / 1000 : -1;
       var moving = step(dt);
       draw();
+      var gn = gaitName(3 * spd); if (gn !== lastGait) { lastGait = gn; caption(); }
       var keep = !rm && visible && (!paused || moving || tm < 1.7 || pAct > 0.01 || ts < boostUntil);
       if (keep || (!ready && visible)) raf = requestAnimationFrame(frame); else last = 0;
     }
     function kick() { if (!raf) { last = 0; raf = requestAnimationFrame(frame); } }
 
     // ---- reduced motion: one still, fully formed pose ----
-    function still() { rm = true; ph = 0.3; tm = 99; Horse.raster(ph, COLS, ROWS, OX, OY, on, SC); for (var k = 0; k < N; k++) { sz[k] = on[k]; dx[k] = dy[k] = vx[k] = vy[k] = 0; } draw(); }
+    function still() { rm = true; ph = 0.3; tm = 99; Horse.raster(ph, 3, COLS, ROWS, CELL, OXP, OYP, on); for (var k = 0; k < N; k++) { sz[k] = on[k]; dx[k] = dy[k] = vx[k] = vy[k] = 0; } draw(); }
     var mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     function onMq() { rm = mq.matches; if (rm) { if (raf) cancelAnimationFrame(raf); raf = 0; still(); } else { tm = -1; ready = false; for (var k = 0; k < N; k++) sz[k] = 0; kick(); } }
     if (mq.addEventListener) mq.addEventListener('change', onMq);
 
+    // ---- pace ----
+    function gaitName(g) { return g < 0.5 ? 'Walk' : g < 1.5 ? 'Trot' : g < 2.5 ? 'Canter' : 'Gallop'; }
+    function caption() { if (hint) hint.textContent = 'Scroll to change pace \u00B7 ' + gaitName(3 * spdT); }
+    function overHorse(cx, cy) {
+      var rc = cv.getBoundingClientRect(), gx = Math.floor((cx - rc.left - gx0) / pitch), gy = Math.floor((cy - rc.top - gy0) / pitch);
+      for (var j = -3; j <= 3; j++) for (var i = -3; i <= 3; i++) {
+        var x = gx + i, y = gy + j;
+        if (x >= 0 && x < COLS && y >= 0 && y < ROWS && sz[y * COLS + x] > 0.5) return true;
+      }
+      return false;
+    }
+    function setHover(h) { if (h !== hovering) { hovering = h; cv.parentNode.classList.toggle('hov', h); } }
+    // Scrolling over the horse sets its pace instead of scrolling the page. A scroll gesture belongs to
+    // whoever it started over (a page scroll already under way is never taken over, and a pace change
+    // never turns into a page scroll if the cursor drifts off the horse mid-gesture).
+    var wheelMode = '', wheelLast = 0;
+    window.addEventListener('wheel', function (e) {
+      if (rm || e.ctrlKey || tm < 1.2) return;
+      var now = e.timeStamp;
+      if (now - wheelLast > 220) wheelMode = overHorse(e.clientX, e.clientY) ? 'horse' : 'page';
+      wheelLast = now;
+      if (wheelMode !== 'horse') return;
+      e.preventDefault();
+      var dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1);
+      spdT = clamp(spdT - dy * 0.0016, 0, 1);       // up = faster, down = slower; never stops, never beyond a gallop
+      setHover(true); caption(); kick();
+    }, { passive: false });
+
     // ---- input ----
     window.addEventListener('pointermove', function (e) {
       if (rm || e.pointerType === 'touch') return;
-      pcx = e.clientX; pcy = e.clientY; pHas = true; kick();
+      pcx = e.clientX; pcy = e.clientY; pHas = true; setHover(overHorse(pcx, pcy)); kick();
     }, { passive: true });
-    document.addEventListener('mouseleave', function () { pHas = false; });
-    window.addEventListener('blur', function () { pHas = false; });
+    document.addEventListener('mouseleave', function () { pHas = false; setHover(false); });
+    window.addEventListener('blur', function () { pHas = false; setHover(false); });
     // a click or tap sends a ring through the dots (the only touch interaction: scrolling is never touched)
     window.addEventListener('click', function (e) {
       if (rm) return;
@@ -1308,6 +1401,7 @@
     // the dots follow the theme colour while it cross-fades
     new MutationObserver(function () { boostUntil = performance.now() + 1100; kick(); }).observe(root, { attributes: true, attributeFilter: ['class'] });
 
+    caption();
     size();
     if (rm) still();
   })();
