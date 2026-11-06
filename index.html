@@ -277,8 +277,6 @@
 
   /* the horse fills the open space between the name and the tagline (its dots can drift anywhere inside it) */
   .hero-mark { flex: 1 1 auto; position: relative; min-height: clamp(120px, 19svh, 320px); }
-  .horse-hint { position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); white-space: nowrap; pointer-events: none; opacity: 0; font-size: var(--text-xs); font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); transition: opacity .6s var(--ease-soft); }
-  @media (hover: hover) and (pointer: fine) { .hero-mark.hov .horse-hint { opacity: 1; } }
   .horse { position: absolute; inset: 0; width: 100%; height: 100%; display: block; color: var(--ink); pointer-events: none; transition: color .9s var(--ease-in-out); }
   .hero-body {
     padding-top: 0;
@@ -594,7 +592,7 @@
     </div>
 
     <!-- the mark: a dot-matrix horse that gallops in place, builds itself on load and parts around the cursor -->
-    <div class="hero-mark" aria-hidden="true"><canvas class="horse" id="horse"></canvas><span class="horse-hint"></span></div>
+    <div class="hero-mark" aria-hidden="true"><canvas class="horse" id="horse"></canvas></div>
 
     <div class="hero-body">
       <p class="tagline">Building projects at the intersection of engineering and creativity.</p>
@@ -1019,7 +1017,7 @@
   // reference does (one dot, a line, then the horse), and its dots part around the cursor on
   // springs and settle back. Torso, neck, head and mane are a traced silhouette; legs and tail
   // are a skeleton that walks, trots, canters or gallops. Scrolling over the horse sets its pace
-  // (up = faster, down = slower), always between a walk and a gallop. Each grid cell is a dot
+  // (down = faster, up = slower), always between a walk and a gallop. Each grid cell is a dot
   // whose size eases toward "on" or "off", so legs sweep through the grid without flicker.
   (function () {
     var cv = document.getElementById('horse');
@@ -1027,7 +1025,6 @@
     var ctx = cv.getContext('2d');
     var COLS = 80, ROWS = 58, CELL = 9.2, OXP = 20, OYP = 10, N = COLS * ROWS;   // a cell is 9.2 px of the silhouette's own space
     var CX = 46.7, CY = 26.1;                  // where the build starts (the middle of the body)
-    var hint = cv.parentNode.querySelector('.horse-hint');
     var REACH = 10, KS = 190, KD = 2 * 0.9 * Math.sqrt(190);      // cursor reach (cells), spring stiffness + damping (quick, no wobble)
 
     var Horse = (function () {
@@ -1221,7 +1218,7 @@
     var W = 0, H = 0, pitch = 6, gx0 = 0, gy0 = 0, dpr = 1;
     var ph = 0.3, last = 0, raf = 0, ready = false, tStart = 0, tm = -1;
     var paused = false, visible = true, boostUntil = 0, lastCol = '';
-    var spd = 0.85, spdT = 0.85, lastGait = '', hovering = false;     // pace: 0 = walk ... 1 = gallop
+    var spd = 0.85, spdT = 0.85;     // pace: 0 = walk ... 1 = gallop
     var pHas = false, pcx = 0, pcy = 0, px = 0, py = 0, pAct = 0;      // pointer (client px) and its smoothed cell position
     var rm = root.classList.contains('rm');
 
@@ -1336,7 +1333,6 @@
       tm = ready ? (ts - tStart) / 1000 : -1;
       var moving = step(dt);
       draw();
-      var gn = gaitName(3 * spd); if (gn !== lastGait) { lastGait = gn; caption(); }
       var keep = !rm && visible && (!paused || moving || tm < 1.7 || pAct > 0.01 || ts < boostUntil);
       if (keep || (!ready && visible)) raf = requestAnimationFrame(frame); else last = 0;
     }
@@ -1349,8 +1345,6 @@
     if (mq.addEventListener) mq.addEventListener('change', onMq);
 
     // ---- pace ----
-    function gaitName(g) { return g < 0.5 ? 'Walk' : g < 1.5 ? 'Trot' : g < 2.5 ? 'Canter' : 'Gallop'; }
-    function caption() { if (hint) hint.textContent = 'Scroll to change pace \u00B7 ' + gaitName(3 * spdT); }
     function overHorse(cx, cy) {
       var rc = cv.getBoundingClientRect(), gx = Math.floor((cx - rc.left - gx0) / pitch), gy = Math.floor((cy - rc.top - gy0) / pitch);
       for (var j = -3; j <= 3; j++) for (var i = -3; i <= 3; i++) {
@@ -1359,7 +1353,6 @@
       }
       return false;
     }
-    function setHover(h) { if (h !== hovering) { hovering = h; cv.parentNode.classList.toggle('hov', h); } }
     // Scrolling over the horse sets its pace instead of scrolling the page. A scroll gesture belongs to
     // whoever it started over (a page scroll already under way is never taken over, and a pace change
     // never turns into a page scroll if the cursor drifts off the horse mid-gesture).
@@ -1372,17 +1365,17 @@
       if (wheelMode !== 'horse') return;
       e.preventDefault();
       var dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1);
-      spdT = clamp(spdT - dy * 0.0016, 0, 1);       // up = faster, down = slower; never stops, never beyond a gallop
-      setHover(true); caption(); kick();
+      spdT = clamp(spdT + dy * 0.0016, 0, 1);       // down = faster, up = slower; never stops, never beyond a gallop
+      kick();
     }, { passive: false });
 
     // ---- input ----
     window.addEventListener('pointermove', function (e) {
       if (rm || e.pointerType === 'touch') return;
-      pcx = e.clientX; pcy = e.clientY; pHas = true; setHover(overHorse(pcx, pcy)); kick();
+      pcx = e.clientX; pcy = e.clientY; pHas = true; kick();
     }, { passive: true });
-    document.addEventListener('mouseleave', function () { pHas = false; setHover(false); });
-    window.addEventListener('blur', function () { pHas = false; setHover(false); });
+    document.addEventListener('mouseleave', function () { pHas = false; });
+    window.addEventListener('blur', function () { pHas = false; });
     // a click or tap sends a ring through the dots (the only touch interaction: scrolling is never touched)
     window.addEventListener('click', function (e) {
       if (rm) return;
@@ -1401,7 +1394,6 @@
     // the dots follow the theme colour while it cross-fades
     new MutationObserver(function () { boostUntil = performance.now() + 1100; kick(); }).observe(root, { attributes: true, attributeFilter: ['class'] });
 
-    caption();
     size();
     if (rm) still();
   })();
