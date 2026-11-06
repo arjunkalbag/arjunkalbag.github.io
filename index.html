@@ -1023,8 +1023,8 @@
     var cv = document.getElementById('horse');
     if (!cv || !cv.getContext) return;
     var ctx = cv.getContext('2d');
-    var COLS = 87, ROWS = 59, CELL = 9.2, OXP = 48, OYP = 18, N = COLS * ROWS;   // a cell is 9.2 px of the silhouette's own space
-    var CX = 49.8, CY = 27;                  // where the build starts (the middle of the body)
+    var COLS = 87, ROWS = 61, CELL = 9.2, OXP = 48, OYP = 34, N = COLS * ROWS;   // a cell is 9.2 px of the silhouette's own space
+    var CX = 49.8, CY = 28.7;                  // where the build starts (the middle of the body)
     var REACH = 10, KS = 190, KD = 2 * 0.9 * Math.sqrt(190);      // cursor reach (cells), spring stiffness + damping (quick, no wobble)
 
     var Horse = (function () {
@@ -1153,7 +1153,7 @@
   var PV = { x: 500, y: 150 }, NAX = { x: 0.884, y: -0.467 }, NNN = { x: 0.467, y: 0.884 }, NLEN = 203.5, RP = { x: 410, y: 230 };
   function neckWeight(x, y) {                                       // 0 on the body, 1 on the head, eased along the neck
     var dx = x - PV.x, dy = y - PV.y, t = (dx * NAX.x + dy * NAX.y) / NLEN, sdist = dx * NNN.x + dy * NNN.y;
-    var a = sstep(0.12, 0.6, t), low = sstep(60, 100, sdist) * (1 - sstep(0.7, 0.95, t));
+    var a = sstep(0.12, 0.6, t), low = sstep(60, 100, sdist) * (1 - sstep(0.52, 0.66, t));   // the whole head (t > .66) turns as one rigid piece
     return a * (1 - low);
   }
   function raster(ph, g, cols, rows, cell, oxp, oyp, out) {
@@ -1188,7 +1188,7 @@
           var ux = qx - RP.x, uy = qy - RP.y, px = RP.x + ux * cr + uy * sr, py = RP.y - ux * sr + uy * cr;
           var sx = px, sy = py;
           for (var it = 0; it < 3; it++) {
-            var wt = neckWeight(sx, sy), a = -neck * wt, ca = Math.cos(a), sa = Math.sin(a), rx = px - PV.x, ry = py - PV.y;
+            var wt = neckWeight(sx, sy), a = neck * wt, ca = Math.cos(a), sa = Math.sin(a), rx = px - PV.x, ry = py - PV.y;
             sx = PV.x + rx * ca - ry * sa; sy = PV.y + rx * sa + ry * ca;
           }
           // mane ripple: the loose strands above the crest drift a little
@@ -1199,7 +1199,7 @@
       }
     }
     // the eye follows the head: a single dot left dark
-    var ex0 = 652 - PV.x, ey0 = 64 - PV.y, wt2 = neckWeight(652, 64), a2 = neck * wt2, c2 = Math.cos(a2), s2 = Math.sin(a2);
+    var ex0 = 652 - PV.x, ey0 = 64 - PV.y, wt2 = neckWeight(652, 64), a2 = -neck * wt2, c2 = Math.cos(a2), s2 = Math.sin(a2);
     var exw = PV.x + ex0 * c2 - ey0 * s2, eyw = PV.y + ex0 * s2 + ey0 * c2;
     var rx2 = exw - RP.x, ry2 = eyw - RP.y, exr = RP.x + rx2 * cr - ry2 * sr, eyr = RP.y + rx2 * sr + ry2 * cr;
     var cx = Math.floor((exr + oxp) / cell), cy = Math.floor((eyr + oyp) / cell);
