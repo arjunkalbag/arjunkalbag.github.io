@@ -34,15 +34,13 @@
 <meta name="twitter:description" content="Engineering, projects, and music." />
 <meta name="twitter:image" content="https://arjunkalbag.xyz/og-card.jpg" />
 
-<link rel="preload" href="assets/InkteraDemo.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="assets/AlteHaasGroteskBold.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..700;1,400..600&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet" />
 
 <style>
-  /* Inktera: the name + AK monogram only. Alte Haas Grotesk Bold: every other display title. */
-  @font-face { font-family: 'Inktera'; src: url('assets/InkteraDemo.woff2') format('woff2'), url('assets/InkteraDemo.otf') format('opentype'); font-display: block; }
+  /* Alte Haas Grotesk Bold: the name, the AK monogram and every display title. */
   @font-face { font-family: 'Alte Haas Grotesk'; src: url('assets/AlteHaasGroteskBold.woff2') format('woff2'), url('assets/AlteHaasGroteskBold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
 
   /* ---------- tokens ---------- */
@@ -98,8 +96,8 @@
     --bar-l: max(var(--bar-x), env(safe-area-inset-left, 0px), calc((100vw - 2000px) / 2));
     --bar-r: max(var(--bar-x), env(safe-area-inset-right, 0px), calc((100vw - 2000px) / 2));
     --bar-pad: max(14px, calc(var(--gl) - var(--bar-l)));
-    --ak: 52px;                          /* the docked monogram: big enough to fill the pill */
-    --mh: clamp(36px, 4.8vw, 96px);      /* the name, top left */
+    --ak: 46px;                          /* the docked monogram: big enough to fill the pill */
+    --mh: clamp(32.5px, 4.33vw, 86.6px); /* the name, top left */
   }
   html.dark {
     --paper:   oklch(17.5% 0.009 70);
@@ -183,7 +181,7 @@
   .bar-r { right: 0; padding-right: max(0px, calc(var(--bar-pad) - 12px)); gap: 2px; z-index: 3; pointer-events: auto; }
   .home {
     pointer-events: none; height: 44px; padding: 0 10px; display: flex; align-items: center; border-radius: 10px;
-    font-family: 'Inktera', sans-serif; font-size: var(--ak); line-height: 1; letter-spacing: -0.01em; color: var(--ink);
+    font-family: var(--font-display); font-weight: 700; font-size: var(--ak); line-height: 1; letter-spacing: -0.01em; color: var(--ink);
   }
   /* JS nudges it (top) so the caps sit exactly centred in the pill */
   .home-ak { position: relative; top: -0.08em; opacity: 0; }
@@ -194,7 +192,7 @@
      transform). At rest the real text shows instead: the name in the page, the AK in the bar. */
   .mark {
     position: fixed; left: 0; top: 0; z-index: 1; pointer-events: none; transform-origin: 0 0;
-    font-family: 'Inktera', sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: -0.01em; line-height: 1.1;
+    font-family: var(--font-display); font-weight: 700; text-transform: uppercase; letter-spacing: -0.01em; line-height: 1.1;
     color: var(--ink); visibility: hidden; transition: color .9s var(--ease-in-out);
   }
   .mark.on { visibility: visible; }
@@ -262,12 +260,12 @@
   .hero {
     min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column;
     /* the name's cap line sits level with the AK's in the bar, so docking is one clean shrink into the corner */
-    padding-top: max(0px, calc(var(--bar-top) + var(--bar-h) / 2 - var(--ak) * 0.322 - var(--mh) * 0.256));
+    padding-top: max(0px, calc(var(--bar-top) + var(--bar-h) / 2 - var(--ak) * 0.357 - var(--mh) * 0.215));   /* half the cap height / cap-line offset of Alte Haas */
     padding-bottom: clamp(16px, 2.6vh, 28px);
   }
   .mh-wrap { container-type: inline-size; }
   .masthead {
-    font-family: 'Inktera', sans-serif; font-weight: 400; text-transform: uppercase;
+    font-family: var(--font-display); font-weight: 700; text-transform: uppercase;
     font-size: var(--mh); line-height: 1.1; letter-spacing: -0.01em; white-space: nowrap;
   }
   .mh-t { display: block; }
@@ -502,7 +500,7 @@
     .wmeta { grid-column: 7 / span 5; }
   }
   @media (max-width: 819px) {
-    :root { --bar-h: 54px; --ak: 42px; }
+    :root { --bar-h: 54px; --ak: 37px; }
     .tagline { grid-column: 1 / -1; grid-row: 1; max-width: 20ch; }
     .now { grid-column: 1 / -1; grid-row: 2; justify-self: start; justify-items: start; text-align: left; gap: 6px; }
     .facts { grid-row: 3; grid-template-columns: 1fr; gap: var(--space-sm); }
@@ -525,7 +523,7 @@
   /* phones: the name sits in the bar's row, level with the AK and the menu (as on larger screens),
      the hero is allowed to run past one screen so nothing is squeezed, and everything gets more air */
   @media (max-width: 639px) {
-    :root { --gutter: 22px; --mh: calc((100vw - var(--gl) - var(--gr)) / 10.4); }
+    :root { --gutter: 22px; --mh: calc((100vw - var(--gl) - var(--gr)) / 11.52); }
     .hero { min-height: 0; padding-bottom: 0; }
     .hero-mark { flex: none; height: clamp(230px, 32svh, 300px); margin-block: 18px 30px; }
     .hero-body { row-gap: 32px; }
@@ -903,7 +901,7 @@
     var tag = document.querySelector('.tagline'), solidAt = 0, solid = false;
     var DUR = 950;                  // a full flight, ms: half way by ~.33s, 94% by ~.67s, done at .95s
     var DOCK_AT = 6, HOME_AT = 2;   // px of scroll that send the name into the bar / bring it back
-    var x0 = 0, y0 = 0, tx = 0, ty = 0, s = 1, rmLine = 0, capc = 0.58, FN = 1, FA = 1;
+    var x0 = 0, y0 = 0, tx = 0, ty = 0, s = 1, rmLine = 0, capc = 0.572, FN = 1, FA = 1;
     // the pill surface only appears once the tagline ("Building projects…") reaches the top
     function pill(y) {
       var on = solid ? y > solidAt - 8 : y > solidAt;  // a few px of give so it never flickers
@@ -915,11 +913,11 @@
     // where the middle of the capitals sits, in em below the top of the text box
     function capCentre() {
       try {
-        var c = document.createElement('canvas').getContext('2d'); c.font = '100px Inktera';
+        var c = document.createElement('canvas').getContext('2d'); c.font = '700 100px "Alte Haas Grotesk"';
         var m = c.measureText('H');
         if (m.fontBoundingBoxAscent && m.actualBoundingBoxAscent) return (m.fontBoundingBoxAscent - m.actualBoundingBoxAscent / 2) / 100;
       } catch (e) {}
-      return 0.58;
+      return 0.572;
     }
     function sstep(a, b, t) { t = clamp((t - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
     // cubic-bezier(.45, 0, .2, 1): a gentle departure and a long, soft deceleration that ends on time
